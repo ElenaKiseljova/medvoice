@@ -35,6 +35,10 @@ if (!function_exists('medvoice_after_setup_theme_function')) :
   function medvoice_after_setup_theme_function () {
     load_theme_textdomain('medvoice', get_template_directory() . '/languages');
 
+    // WooCommerce support.
+    add_theme_support('woocommerce');
+
+
     /* ==============================================
     ********  //Миниатюрки
     =============================================== */
@@ -167,25 +171,25 @@ if (!function_exists('medvoice_init_function')) :
 
     function medvoice_create_acf_pages() {
       if(function_exists('acf_add_options_page')) {
-        acf_add_options_page(array(
-          'page_title' 	=> 'Подписка',
-          'menu_title'	=> 'Подписка',
-          'menu_slug' 	=> 'subscription',
-          'capability'	=> 'edit_posts',
-          'icon_url' => 'dashicons-tickets',
-          'position' => 22,
-          'redirect'		=> false,
-        ));
+        // acf_add_options_page(array(
+        //   'page_title' 	=> 'Подписка',
+        //   'menu_title'	=> 'Подписка',
+        //   'menu_slug' 	=> 'subscription',
+        //   'capability'	=> 'edit_posts',
+        //   'icon_url' => 'dashicons-tickets',
+        //   'position' => 22,
+        //   'redirect'		=> false,
+        // ));
 
-        acf_add_options_page(array(
-          'page_title' 	=> 'WayForPay',
-          'menu_title'	=> 'WayForPay',
-          'menu_slug' 	=> 'wayforpay',
-          'capability'	=> 'edit_posts',
-          'icon_url' => 'dashicons-money-alt',
-          'position' => 23,
-          'redirect'		=> false,
-        ));
+        // acf_add_options_page(array(
+        //   'page_title' 	=> 'WayForPay',
+        //   'menu_title'	=> 'WayForPay',
+        //   'menu_slug' 	=> 'wayforpay',
+        //   'capability'	=> 'edit_posts',
+        //   'icon_url' => 'dashicons-money-alt',
+        //   'position' => 23,
+        //   'redirect'		=> false,
+        // ));
       }    
     }
 
@@ -279,74 +283,228 @@ function medvoice_get_converted_price( $price = 0, $method = 'sale' ) {
   return $price;
 }
 
-/* ==============================================
-  ********  //Подписка на тариф
+if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
+  /* ==============================================
+  ********  //Хэш-сумма
   =============================================== */
 
-  add_action('wp_ajax_medvoice_subscription', 'medvoice_subscription');
-  add_action('wp_ajax_nopriv_medvoice_subscription', 'medvoice_subscription');
+  /**
+   * $data : $_POST, $_REQUEST, др. ассоциативный массив
+   * $attr : ключи массива, которые используются для создания хэш строки
+   */
+  // function medvoice_generate_hash ( $data = [], $attr = [] ) {
+  //   // Дефолтный массив ключей (при создании платежа) для хэша
+  //   if (empty($attr)) {
+  //     $attr = [
+  //       'merchantAccount', 
+  //       'merchantDomainName', 
+  //       'orderReference',
+  //       'orderDate',
+  //       'amount',
+  //       'currency',
+  //       'productName',
+  //       'productCount',
+  //       'productPrice',
+  //     ];
+  //   }
 
-  function medvoice_subscription () {
+  //   // Массив из элементов, которые используются для создания хэша
+  //   $data_filtered = [];
+
+  //   // Проверка $data
+  //   foreach ($data as $key => $value) {
+
+  //     // Если ключ массива есть в массиве атрибутов для хэша
+  //     if ( in_array( $key, $attr ) ) {
+
+  //       if (is_array($value)) {
+  //         $value = implode(';', $value);
+  //       }
+
+  //       // Добавляем в отфильтрованный ассоциативный массив
+  //       array_push($data_filtered, $value);
+
+  //     }
+  //   }
+
+  //   // Получаем строку
+  //   $hash_string = implode(';', $data_filtered);
+
+  //   // Убираем пробелы
+  //   $hash_string = trim($hash_string);
+    
+  //   // Получаем ключ безопасности WayForPay
+  //   $new_wc_wayforpay = new WC_wayforpay();
+
+  //   $key = $new_wc_wayforpay->settings['secret_key'] ?? '';  
+
+  //   // Получаем хэш
+  //   $hash = hash_hmac( 'md5', $hash_string, $key );
+
+  //   return $hash;
+  // }
+
+  /* ==============================================
+  ********  //Подписка на тариф (создание заказа WooCommerce)
+  =============================================== */
+
+  add_action( 'wp_ajax_medvoice_ajax_create_order', 'medvoice_ajax_create_order' );
+  add_action( 'wp_ajax_nopriv_medvoice_ajax_create_order', 'medvoice_ajax_create_order' );
+
+  function medvoice_ajax_create_order() {
     try {
-      $new_post = [];
-      foreach ($_POST as $key => $value) {
-        if (
-          $key === 'merchantAccount' || 
-          $key === 'merchantDomainName' || 
-          $key === 'orderReference' ||
-          $key === 'orderDate' ||
-          $key === 'amount' ||
-          $key === 'currency' ||
-          $key === 'productName' ||
-          $key === 'productCount' ||
-          $key === 'productPrice'
-        ) {
+      // Проверка nonce
+      check_ajax_referer('medvoice_ajax_subscribe', 'security');
 
-          if (is_array($value)) {
-            $value = implode(';', $value);
+      // Получить ID Товара из $_REQUEST
+      $product_id = isset($_REQUEST['product_id']) ? (int) trim( $_REQUEST['product_id'] ) : null;
+
+      if ($product_id) {
+        // Проверка наличия мейла
+        // $email = isset($_REQUEST['email']) ? esc_attr( trim( $_REQUEST['email'] ) ) : '';
+
+        // if ( !filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+        //   $response = [
+        //     'message' => __('Неверный электронный почтовый ящик', 'medvoice'),
+        //   ];
+
+        //   wp_send_json_error( $response );
+
+        //   wp_die(  );
+        // }
+
+        // Получить корзину
+        $cart = WC()->cart ?? null;
+
+        if ($cart && $cart instanceof WC_Cart) {
+          // Очистить корзину на старте оформления
+          $cart->empty_cart();
+
+          // Добавить выбранный Товар
+          $cart->add_to_cart( $product_id );
+
+          // Получение данных о Пользователе 
+          $user_id = get_current_user_id();    
+          // $nickname = isset($_REQUEST['nickname']) ? esc_attr( trim( $_REQUEST['nickname'] ) ) : '';
+          // $first_name = isset($_REQUEST['first_name']) ? esc_attr( trim( $_REQUEST['first_name'] ) ) : '';
+          // $last_name = isset($_REQUEST['last_name']) ? esc_attr( trim( $_REQUEST['last_name'] ) ) : '';
+
+          // $country = isset($_REQUEST['country']) ? esc_attr( trim( $_REQUEST['country'] ) ) : '';
+          // $city = isset($_REQUEST['city']) ? esc_attr( trim( $_REQUEST['city'] ) ) : '';
+
+          // Данные для WooCommerce
+          $address = [];
+
+          // $address['email'] = $email;
+
+          // if (!empty($first_name)) {
+          //   $address['first_name'] = $first_name;
+          // } else if (!empty($nickname) && empty($first_name)) {
+          //   $address['first_name'] = $nickname;
+          // }
+
+          // if (!empty($last_name)) {
+          //   $address['last_name'] = $last_name;
+          // }          
+
+          // if (!empty($country)) {
+          //   $address['country'] = $country;
+          // }
+
+          // if (!empty($city)) {
+          //   $address['city'] = $city;
+          // }
+      
+          // Создание заказа
+          $attr = [
+            'customer_id'   => $user_id,
+            'created_via'   => 'medvoice_ajax',
+          ];
+
+          $order = wc_create_order( $attr );
+      
+          // Информация о покупателе
+          $order->set_address( $address, 'billing' );
+          $order->set_address( $address, 'shipping' );
+
+          // Товары из корзины
+          foreach( $cart->get_cart() as $cart_item_key => $cart_item ) {
+
+            $_product     = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
+            $product_id   = apply_filters( 'woocommerce_cart_item_product_id', $cart_item['product_id'], $cart_item, $cart_item_key );
+
+            $order->add_product( $_product, $cart_item['quantity'], [
+              'variation' => $cart_item['variation'],
+              'totals'    => [
+                'subtotal'     => $cart_item['line_subtotal'],
+                'subtotal_tax' => $cart_item['line_subtotal_tax'],
+                'total'        => $cart_item['line_total'],
+                'tax'          => $cart_item['line_tax'],
+                'tax_data'     => $cart_item['line_tax_data']
+              ]
+            ]);
           }
 
-          array_push($new_post, $value);
+          // Добавить купоны
+          foreach ( $cart->get_coupons() as $code => $coupon ) {
+            $order->add_coupon( $code, $cart->get_coupon_discount_amount( $code ), $cart->get_coupon_discount_tax_amount( $code ) );
+          }
 
-        }
-      }
-      $hash_string = implode(';', $new_post);
-      $hash_string = trim($hash_string);
-      
-      $key = "flk3409refn54t54t*FNJRET";
+          $order->calculate_totals();
 
-      $hash = hash_hmac("md5",$hash_string,$key);
+          // Отправить письмо юзеру
+          $mailer = WC()->mailer();
+          $email = $mailer->emails['WC_Email_Customer_Processing_Order'];
+          $email->trigger( $order->id );
 
-      $response = $hash;//[$hash_string, $hash, $new_post];
-      // DH1645645833
+          // Отправить письмо админу
+          $email = $mailer->emails['WC_Email_New_Order'];
+          $email->trigger( $order->id );
 
-      // $post_data = array(
-      //   'post_title'    => 'Order',
-      //   'post_type'     => 'post',
-      //   'post_status'   => 'publish'
-      // );
+          // Очистить корзину
+          $cart->empty_cart();
 
-      // $post_id = wp_insert_post( $post_data );
+          // Получаем форму WayForPay
+          $new_wc_wayforpay = new WC_wayforpay();
 
-      // $post_update = array(
-      //   'ID'         => $post_id,
-      //   'post_title' => 'Order #' . $post_id
-      // );
-    
-      // wp_update_post( $post_update );
+          $wayforpay_form = $new_wc_wayforpay->medvoice_generate_wayforpay_form( $order->id );  
 
-      wp_send_json_success($response);
+          $response = [
+            'message' => __('Успешно сформирован счет в WayForPay', 'medvoice'),
+            'form' => $wayforpay_form,
+          ];
 
-      wp_die();
+          wp_send_json_success( $response );
+
+          wp_die(  );
+        } else {
+          $response = [
+            'message' => __('Корзина не существует', 'medvoice'),
+          ];
+
+          wp_send_json_error( $response );
+
+          wp_die(  );
+        }      
+      } else {
+        $response = [
+          'message' => __('Товар не существует', 'medvoice'),
+        ];
+
+        wp_send_json_error( $response );
+
+        wp_die(  );
+      } 
     } catch (\Throwable $th) {
       $response = [
-        'message' => __('Что-то пошло не так... Повторите попытку позже или свяжитесь с нами другим способом.', 'medvoice'),
-        'details' => $th
+        'error' => $th,
+        'message' => __('Что-то пошло не так...', 'medvoice'),
       ];
 
-      wp_send_json_error($response);
+      wp_send_json_error( $response );
 
-      wp_die();  
+      wp_die(  );
     }
   }
+}  
 ?>
