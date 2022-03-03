@@ -37,8 +37,8 @@
               <?= $tariff->name; ?>
             </h3>
             <p>
-              <?= $tariff->price; ?>
-            </p> грн
+              <?= medvoice_get_price_text( medvoice_get_currency_code(), medvoice_get_converted_price( $tariff->price ) ); ?>
+            </p>
           </li>
         <?php endforeach; ?>
       </ul>

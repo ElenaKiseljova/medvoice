@@ -35,10 +35,6 @@ if (!function_exists('medvoice_after_setup_theme_function')) :
   function medvoice_after_setup_theme_function () {
     load_theme_textdomain('medvoice', get_template_directory() . '/languages');
 
-    // WooCommerce support.
-    add_theme_support('woocommerce');
-
-
     /* ==============================================
     ********  //Миниатюрки
     =============================================== */
@@ -198,6 +194,39 @@ if (!function_exists('medvoice_init_function')) :
 endif;
 
 /* ==============================================
+  ********  //Редиректы
+  =============================================== */
+add_action( 'parse_query', 'medvoice_disabled_some_links' );
+
+function medvoice_disabled_some_links ( $query ) {  
+  
+  $cur_query = $query->query_vars;
+
+  if( ($query->is_singular && $cur_query['post_type'] === 'product') ) {
+    wp_redirect( home_url() );
+
+    exit;
+  }
+}
+
+/* ==============================================
+  ********  //Фильтры ссылок
+  =============================================== */
+// add_filter( 'register_url', 'medvoice_register_urf_filter' );
+// function medvoice_register_urf_filter( $register ){
+// 	return '/?action=register';
+// }
+
+// add_filter( 'login_url', 'medvoice_login_url_filter', 10, 3 );
+// function medvoice_login_url_filter( $login_url, $redirect, $force_reauth ){
+// 	return '/?action=login';
+// }
+// add_filter( 'wp_mail_content_type', 'medvoice_wp_mail_content_type_filter' );
+// function medvoice_wp_mail_content_type_filter( $content_type ){
+// 	return 'text/html';
+// }
+
+/* ==============================================
   ********  //Currency by Countries
 =============================================== */
 function medvoice_get_ip() {
@@ -242,7 +271,7 @@ function medvoice_get_country_code() {
   return $country_code;
 }
 
-function medvoice_get_currency_code() {
+function medvoice_get_currency_code(  ) {
   $currency_code = 'USD';
 
   $country_code = medvoice_get_country_code();
@@ -260,6 +289,36 @@ function medvoice_get_currency_code() {
 
   return $currency_code;
 } 
+
+function medvoice_get_price_text( $currency_code = 'USD', $price = 0 ) {
+  switch ($currency_code) {
+    case 'USD':
+      return '$ ' . $price;
+
+      break;
+
+    case 'EUR':
+      return '€ ' . $price;
+      
+      break;
+    
+    case 'RUR':
+      return $price . ' руб';
+      
+      break;
+
+    case 'UAH':
+      return $price . ' грн';
+      
+      break;
+    
+    default:
+      return '$ ' . $price;
+
+      break;
+  }
+}
+
 /**
  * $method (string) : 'sale', 'buy'
  */
