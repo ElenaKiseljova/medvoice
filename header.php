@@ -87,8 +87,8 @@
           <form action="" id="<?= $action; ?>">
             <?php if ( $action !== 'login' ) : ?>
               <p>
-                <label for="first_name">Имя</label>
-                <input type="text" name="first_name" id="first_name" placeholder="Введите ваше имя">
+                <label for="nickname">Имя</label>
+                <input type="text" name="nickname" id="nickname" placeholder="Введите ваше имя">
               </p>
             <?php endif; ?>            
 
@@ -109,6 +109,8 @@
             <button type="submit">
               <?= $button; ?>         
             </button>
+
+            <div id="ajax-response"></div>
           </form>
 
           <?php if ( $action === 'login' ) : ?>
@@ -116,10 +118,6 @@
           <?php else : ?>
             <p><a href="<?= wp_login_url(  ); ?>">Войти</a> в существующий аккаунт</p>
           <?php endif; ?>
-
-          <div id="ajax-response">
-
-          </div>
         <?php
       }  
     ?>   

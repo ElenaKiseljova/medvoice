@@ -23,11 +23,22 @@ function medvoice_styles () {
 function medvoice_scripts () {
   wp_enqueue_script('additional-script', get_template_directory_uri() . '/assets/js/additional.js', $deps = array(), $ver = null, $in_footer = true );
 
+  // reCAPTCHA v3
+  $site_key = get_field( 'site_key', 'options' ) ?? false;
+
+  if ($site_key) {
+    wp_enqueue_script('recaptcha-script', 'https://www.google.com/recaptcha/api.js?render=' . $site_key, $deps = array(), $ver = null, $in_footer = true );
+  }
+
   // AJAX
   $args = array(
     'url' => admin_url('admin-ajax.php'),
     'nonce' => wp_create_nonce('additional-script.js_nonce'),
-  );
+  );  
+
+  if ( $site_key ) {
+    $args['site_key'] = $site_key;
+  }
 
   wp_localize_script( 'additional-script', 'medvoice_ajax', $args);  
 }
@@ -170,31 +181,35 @@ if (!function_exists('medvoice_init_function')) :
 
     function medvoice_create_acf_pages() {
       if(function_exists('acf_add_options_page')) {
-        // acf_add_options_page(array(
-        //   'page_title' 	=> 'Подписка',
-        //   'menu_title'	=> 'Подписка',
-        //   'menu_slug' 	=> 'subscription',
-        //   'capability'	=> 'edit_posts',
-        //   'icon_url' => 'dashicons-tickets',
-        //   'position' => 22,
-        //   'redirect'		=> false,
-        // ));
-
-        // acf_add_options_page(array(
-        //   'page_title' 	=> 'WayForPay',
-        //   'menu_title'	=> 'WayForPay',
-        //   'menu_slug' 	=> 'wayforpay',
-        //   'capability'	=> 'edit_posts',
-        //   'icon_url' => 'dashicons-money-alt',
-        //   'position' => 23,
-        //   'redirect'		=> false,
-        // ));
+        acf_add_options_page(array(
+          'page_title' 	=> 'Настройки для темы Medvoice',
+          'menu_title'	=> 'Настройки для темы Medvoice',
+          'menu_slug' 	=> 'medvoice-settings',
+          'capability'	=> 'edit_posts',
+          'icon_url' => 'dashicons-admin-settings',
+          'position' => 22,
+          'redirect'		=> false,
+        ));
       }    
     }
 
     medvoice_create_acf_pages();
   }  
 endif;
+
+/* ==============================================
+  ********  //ACF редактирование набора инструментов редактора
+  =============================================== */
+
+add_filter( 'acf/fields/wysiwyg/toolbars' , 'my_toolbars'  );
+function my_toolbars( $toolbars )
+{
+  
+  array_push($toolbars['Full' ][1], 'underline');
+
+  // return $toolbars - IMPORTANT!
+  return $toolbars;
+}
 
 /* ==============================================
   ********  //Редиректы
@@ -434,18 +449,6 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
       $product_id = isset($_REQUEST['product_id']) ? (int) trim( $_REQUEST['product_id'] ) : null;
 
       if ($product_id) {
-        // Проверка наличия мейла
-        // $email = isset($_REQUEST['email']) ? esc_attr( trim( $_REQUEST['email'] ) ) : '';
-
-        // if ( !filter_var($email, FILTER_VALIDATE_EMAIL) ) {
-        //   $response = [
-        //     'message' => __('Неверный электронный почтовый ящик', 'medvoice'),
-        //   ];
-
-        //   wp_send_json_error( $response );
-
-        //   wp_die(  );
-        // }
 
         // Получить корзину
         $cart = WC()->cart ?? null;
@@ -459,35 +462,9 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
 
           // Получение данных о Пользователе 
           $user_id = get_current_user_id();    
-          // $nickname = isset($_REQUEST['nickname']) ? esc_attr( trim( $_REQUEST['nickname'] ) ) : '';
-          // $first_name = isset($_REQUEST['first_name']) ? esc_attr( trim( $_REQUEST['first_name'] ) ) : '';
-          // $last_name = isset($_REQUEST['last_name']) ? esc_attr( trim( $_REQUEST['last_name'] ) ) : '';
-
-          // $country = isset($_REQUEST['country']) ? esc_attr( trim( $_REQUEST['country'] ) ) : '';
-          // $city = isset($_REQUEST['city']) ? esc_attr( trim( $_REQUEST['city'] ) ) : '';
 
           // Данные для WooCommerce
           $address = [];
-
-          // $address['email'] = $email;
-
-          // if (!empty($first_name)) {
-          //   $address['first_name'] = $first_name;
-          // } else if (!empty($nickname) && empty($first_name)) {
-          //   $address['first_name'] = $nickname;
-          // }
-
-          // if (!empty($last_name)) {
-          //   $address['last_name'] = $last_name;
-          // }          
-
-          // if (!empty($country)) {
-          //   $address['country'] = $country;
-          // }
-
-          // if (!empty($city)) {
-          //   $address['city'] = $city;
-          // }
       
           // Создание заказа
           $attr = [
@@ -581,4 +558,5 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
     }
   }
 }  
+
 ?>

@@ -10,7 +10,7 @@
       return regex.test(value.toLowerCase());
     },
     name(value) {
-      const pattern = /^[\p{L} ]+$/gu;
+      const pattern = /^[\p{L} ._-]+$/gu;
       return pattern.test(value);
     },
     phone(value) {
@@ -41,7 +41,7 @@
       let valid = true;
 
       const checkValid = (field) => {
-        if (field.name === 'name') {
+        if (field.name === 'name' || field.name === 'nickname') {
           valid = validation.name(field.value);
 
           validation.drawError(field, valid);
@@ -67,6 +67,12 @@
 
         field.addEventListener('input', () => {
           checkValid(field);
+
+          let nextElement = field.parentNode.nextElementSibling;
+
+          if (nextElement && nextElement.classList.contains('error-span')) {
+            nextElement.remove();
+          }
         });
       });
 
@@ -85,64 +91,104 @@
         const formStatus = form.querySelector('#ajax-response');
 
         // Отправка формы
+        const send = (dataForm) => {
+          try {
+            const url = medvoice_ajax.url;
+
+            form.classList.add('sending');
+
+            fetch(url, {
+              method: 'POST',
+              credentials: 'same-origin',
+              body: dataForm
+            })
+              .then((response) => response.json())
+              .then((response) => {
+                if (formStatus) {
+                  formStatus.innerHTML = '';
+                }
+
+                if (response.success === true) {
+                  if (formStatus) {
+                    formStatus.innerHTML = response.data.message ?? '';
+                  }
+
+                  // Уникальные действия при успехе отправки формы
+                  data.callback(form, response);
+
+                  console.log('Успех:', response);
+                } else {
+                  if (response.data && response.data.type && response.data.message) {
+                    const field = form.querySelector(`input[name="${response.data.type}"]`);
+
+                    if (field) {
+                      const errorSpan = document.createElement('span');
+                      errorSpan.classList.add('error-span');
+                      errorSpan.textContent = response.data.message;
+                      errorSpan.style.color = 'red';
+
+                      field.parentNode.insertAdjacentElement('afterend', errorSpan);
+                    }
+                  } else if (formStatus) {
+                    formStatus.innerHTML = (response.data && response.data.message) ? response.data.message : 'Что-то пошло не так...';
+                  }
+
+                  console.error('Ошибка:', response);
+                }
+
+                form.classList.remove('sending');
+
+                setTimeout(() => {
+                  if (formStatus) {
+                    formStatus.innerHTML = '';
+                  }
+                }, 2000);
+              })
+              .catch((error) => {
+                form.classList.remove('sending');
+
+                console.error('Ошибка:', error);
+              });
+          } catch (error) {
+            form.classList.remove('sending');
+
+            console.error('Ошибка:', error);
+          }
+        };
+
+        // Отправка формы
         form.addEventListener('submit', (evt) => {
           evt.preventDefault();
 
           if (data.condition(form)) {
-            const url = medvoice_ajax.url;
             const dataForm = new FormData(form);
 
             dataForm.append('action', data.action);
             dataForm.append('security', medvoice_ajax.nonce);
 
-            try {
-              form.classList.add('sending');
+            // recaptcha (start)
+            let noBot = 0;
 
-              fetch(url, {
-                method: "POST",
-                credentials: 'same-origin',
-                body: dataForm
-              })
-                .then((response) => response.json())
-                .then((response) => {
-                  if (formStatus) {
-                    formStatus.innerHTML = '';
-                  }
+            const siteKey = medvoice_ajax.site_key ?? false;
 
-                  if (response.success === true) {
-                    if (formStatus) {
-                      formStatus.innerHTML = response.data.message ?? '';
-                    }
+            if (siteKey) {
+              grecaptcha.ready(function () {
+                grecaptcha.execute(siteKey, { action: 'submit' }).then(function (token) {
+                  // console.log('grecaptcha is OK');
 
-                    // Уникальные действия при успехе отправки формы
-                    data.callback(form, response);
+                  noBot = 1;
 
-                    console.log('Успех:', response);
-                  } else {
-                    if (formStatus) {
-                      formStatus.innerHTML = (response.data && response.data.message) ? response.data.message : 'Что-то пошло не так...';
-                    }
+                  dataForm.append('antibot', noBot);
 
-                    console.error('Ошибка:', response);
-                  }
-
-                  form.classList.remove('sending');
-
-                  setTimeout(() => {
-                    if (formStatus) {
-                      formStatus.innerHTML = '';
-                    }
-                  }, 2000);
-                })
-                .catch((error) => {
-                  form.classList.remove('sending');
-
-                  console.error('Ошибка:', error);
+                  send(dataForm);
                 });
-            } catch (error) {
-              form.classList.remove('sending');
+              });
+            } else {
+              noBot = 1;
 
-              console.error('Ошибка:', error);
+              dataForm.append('antibot', noBot);
+
+              send(dataForm);
             }
           } else {
             if (formStatus) {
@@ -224,14 +270,25 @@
 
         additional.form(data);
       },
-      register: {
+      register() {
+        const data = {
+          id: 'register',
+          action: 'medvoice_ajax_register_mail',
+          condition: validation.start,
+          noConditionText: 'Некорректно заполнены поля',
+          callback: additional.user.callbackRegister
+        };
 
+        additional.form(data);
       },
       trial() {
 
       },
       callbackLogin() {
         document.location.reload();
+      },
+      callbackRegister() {
+        // Какие-то действия
       }
     }
   };
@@ -239,5 +296,6 @@
   document.addEventListener('DOMContentLoaded', () => {
     additional.subscription.init();
     additional.user.login();
+    additional.user.register();
   });
 })();
