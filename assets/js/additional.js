@@ -341,5 +341,6 @@
     additional.user.init(['login', 'register', 'trial']);
 
     // additional.setUserTime();
+
   });
 })();
