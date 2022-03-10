@@ -24,16 +24,20 @@
   <?php if ( is_user_logged_in(  ) ) : ?>
     <form class="form" id="subscription" style="text-align:center;">
       <?php 
-        $args = [
-          'virtual' => true
-        ];
+        $tariffs = get_field( 'tariffs', 79 ) ?? [];
+
+        $args = array(
+          'include' => $tariffs,
+          'orderby' => 'menu_order',
+          'order' => 'ASC'
+        );
 
         $tariffs = wc_get_products( $args );
       ?>
       <?php if ($tariffs && !empty($tariffs) && !is_wp_error( $tariffs )) : ?>
         <ul class="list" style="display:flex;justify-content:space-around;">
           <?php foreach ($tariffs as $key => $tariff) : ?>
-            <li class="list__item <?= $key === 0 ? 'active' : ''; ?>" data-product-id="<?= $tariff->get_id(); ?>">
+            <li class="list__item <?= $key === 0 ? 'active' : ''; ?>" data-product-id="<?= $tariff->get_id(); ?>" data-months="<?= (int) $tariff->name; ?>">
               <h3>
                 <?= $tariff->name; ?>
               </h3>
@@ -46,8 +50,7 @@
       <?php endif; ?>
 
       <input type="hidden" name="product_id">
-      
-      <input type="hidden" name="security" value="<?= wp_create_nonce( 'medvoice_ajax_subscribe' ); ?>">
+      <input type="hidden" name="months">
 
       <button>
         Перейти к оплате
@@ -56,6 +59,18 @@
       <p id="ajax-response"></p>
     </form>
   <?php endif; ?>  
+
+  <br>
+  <br>
+  <?php 
+    // var_dump(medvoice_get_user_subscribe_end_date());
+  ?>
+  <br>
+  <br>
+  <?php  
+
+    // echo medvoice_show_time();
+  ?>
 </main>
 
 <?php 

@@ -211,7 +211,7 @@
           tariffs.forEach(tariff => {
             // Если есть активный пункт в верстке
             if (tariff.classList.contains('active')) {
-              additional.subscription.setProductId(tariff);
+              additional.subscription.setData(tariff);
             }
 
             // Если кликнули по пункту
@@ -219,7 +219,7 @@
               tariffs.forEach(item => item.classList.remove('active'));
 
               tariff.classList.add('active');
-              additional.subscription.setProductId(tariff);
+              additional.subscription.setData(tariff);
             });
           });
         }
@@ -227,7 +227,7 @@
         const data = {
           id: 'subscription',
           action: 'medvoice_ajax_create_order',
-          condition: additional.subscription.checkProductId,
+          condition: additional.subscription.checkData,
           noConditionText: 'Выберите Тариф',
           callback: additional.subscription.callback
         };
@@ -235,17 +235,25 @@
         additional.form(data);
       },
       // Получение заначения ИД продукта
-      checkProductId() {
+      checkData() {
         const inputProductId = document.querySelector('input[name="product_id"]');
+        const inputMonths = document.querySelector('input[name="months"]');
 
-        return inputProductId ? inputProductId.value.length > 0 : false;
+        return (inputProductId && inputMonths) ? (inputProductId.value.length > 0 && inputMonths.value.length > 0) : false;
       },
       // Установка заначения ИД продукта
-      setProductId(tariff) {
+      setData(tariff) {
         const productId = parseInt(tariff.dataset.productId);
         const inputProductId = document.querySelector('input[name="product_id"]');
 
-        inputProductId.value = productId;
+        const months = parseInt(tariff.dataset.months);
+        const inputMonths = document.querySelector('input[name="months"]');
+
+        if (inputProductId && inputMonths) {
+          inputProductId.value = productId;
+
+          inputMonths.value = months;
+        }
       },
       callback(form, response) {
         // WayForPay (start)
@@ -294,12 +302,44 @@
           additional.form(data);
         });
       },
-    }
+    },
+    // setUserTime() {
+    //   const dataForm = new FormData();
+
+    //   dataForm.append('action', 'medvoice_set_user_time');
+    //   dataForm.append('security', medvoice_ajax.nonce);
+    //   dataForm.append('offset', new Date().getTimezoneOffset());
+
+    //   try {
+    //     const url = medvoice_ajax.url;
+
+    //     fetch(url, {
+    //       method: 'POST',
+    //       credentials: 'same-origin',
+    //       body: dataForm
+    //     })
+    //       .then((response) => response.json())
+    //       .then((response) => {
+    //         if (response.success === true) {
+    //           console.log('Успех:', response);
+    //         } else {
+    //           console.error('Ошибка:', response);
+    //         }
+    //       })
+    //       .catch((error) => {
+    //         console.error('Ошибка:', error);
+    //       });
+    //   } catch (error) {
+    //     console.error('Ошибка:', error);
+    //   }
+    // }
   };
 
   document.addEventListener('DOMContentLoaded', () => {
     additional.subscription.init();
 
     additional.user.init(['login', 'register', 'trial']);
+
+    // additional.setUserTime();
   });
 })();

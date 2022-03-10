@@ -9,8 +9,11 @@ if( wp_doing_ajax() ) {
     add_action('wp_ajax_nopriv_medvoice_ajax_login', 'medvoice_ajax_login');
 
     add_action( 'wp_ajax_medvoice_ajax_register_mail', 'medvoice_ajax_register_mail' );
-    add_action( 'wp_ajax_nopriv_medvoice_ajax_register_mail', 'medvoice_ajax_register_mail' );
+    add_action( 'wp_ajax_nopriv_medvoice_ajax_register_mail', 'medvoice_ajax_register_mail' );    
   }
+
+  add_action( 'wp_ajax_medvoice_set_user_time', 'medvoice_set_user_time' );
+  add_action( 'wp_ajax_nopriv_medvoice_set_user_time', 'medvoice_set_user_time' );
 }
 
 // Signin
@@ -199,6 +202,46 @@ function medvoice_register()
   }
 }
 
+
+/* ==============================================
+********  //Время по часовому поясу
+=============================================== */
+function medvoice_set_user_time()
+{
+  try {
+    if (isset($_POST['offset']) && (!isset($_COOKIE['medvoice_user_time_offset']) || $_COOKIE['medvoice_user_time_offset'] !== $_POST['offset'])) {
+      setcookie('medvoice_user_time_offset', $_POST['offset'], time() + 60 * 60 * 24, "/");
+    }
+
+    wp_send_json_success( 'Локальная дата установлена!' );
+  } catch ( Throwable $th) {
+    wp_send_json_error( $th );
+  } 
+  
+  wp_die(  );
+}
+
+// function medvoice_show_time()
+// {
+//   return date('H:i', utc_to_usertime(time())) . ' (UTC' . utc_value() . ')';
+// }
+
+// function utc_to_usertime($time)
+// {
+//   return isset($_COOKIE['medvoice_user_time_offset']) ? $time - ($_COOKIE['medvoice_user_time_offset'] * 60) : $time;
+// }
+
+// function usertime_to_utc($time)
+// {
+//   return isset($_COOKIE['medvoice_user_time_offset']) ? $time + ($_COOKIE['medvoice_user_time_offset'] * 60) : $time;
+// }
+
+// function utc_value()
+// {
+//   return isset($_COOKIE['medvoice_user_time_offset']) ? (($_COOKIE['medvoice_user_time_offset'] <= 0 ? '+' : '-') . (!empty($_COOKIE['medvoice_user_time_offset']) ? gmdate('H:i',
+//           abs($_COOKIE['medvoice_user_time_offset'] * 60)) : 0)) : '+0';
+// }
+
 class Medvoice
 {
   public function insert_table_unconfirmed_mail_users_into_db( ) 
@@ -235,9 +278,9 @@ class Medvoice
     global $wpdb;
 
     if ($key) {
-      $user = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `{$wpdb->base_prefix}unconfirmed_mail_users` where user_key = %d", $key ) );
+      $medvoice_user = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `{$wpdb->base_prefix}unconfirmed_mail_users` where user_key = %d", $key ) );
 
-      return $user;
+      return $medvoice_user;
     }    
   }
 }
