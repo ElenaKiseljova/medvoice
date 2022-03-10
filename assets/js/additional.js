@@ -1,6 +1,8 @@
 (() => {
   'use strict';
 
+  const { __, _x, _n, _nx } = wp.i18n;
+
   const validation = {
     email(value) {
       const regex = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
@@ -130,7 +132,9 @@
                       field.parentNode.insertAdjacentElement('afterend', errorSpan);
                     }
                   } else if (formStatus) {
-                    formStatus.innerHTML = (response.data && response.data.message) ? response.data.message : 'Что-то пошло не так...';
+                    formStatus.innerHTML = (response.data && response.data.message) ?
+                      response.data.message :
+                      __('Что-то пошло не так...', 'medvoice');
                   }
 
                   console.error('Ошибка:', response);
@@ -259,43 +263,43 @@
     },
     // Логирование, регистрация, заказ триала
     user: {
-      login() {
-        const data = {
-          id: 'login',
-          action: 'medvoice_ajax_login',
-          condition: validation.start,
-          noConditionText: 'Некорректно заполнены поля',
-          callback: additional.user.callbackLogin
+      init(ids = []) {
+        const actions = {
+          login: 'medvoice_ajax_login',
+          register: 'medvoice_ajax_register_mail',
+          trial: 'medvoice_ajax_register_mail',
         };
 
-        additional.form(data);
-      },
-      register() {
-        const data = {
-          id: 'register',
-          action: 'medvoice_ajax_register_mail',
-          condition: validation.start,
-          noConditionText: 'Некорректно заполнены поля',
-          callback: additional.user.callbackRegister
+        const callbacks = {
+          login() {
+            document.location.reload();
+          },
+          register() {
+            // Какие-то действия
+          },
+          trial() {
+            // Какие-то действия
+          }
         };
 
-        additional.form(data);
-      },
-      trial() {
+        ids.forEach(id => {
+          const data = {
+            id: id,
+            action: actions[id],
+            condition: validation.start,
+            noConditionText: __('Некорректно заполнены поля', 'medvoice'),
+            callback: callbacks[id],
+          };
 
+          additional.form(data);
+        });
       },
-      callbackLogin() {
-        document.location.reload();
-      },
-      callbackRegister() {
-        // Какие-то действия
-      }
     }
   };
 
   document.addEventListener('DOMContentLoaded', () => {
     additional.subscription.init();
-    additional.user.login();
-    additional.user.register();
+
+    additional.user.init(['login', 'register', 'trial']);
   });
 })();

@@ -18,28 +18,22 @@
     <h2><?= $medvoice_user->nickname; ?></h2>
 
     <a href="<?= wp_logout_url( home_url() ); ?>">
-      Выйти
+      <?= __( 'Выйти', 'medvoice' ); ?>
     </a>
   <?php else : ?>
     <p>
       <a href="<?= wp_login_url(  ); ?>">
-        Войти
+        <?= __( 'Войти', 'medvoice' ); ?>
       </a>
     </p>
     
     <p>
       <a href="<?= wp_registration_url(); ?>">
-        Зарегистрироваться
+        <?= __( 'Зарегистрироваться', 'medvoice' ); ?>
       </a>
     </p>
 
-    <?php 
-      /**
-       * hooked login_button (Google Log In plugin)
-       */
-
-      do_action( 'login_form' ); 
-    ?>
+    
 
   <style>
     .error input {
@@ -49,27 +43,31 @@
 
     <?php 
       if ( isset($_GET['action']) ) {
+        $email = null;
+
         $action = $_GET['action'];
 
         switch ( $_GET['action'] ) {
           case 'login':            
-            $title = 'Войдите в свой аккаунт';
-            $button = 'Войти';
-            $password = 'Введите ваш пароль';
+            $title = __( 'Войдите в свой аккаунт', 'medvoice' );
+            $button = __( 'Войти', 'medvoice' );
+            $password = __( 'Введите ваш пароль', 'medvoice' );
 
             break;
           
           case 'register':
-            $title = 'Создайте аккаунт';
-            $button = 'Начать регистрацию';
-            $password = 'Придумайте пароль';
+            $title = __( 'Создайте аккаунт', 'medvoice' );
+            $button = __( 'Начать регистрацию', 'medvoice' );
+            $password = __( 'Придумайте пароль', 'medvoice' );
 
             break;
 
           case 'trial':
-            $title = 'Создайте аккаунт';
-            $button = 'Оформить триал';
-            $password = 'Придумайте пароль';
+            $title = __( 'Создайте аккаунт', 'medvoice' );
+            $button = __( 'Оформить триал', 'medvoice' );
+            $password = __( 'Придумайте пароль', 'medvoice' );
+
+            $email = isset($_GET['email']) ? strip_tags($_GET['email']) : null;
 
             break;
           
@@ -82,42 +80,88 @@
         }
 
         ?>
-          <h3><?= $title; ?></h3>
+          
 
-          <form action="" id="<?= $action; ?>">
-            <?php if ( $action !== 'login' ) : ?>
-              <p>
-                <label for="nickname">Имя</label>
-                <input type="text" name="nickname" id="nickname" placeholder="Введите ваше имя">
+          <form class="form form--<?= $action; ?>" action="" id="<?= $action; ?>">
+            <!-- Если это отдельные стр, то h1, если нет - h2 -->
+            <h1 class="form__title"><?= $title; ?></h1>
+
+            <div class="form__content">
+              <div class="form__google">
+                <?php 
+                  /**
+                   * hooked login_button (Google Log In plugin)
+                   */
+
+                  do_action( 'login_form' ); 
+                ?>
+              </div>
+              
+              <?php if ( $action !== 'login' ) : ?>
+                <p class="form__row">
+                  <label class="form__label" for="nickname"><?= __( 'Имя', 'medvoice' ); ?></label>
+                  <input class="form__field" type="text" name="nickname" id="nickname" placeholder="<?= __( 'Введите ваше имя', 'medvoice' ); ?>">
+                </p>
+              <?php endif; ?>            
+
+              <p class="form__row">
+                <label class="form__label" for="email"><?= __( 'Логин', 'medvoice' ); ?></label>
+                <input class="form__field" type="email" name="email" id="email" placeholder="<?= __( 'Введите ваш email', 'medvoice' ); ?>" <?= isset($email) ? 'value="' . $email . '"' : ''; ?>>
               </p>
-            <?php endif; ?>            
 
-            <p>
-              <label for="email">Логин</label>
-              <input type="email" name="email" id="email" placeholder="Введите ваш email">
-            </p>
+              <p class="form__row">
+                <label class="form__label" for="password"><?= __( 'Пароль', 'medvoice' ); ?></label>
+                <input class="form__field" type="password" name="password" id="password" placeholder="<?= $password; ?>">
+              </p>
+              
+              <?php if ( $action === 'login' ) : ?>
+                <p class="form__text text">
+                  <?= 
+                    sprintf(
+                      __( '<a href="%s">Забыли пароль</a>', 'medvoice' ),
+                        '/?action=forgot'
+                    ); 
+                  ?>  
+                </p>
+              <?php endif; ?>
 
-            <p>
-              <label for="password">Пароль</label>
-              <input type="password" name="password" id="password" placeholder="<?= $password; ?>">
-            </p>
+              <?php if ( $action === 'trial' ) : ?>
+                <input type="hidden" name="trial" value="1">
+              <?php endif; ?>
 
-            <?php if ( $action === 'trial' ) : ?>
-              <input type="hidden" name="trial" value="1">
-            <?php endif; ?>
-
-            <button type="submit">
-              <?= $button; ?>         
-            </button>
-
-            <div id="ajax-response"></div>
+              <button class="form__button form__button--<?= $action; ?> button" type="submit">
+                <?= $button; ?>         
+              </button>
+              
+              <!-- Это не надо стилизовать (старт) -->
+              <div class="text" id="ajax-response"></div>
+              <!-- Это не надо стилизовать (конец) -->
+            </div>            
           </form>
-
-          <?php if ( $action === 'login' ) : ?>
-            <p>Ещё нет аккаунта? <a href="<?= wp_registration_url(); ?>">Оформите подписку</a> или <a href="/?action=trial">триальную версию</a></p>
-          <?php else : ?>
-            <p><a href="<?= wp_login_url(  ); ?>">Войти</a> в существующий аккаунт</p>
-          <?php endif; ?>
+          
+          <p class="text text--subform">
+            <?php if ( $action === 'login' ) : ?>
+              <?= 
+                  sprintf(
+                    __( 'Ещё нет аккаунта? 
+                          <a href="%s">Оформите подписку</a> 
+                          или 
+                          <a href="%s">триальную версию</a>', 'medvoice' 
+                      ),
+                      wp_registration_url(),
+                      '/?action=trial'
+                  ); 
+                ?>  
+            <?php else : ?>
+              <?= 
+                  sprintf(
+                    __( '<a href="%s">Войти</a>  в существующий аккаунт' ),
+                      wp_login_url(  )
+                  ); 
+                ?> 
+            <?php endif; ?>
+          </p>
+          
         <?php
       }  
     ?>   

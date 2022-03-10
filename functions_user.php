@@ -76,6 +76,9 @@ function medvoice_ajax_register_mail() {
     check_ajax_referer('additional-script.js_nonce', 'security');
 
     if($_POST['antibot'] == 1) {
+      // Триальная ли форма отправлена
+      $trial = ((int) $_GET['trial'] === 1) ? 1 : 0;
+
       // Получаем данные из полей формы и проверяем их
       $info = array();
 
@@ -99,7 +102,11 @@ function medvoice_ajax_register_mail() {
 
       $pass = wp_hash_password($info['user_password']);
       
-      $confirm_link = get_home_url(  ) . '/?action=confirm&key=' . $pass . '&email=' . rawurlencode($info['user_login']) . '&name=' . $info['nickname'];
+      $confirm_link = get_home_url(  ) . '/?action=confirm' .
+                                         '&key=' . $pass . 
+                                         '&email=' . rawurlencode($info['user_login']) . 
+                                         '&name=' . $info['nickname'] .
+                                         '&trial=' . $trial;
 
       $confirm_text = get_custom_logo() . '<br><br>';
       $confirm_text .= '<p>' . __( 'Приветствуем Вас, ', 'medvoice' ) . '<b>' . $info['nickname'] . '</b></p>';
@@ -148,6 +155,8 @@ add_action( 'init', 'medvoice_register' );
 function medvoice_register()
 {
   if (isset($_GET['action']) && $_GET['action'] === 'confirm') {
+    $trial = (int) $_GET['trial'];
+
     $password = htmlspecialchars($_GET['key']);
     $email = rawurldecode($_GET['email']);
     $nickname = $_GET['name'];
@@ -174,6 +183,10 @@ function medvoice_register()
       $user_signon = wp_signon( $info, false );
 
       wp_set_current_user( $user_signon->ID, $user_signon->user_login );
+
+      if ( $trial === 1 ) {
+        // Тут будет код/ф-я для подписки
+      }
 
       /* Перенаправление браузера */
       header('Location: ' . get_bloginfo( 'url' )); 

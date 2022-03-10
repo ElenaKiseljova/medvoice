@@ -23,6 +23,9 @@ function medvoice_styles () {
 function medvoice_scripts () {
   wp_enqueue_script('additional-script', get_template_directory_uri() . '/assets/js/additional.js', $deps = array(), $ver = null, $in_footer = true );
 
+  // С переводами
+  wp_set_script_translations( 'additional-script', 'medvoice' );
+
   // reCAPTCHA v3
   $site_key = get_field( 'site_key', 'options' ) ?? false;
 
