@@ -226,7 +226,7 @@
 
         const data = {
           id: 'subscription',
-          action: 'medvoice_ajax_create_order',
+          action: 'medvoice_create_order_ajax',
           condition: additional.subscription.checkData,
           noConditionText: 'Выберите Тариф',
           callback: additional.subscription.callback
@@ -303,36 +303,36 @@
         });
       },
     },
-    // setUserTime() {
-    //   const dataForm = new FormData();
+    setUserTime() {
+      const dataForm = new FormData();
 
-    //   dataForm.append('action', 'medvoice_set_user_time');
-    //   dataForm.append('security', medvoice_ajax.nonce);
-    //   dataForm.append('offset', new Date().getTimezoneOffset());
+      dataForm.append('action', 'medvoice_set_user_time');
+      dataForm.append('security', medvoice_ajax.nonce);
+      dataForm.append('offset', new Date().getTimezoneOffset());
 
-    //   try {
-    //     const url = medvoice_ajax.url;
+      try {
+        const url = medvoice_ajax.url;
 
-    //     fetch(url, {
-    //       method: 'POST',
-    //       credentials: 'same-origin',
-    //       body: dataForm
-    //     })
-    //       .then((response) => response.json())
-    //       .then((response) => {
-    //         if (response.success === true) {
-    //           console.log('Успех:', response);
-    //         } else {
-    //           console.error('Ошибка:', response);
-    //         }
-    //       })
-    //       .catch((error) => {
-    //         console.error('Ошибка:', error);
-    //       });
-    //   } catch (error) {
-    //     console.error('Ошибка:', error);
-    //   }
-    // }
+        fetch(url, {
+          method: 'POST',
+          credentials: 'same-origin',
+          body: dataForm
+        })
+          .then((response) => response.json())
+          .then((response) => {
+            if (response.success === true) {
+              console.log('Успех:', response);
+            } else {
+              console.error('Ошибка:', response);
+            }
+          })
+          .catch((error) => {
+            console.error('Ошибка:', error);
+          });
+      } catch (error) {
+        console.error('Ошибка:', error);
+      }
+    }
   };
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -340,7 +340,7 @@
 
     additional.user.init(['login', 'register', 'trial']);
 
-    // additional.setUserTime();
+    additional.setUserTime();
 
   });
 })();

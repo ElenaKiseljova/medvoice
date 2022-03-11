@@ -63,12 +63,13 @@
   <br>
   <br>
   <?php 
-    // var_dump(medvoice_get_user_subscribe_end_date());
+    echo medvoice_get_user_subscribe_end_date();
   ?>
   <br>
   <br>
   <?php  
-
+  // $medvoice_user = wp_get_current_user();
+  //   update_metadata('user', $medvoice_user->ID, 'st', time());
     // echo medvoice_show_time();
   ?>
 </main>

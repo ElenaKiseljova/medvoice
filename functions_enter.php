@@ -11,9 +11,6 @@ if( wp_doing_ajax() ) {
     add_action( 'wp_ajax_medvoice_ajax_register_mail', 'medvoice_ajax_register_mail' );
     add_action( 'wp_ajax_nopriv_medvoice_ajax_register_mail', 'medvoice_ajax_register_mail' );    
   }
-
-  add_action( 'wp_ajax_medvoice_set_user_time', 'medvoice_set_user_time' );
-  add_action( 'wp_ajax_nopriv_medvoice_set_user_time', 'medvoice_set_user_time' );
 }
 
 // Signin
@@ -73,15 +70,13 @@ function medvoice_ajax_login()
 }
 
 // Sign up (mail)
-function medvoice_ajax_register_mail() {
+function medvoice_ajax_register_mail() 
+{
   try {
     // Первым делом проверяем параметр безопасности
     check_ajax_referer('additional-script.js_nonce', 'security');
 
     if($_POST['antibot'] == 1) {
-      // Триальная ли форма отправлена
-      $trial = ((int) $_GET['trial'] === 1) ? 1 : 0;
-
       // Получаем данные из полей формы и проверяем их
       $info = array();
 
@@ -97,7 +92,7 @@ function medvoice_ajax_register_mail() {
 
       if ( empty($info['user_password']) ) {
         wp_send_json_error(['type' => 'password', 'message' => __('Введите пароль', 'medvoice')]);
-      } else if( 8 >= mb_strlen($info['user_password']) ) {
+      } else if( 7 >= mb_strlen($info['user_password']) ) {
         wp_send_json_error(['type' => 'password', 'message' => __('Пароль должен быть не менее 8 символов.', 'medvoice')]);
       }
 
@@ -108,8 +103,7 @@ function medvoice_ajax_register_mail() {
       $confirm_link = get_home_url(  ) . '/?action=confirm' .
                                          '&key=' . $pass . 
                                          '&email=' . rawurlencode($info['user_login']) . 
-                                         '&name=' . $info['nickname'] .
-                                         '&trial=' . $trial;
+                                         '&name=' . $info['nickname'];
 
       $confirm_text = get_custom_logo() . '<br><br>';
       $confirm_text .= '<p>' . __( 'Приветствуем Вас, ', 'medvoice' ) . '<b>' . $info['nickname'] . '</b></p>';
@@ -132,14 +126,9 @@ function medvoice_ajax_register_mail() {
 
       wp_mail( $to, $confirm_subject, $confirm_text, $headers );
 
-      // Добавление пользователя во временную таблицу
-      // if ( class_exists( 'Medvoice' ) ) {
-      //   $medvoice = new Medvoice;
-      // } 
-
-      wp_send_json_success(['info' => $info, 'message' => __('Успешный запрос!', 'medvoice')]);
+      wp_send_json_success(['message' => __('Успешный запрос!', 'medvoice')]);
     } else {
-      wp_send_json_error(['post' => $_POST, 'message' => __('Подтвердите, что Вы не робот', 'medvoice')]);
+      wp_send_json_error(['message' => __('Подтвердите, что Вы не робот', 'medvoice')]);
     }   
 
     wp_die();
@@ -158,8 +147,6 @@ add_action( 'init', 'medvoice_register' );
 function medvoice_register()
 {
   if (isset($_GET['action']) && $_GET['action'] === 'confirm') {
-    $trial = (int) $_GET['trial'];
-
     $password = htmlspecialchars($_GET['key']);
     $email = rawurldecode($_GET['email']);
     $nickname = $_GET['name'];
@@ -187,101 +174,17 @@ function medvoice_register()
 
       wp_set_current_user( $user_signon->ID, $user_signon->user_login );
 
-      if ( $trial === 1 ) {
-        // Тут будет код/ф-я для подписки
+      $product_id = get_field( 'trial', 'options' ) ?? null;
+
+      if ( isset($product_id) ) {
+        medvoice_create_order( $product_id );
       }
 
       /* Перенаправление браузера */
-      header('Location: ' . get_bloginfo( 'url' )); 
-
-      /* Убедиться, что код ниже не выполнится после перенаправления .*/
-      exit;
+      wp_redirect( get_bloginfo( 'url' ) );
     } else {
       return $user_id;
     }
-  }
-}
-
-
-/* ==============================================
-********  //Время по часовому поясу
-=============================================== */
-function medvoice_set_user_time()
-{
-  try {
-    if (isset($_POST['offset']) && (!isset($_COOKIE['medvoice_user_time_offset']) || $_COOKIE['medvoice_user_time_offset'] !== $_POST['offset'])) {
-      setcookie('medvoice_user_time_offset', $_POST['offset'], time() + 60 * 60 * 24, "/");
-    }
-
-    wp_send_json_success( 'Локальная дата установлена!' );
-  } catch ( Throwable $th) {
-    wp_send_json_error( $th );
-  } 
-  
-  wp_die(  );
-}
-
-// function medvoice_show_time()
-// {
-//   return date('H:i', utc_to_usertime(time())) . ' (UTC' . utc_value() . ')';
-// }
-
-// function utc_to_usertime($time)
-// {
-//   return isset($_COOKIE['medvoice_user_time_offset']) ? $time - ($_COOKIE['medvoice_user_time_offset'] * 60) : $time;
-// }
-
-// function usertime_to_utc($time)
-// {
-//   return isset($_COOKIE['medvoice_user_time_offset']) ? $time + ($_COOKIE['medvoice_user_time_offset'] * 60) : $time;
-// }
-
-// function utc_value()
-// {
-//   return isset($_COOKIE['medvoice_user_time_offset']) ? (($_COOKIE['medvoice_user_time_offset'] <= 0 ? '+' : '-') . (!empty($_COOKIE['medvoice_user_time_offset']) ? gmdate('H:i',
-//           abs($_COOKIE['medvoice_user_time_offset'] * 60)) : 0)) : '+0';
-// }
-
-class Medvoice
-{
-  public function insert_table_unconfirmed_mail_users_into_db( ) 
-  {
-    global $wpdb;
-
-    // set the default character set and collation for the table
-    $charset_collate = $wpdb->get_charset_collate();
-    // Check that the table does not already exist before continuing
-    $sql = "CREATE TABLE IF NOT EXISTS `{$table}unconfirmed_mail_users` (
-      id bigint(50) NOT NULL AUTO_INCREMENT,
-      user_key varchar(100),
-      user_email varchar(100),
-      user_pass varchar(100),
-      nickname varchar(100),
-      PRIMARY KEY (id)
-      ) $charset_collate;";
-
-    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-
-    dbDelta( $sql );
-
-    $is_error = !empty( $wpdb->last_error ); 
-
-    if ($is_error) {
-      echo $wpdb->last_error;
-    }
-
-    return $is_error;
-  }
-
-  public function get_unconfirmed_mail_user( $key = null )
-  {
-    global $wpdb;
-
-    if ($key) {
-      $medvoice_user = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `{$wpdb->base_prefix}unconfirmed_mail_users` where user_key = %d", $key ) );
-
-      return $medvoice_user;
-    }    
   }
 }
 

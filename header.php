@@ -125,10 +125,6 @@
                 </p>
               <?php endif; ?>
 
-              <?php if ( $action === 'trial' ) : ?>
-                <input type="hidden" name="trial" value="1">
-              <?php endif; ?>
-
               <button class="form__button form__button--<?= $action; ?> button" type="submit">
                 <?= $button; ?>         
               </button>
