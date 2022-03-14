@@ -2,8 +2,8 @@
 /*INCLUDE SETTINGS FUNCTIONS.PHP*/
 require_once( TEMPLATEPATH . '/functions_settings.php' );
 
-/*INCLUDE ENTER FUNCTIONS.PHP*/
-require_once( TEMPLATEPATH . '/functions_enter.php' );
+/*INCLUDE AUTHENTICATION FUNCTIONS.PHP*/
+require_once( TEMPLATEPATH . '/functions_authentication.php' );
 
 /* medvoice */
   
@@ -444,6 +444,8 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
           ];
 
           wp_send_json_error( $response );
+
+          wp_die(  );
         } 
       } else {
         $response = [
@@ -553,8 +555,6 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
         // Очистить корзину
         $cart->empty_cart();
 
-        
-
         // Если заказ не триальный - выставляем счет
         if ( isset($months) ) {
           // Получаем форму WayForPay
@@ -569,21 +569,32 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
           
           
           wp_send_json_success( $response );
-        }     
+        }
       } else {
         $response = [
           'message' => __('Пользователь не существует', 'medvoice'),
+          'user' => $medvoice_user
         ];
 
         wp_send_json_error( $response );
+
+        wp_die(  );
       }            
     } else {
       $response = [
         'message' => __('Корзина не существует', 'medvoice'),
       ];
 
-      wp_send_json_error( $response );
-    } 
+      if ( isset($months) ) {
+        wp_send_json_error( $response );
+
+        wp_die(  );
+      } else {
+        wp_redirect( get_home_url(  ) );
+
+        exit();
+      }        
+    }     
   }
 
   /* ==============================================
@@ -613,6 +624,8 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
             $trial_days = get_field( 'trial_days', 'options' ) ?? 7;
 
             $st = mktime(date('H', time()), date('i', time()), date('s', time()), date('m', $start_time), date('d', $start_time) + $trial_days, date('Y', $start_time));
+            
+            update_metadata('user', $medvoice_user->ID, 'trial', 1);
           }          
 
           update_metadata('user', $medvoice_user->ID, 'subscribed', 1);

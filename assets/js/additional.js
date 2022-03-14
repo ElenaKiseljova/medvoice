@@ -12,7 +12,7 @@
       return regex.test(value.toLowerCase());
     },
     name(value) {
-      const pattern = /^[\p{L} ._-]+$/gu;
+      const pattern = /^[\d\p{L} ._-]+$/gu;
       return pattern.test(value);
     },
     phone(value) {
