@@ -1,6 +1,6 @@
 <?php 
 /* ==============================================
-  ********  //Хэш-сумма
+  ********  //Хэш-сумма для WayForPay
   =============================================== */
 
   /**
@@ -58,53 +58,4 @@
 
   //   return $hash;
   // }
-
-
-  // class Medvoice
-  // {
-  //   public function insert_table_unconfirmed_mail_users_into_db( ) 
-  //   {
-  //     global $wpdb;
-  
-  //     // set the default character set and collation for the table
-  //     $charset_collate = $wpdb->get_charset_collate();
-  //     // Check that the table does not already exist before continuing
-  //     $sql = "CREATE TABLE IF NOT EXISTS `{$table}unconfirmed_mail_users` (
-  //       id bigint(50) NOT NULL AUTO_INCREMENT,
-  //       user_key varchar(100),
-  //       user_email varchar(100),
-  //       user_pass varchar(100),
-  //       nickname varchar(100),
-  //       PRIMARY KEY (id)
-  //       ) $charset_collate;";
-  
-  //     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-  
-  //     dbDelta( $sql );
-  
-  //     $is_error = !empty( $wpdb->last_error ); 
-  
-  //     if ($is_error) {
-  //       echo $wpdb->last_error;
-  //     }
-  
-  //     return $is_error;
-  //   }
-  
-  //   public function get_unconfirmed_mail_user( $key = null )
-  //   {
-  //     global $wpdb;
-  
-  //     if ($key) {
-  //       $medvoice_user = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `{$wpdb->base_prefix}unconfirmed_mail_users` where user_key = %d", $key ) );
-  
-  //       return $medvoice_user;
-  //     }    
-  //   }
-  // }
-
-  // function medvoice_show_time()
-// {
-//   return date('H:i', utc_to_usertime(time())) . ' (UTC' . utc_value() . ')';
-// }
 ?>

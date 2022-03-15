@@ -64,11 +64,19 @@
 
       const fields = form.querySelectorAll('input');
 
+      const passwordField = form.querySelector('input[name="password"]');
+
       fields.forEach((field) => {
         checkValid(field);
 
         field.addEventListener('input', () => {
-          checkValid(field);
+          if (field.name !== 'password-confirm') {
+            checkValid(field);
+          } else if (field.name === 'password-confirm' && passwordField) {
+            const valid = field.value === passwordField.value && validation.password(field.value);
+
+            validation.drawError(field, valid);
+          }
 
           let nextElement = field.parentNode.nextElementSibling;
 
@@ -276,6 +284,8 @@
           login: 'medvoice_ajax_login',
           register: 'medvoice_ajax_register_mail',
           trial: 'medvoice_ajax_register_mail',
+          forgot: 'medvoice_ajax_forgot_password',
+          reset: 'medvoice_ajax_reset_password',
         };
 
         const callbacks = {
@@ -286,6 +296,12 @@
             // Какие-то действия
           },
           trial() {
+            // Какие-то действия
+          },
+          forgot() {
+            // Какие-то действия
+          },
+          reset() {
             // Какие-то действия
           }
         };
@@ -338,7 +354,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     additional.subscription.init();
 
-    additional.user.init(['login', 'register', 'trial']);
+    additional.user.init(['login', 'register', 'trial', 'forgot', 'reset']);
 
     additional.setUserTime();
 

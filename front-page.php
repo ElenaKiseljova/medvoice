@@ -15,12 +15,6 @@
     20 грн в валюте геолокации: <?=  medvoice_get_converted_price(20); ?>
   </div>  
 
-  <style>
-    .active {
-      border: 1px dashed gray;
-    }
-  </style>
-
   <?php if ( is_user_logged_in(  ) ) : ?>
     <form class="form" id="subscription" style="text-align:center;">
       <?php 

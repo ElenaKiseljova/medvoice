@@ -8,3 +8,11 @@
 */
 
 /* @import url('assets/css/style.min.css'); */
+
+.error input {
+  border-color: red;
+}
+
+.active {
+  border: 1px dashed gray;
+}

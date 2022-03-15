@@ -33,14 +33,6 @@
       </a>
     </p>
 
-    
-
-  <style>
-    .error input {
-      border-color: red;
-    }
-  </style>
-
     <?php 
       if ( isset($_GET['action']) ) {
         $email = null;
@@ -71,6 +63,19 @@
 
             break;
           
+          case 'forgot':
+            $title = __( 'Забыли пароль?', 'medvoice' );
+            $button = __( 'Восстановить', 'medvoice' );
+
+            break;
+          
+          case 'reset':
+            $title = __( 'Создайте новый пароль', 'medvoice' );
+            $button = __( 'Сохранить', 'medvoice' );
+            $password = '';
+
+            break;
+          
           default:
             $title = '';
             $button = '';
@@ -97,22 +102,33 @@
                 ?>
               </div>
               
-              <?php if ( $action !== 'login' ) : ?>
+              <?php if ( $action === 'register' || $action === 'trial' ) : ?>
                 <p class="form__row">
                   <label class="form__label" for="nickname"><?= __( 'Имя', 'medvoice' ); ?></label>
                   <input class="form__field" type="text" name="nickname" id="nickname" placeholder="<?= __( 'Введите ваше имя', 'medvoice' ); ?>">
                 </p>
               <?php endif; ?>            
-
-              <p class="form__row">
-                <label class="form__label" for="email"><?= __( 'Логин', 'medvoice' ); ?></label>
-                <input class="form__field" type="email" name="email" id="email" placeholder="<?= __( 'Введите ваш email', 'medvoice' ); ?>" <?= isset($email) ? 'value="' . $email . '"' : ''; ?>>
-              </p>
-
-              <p class="form__row">
-                <label class="form__label" for="password"><?= __( 'Пароль', 'medvoice' ); ?></label>
-                <input class="form__field" type="password" name="password" id="password" placeholder="<?= $password; ?>">
-              </p>
+              
+              <?php if ( $action !== 'reset' ) : ?>
+                <p class="form__row">
+                  <label class="form__label" for="email"><?= __( 'Логин', 'medvoice' ); ?></label>
+                  <input class="form__field" type="email" name="email" id="email" placeholder="<?= __( 'Введите ваш email', 'medvoice' ); ?>" <?= isset($email) ? 'value="' . $email . '"' : ''; ?>>
+                </p>
+              <?php endif; ?>               
+              
+              <?php if ( $action !== 'forgot' ) : ?>
+                <p class="form__row">
+                  <label class="form__label" for="password"><?= __( 'Пароль', 'medvoice' ); ?></label>
+                  <input class="form__field" type="password" name="password" id="password" placeholder="<?= $password; ?>">
+                </p>
+              <?php endif; ?>   
+              
+              <?php if ( $action === 'reset' ) : ?>
+                <p class="form__row">
+                  <label class="form__label" for="password-confirm"><?= __( 'Подтвердите пароль', 'medvoice' ); ?></label>
+                  <input class="form__field" type="password" name="password-confirm" id="password-confirm" placeholder="<?= $password; ?>">
+                </p>
+              <?php endif; ?> 
               
               <?php if ( $action === 'login' ) : ?>
                 <p class="form__text text">
@@ -124,6 +140,11 @@
                   ?>  
                 </p>
               <?php endif; ?>
+
+              <?php if ( $action === 'reset' && isset($_GET['key']) && isset($_GET['login']) ) : ?>
+                <input type="hidden" name="key" value="<?= $_GET['key']; ?>">
+                <input type="hidden" name="login" value="<?= $_GET['login']; ?>">
+              <?php endif; ?> 
 
               <button class="form__button form__button--<?= $action; ?> button" type="submit">
                 <?= $button; ?>         
