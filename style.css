@@ -7,12 +7,12 @@
   Text Domain: medvoice
 */
 
-/* @import url('assets/css/style.min.css'); */
+@import url('assets/css/style.min.css');
 
 .error input {
   border-color: red;
 }
 
-.active {
+.list__item.active {
   border: 1px dashed gray;
 }
