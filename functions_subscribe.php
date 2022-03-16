@@ -159,10 +159,10 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
         // Записываю кол-во месяцев в заказ
         if ( isset($months) ) {
           $order->update_meta_data( 'months', $months );
-          $order->update_meta_data( 'trial', 0 );
+          $order->update_meta_data( 'trial', '0' );
         } else {    
           $order->update_meta_data( 'months', 0 );            
-          $order->update_meta_data( 'trial', 1 );
+          $order->update_meta_data( 'trial', '1' );
         }
         
         // Сохранение обновлений мета заказа
@@ -230,7 +230,7 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
   {
     if ( isset($order) ) {
       $months = (int) $order->get_meta( 'months' );
-      $trial = (int) $order->get_meta( 'trial' );
+      $trial = $order->get_meta( 'trial' );
 
       $user_id = $order->get_user_id();
 
@@ -245,16 +245,18 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
 
           if ( $months > 0 ) {
             $st = mktime(date('H', time()), date('i', time()), date('s', time()), date('m', $start_time) + $months, date('d', $start_time), date('Y', $start_time));
+            
+            update_user_meta($medvoice_user->ID, 'trial', '0');
+            update_user_meta($medvoice_user->ID, 'subscribed', '1');
           } else {
             $trial_days = get_field( 'trial_days', 'options' ) ?? 7;
 
             $st = mktime(date('H', time()), date('i', time()), date('s', time()), date('m', $start_time), date('d', $start_time) + $trial_days, date('Y', $start_time));
             
-            update_metadata('user', $medvoice_user->ID, 'trial', 1);
-          }          
-
-          update_metadata('user', $medvoice_user->ID, 'subscribed', 1);
-          update_metadata('user', $medvoice_user->ID, 'st', $st);
+            update_user_meta($medvoice_user->ID, 'trial', '1');
+          }   
+          
+          update_user_meta($medvoice_user->ID, 'st', $st);
         } 
         
         // Откат подписки при отмене заказа 
@@ -263,10 +265,10 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
           
           $st = mktime(date('H', $end_time), date('i', $end_time), date('s', $end_time), date('m', $end_time) - $months, date('d', $end_time), date('Y', $end_time));
 
-          update_metadata('user', $medvoice_user->ID, 'st', $st);
+          update_user_meta($medvoice_user->ID, 'st', $st);
 
           if ( $st <= time() ) {
-            update_metadata('user', $medvoice_user->ID, 'subscribed', 0);
+            update_user_meta($medvoice_user->ID, 'subscribed', '0');
           }
         }
         
@@ -294,6 +296,8 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
 
       return $orders;
     }
+
+    return;
   }
 
   /* ==============================================
@@ -302,7 +306,28 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
   =============================================== */
   function medvoice_get_user_subscribe_days_left() 
   {
+    if ( is_user_logged_in(  ) ) {
+      $st = time();
 
+      $medvoice_user = wp_get_current_user(  );
+
+      $subscribed = !empty($medvoice_user->get( 'subscribed' )) ? $medvoice_user->get( 'subscribed' ) : '0';
+
+      if ( $subscribed === '1' ) {
+        $st = !empty($medvoice_user->get( 'st' )) ? $medvoice_user->get( 'st' ) : $st;
+      }
+
+      $start_date = new DateTime( date( 'Y-m-d' ) );
+      $end_date = new DateTime( date( 'Y-m-d', $st ));
+
+      $difference = $end_date->diff( $start_date );
+
+      $subscribe_days_left = $difference->format("%a");
+
+      return $subscribe_days_left;     
+    }
+
+    return;
   }
 
   /* ==============================================
@@ -316,14 +341,29 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
 
       $medvoice_user = wp_get_current_user(  );
 
-      $subscribed = !empty($medvoice_user->get( 'subscribed' )) ? (int) $medvoice_user->get( 'subscribed' ) : 0;
+      $subscribed = !empty($medvoice_user->get( 'subscribed' )) ? $medvoice_user->get( 'subscribed' ) : '0';
 
-      if ( $subscribed === 1 ) {
-        $st = !empty($medvoice_user->get( 'st' )) ? $medvoice_user->get( 'st' ) : time();
+      if ( $subscribed === '1' ) {
+        $st = !empty($medvoice_user->get( 'st' )) ? $medvoice_user->get( 'st' ) : $st;
       }
 
       return date('Y-m-d H:i:s', utc_to_usertime($st));
     }
+
+    return;
+  }
+
+  function medvoice_check_user_subscribe_trial() {
+    if ( is_user_logged_in(  ) ) {
+      $medvoice_user = wp_get_current_user(  );
+
+      $trial = !empty($medvoice_user->get( 'trial' )) ? $medvoice_user->get( 'trial' ) : '0';
+      $subscribed = !empty($medvoice_user->get( 'subscribed' )) ? $medvoice_user->get( 'subscribed' ) : '0';
+
+      return get_user_meta( $medvoice_user->ID );
+    }
+
+    return;
   }
 } 
 ?>

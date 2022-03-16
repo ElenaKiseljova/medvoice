@@ -1,152 +1,80 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-  
-  <?php
-    wp_head();
-  ?>
-</head>
-
-<body> 
+<?php 
+  get_template_part( 'templates/header' );
+?>
   <div class="container">
-    <aside class="nav">
-      <?php 
-        $logo_large = get_theme_mod( 'logo_large' ) ?? '';
-        $logo_narrow = get_theme_mod( 'logo_narrow' ) ?? '';
-      ?>
-      <a href="<?= get_bloginfo( 'url' ); ?>" class="logo logo--nav">
-        <img class="logo__img" src="<?= $logo_large; ?>" alt="<?= get_bloginfo( 'name' ); ?>">
-        <img class="logo__img--short hidden" src="<?= $logo_narrow; ?>" alt="<?= get_bloginfo( 'name' ); ?>">
-      </a>
-
-      <button class="nav__btn">
-        <svg class="nav__btn-arrow" width="6" height="10" viewBox="0 0 6 10" xmlns="http://www.w3.org/2000/svg">
-          <path d="M5.79191 9.80328C5.65318 9.93443 5.47977 10 5.28902 10C5.11561 10 4.92486 9.93443 4.78613 9.80328L0.208092 5.47541C0.0693641 5.34426 4.76837e-07 5.18033 4.76837e-07 5C4.76837e-07 4.81967 0.0693641 4.65574 0.208092 4.52459L4.78613 0.196721C5.06358 -0.0655738 5.51445 -0.0655738 5.79191 0.196721C6.06936 0.459016 6.06936 0.885246 5.79191 1.14754L1.71676 5L5.79191 8.85246C6.06936 9.11475 6.06936 9.54098 5.79191 9.80328Z"/>
-        </svg>                    
-      </button>
-
-      <nav class="nav__wrapper">
-        <ul class="nav__list">
-          <li class="nav__item nav__item--active">
-              <a class="nav__item-link" href="#">
-                  <svg class="nav__icon" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M7.9 17C8.17614 17 8.4 16.7761 8.4 16.5V12.5588C8.4 12.2827 8.62386 12.0588 8.9 12.0588H11.1C11.3761 12.0588 11.6 12.2827 11.6 12.5588V16.5C11.6 16.7761 11.8239 17 12.1 17H15.1C15.3761 17 15.6 16.7761 15.6 16.5V10.4118H16.7246C17.1793 10.4118 17.398 9.85401 17.0644 9.54498L10.3398 3.31483C10.1481 3.1372 9.85191 3.1372 9.66019 3.31483L2.93557 9.54498C2.60202 9.85401 2.82068 10.4118 3.27538 10.4118H4.4V16.5C4.4 16.7761 4.62386 17 4.9 17H7.9Z"/>
-                  </svg>
-                  <p class="nav__text">Главная</p>
-              </a>
-          </li>
-          <li class="nav__item">
-              <a class="nav__item-link" href="#">
-                  <svg class="nav__icon" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10.75 7.7C10.75 7.81046 10.8395 7.9 10.95 7.9H14.3676C14.5491 7.9 14.6368 7.67765 14.5041 7.55379L11.0865 4.36403C10.9586 4.24471 10.75 4.33537 10.75 4.51024V7.7ZM5.5 3H11.3029C11.4296 3 11.5515 3.04806 11.6441 3.13447L15.8412 7.05175C15.9425 7.14631 16 7.27869 16 7.41728V15.6C16 15.9713 15.842 16.3274 15.5607 16.5899C15.2794 16.8525 14.8978 17 14.5 17H5.5C4.6675 17 4 16.37 4 15.6V4.4C4 3.623 4.6675 3 5.5 3ZM13.437 14.6858C13.5698 14.7766 13.75 14.6816 13.75 14.5208V10.8392C13.75 10.6784 13.5698 10.5834 13.437 10.6742L11.813 11.7858C11.6802 11.8766 11.5 11.7816 11.5 11.6208V10.96C11.5 10.6839 11.2761 10.46 11 10.46H6.75C6.47386 10.46 6.25 10.6839 6.25 10.96V14.4C6.25 14.6761 6.47386 14.9 6.75 14.9H11C11.2761 14.9 11.5 14.6761 11.5 14.4V13.7392C11.5 13.5784 11.6802 13.4834 11.813 13.5742L13.437 14.6858Z"/>
-                  </svg>
-                  <p class="nav__text">Курсы</p>
-              </a>
-          </li>
-          <li class="nav__item">
-              <a class="nav__item-link" href="#">
-                  <svg class="nav__icon" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M4.4 5.8H3V15.6C3 15.9713 3.1475 16.3274 3.41005 16.5899C3.6726 16.8525 4.0287 17 4.4 17H14.2V15.6H4.4V5.8ZM15.6 3H7.2C6.8287 3 6.4726 3.1475 6.21005 3.41005C5.9475 3.6726 5.8 4.0287 5.8 4.4V12.8C5.8 13.1713 5.9475 13.5274 6.21005 13.7899C6.4726 14.0525 6.8287 14.2 7.2 14.2H15.6C15.9713 14.2 16.3274 14.0525 16.5899 13.7899C16.8525 13.5274 17 13.1713 17 12.8V4.4C17 4.0287 16.8525 3.6726 16.5899 3.41005C16.3274 3.1475 15.9713 3 15.6 3ZM10 11.75V5.45L14.2 8.6L10 11.75Z"/>
-                  </svg>
-                  <p class="nav__text">Вебинары</p>
-              </a>
-          </li>
-          <li class="nav__item">
-              <a class="nav__item-link" href="#">
-                  <svg class="nav__icon" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M8.16667 3C7.89052 3 7.66667 3.22386 7.66667 3.5V14.1667C7.66667 14.4428 7.89052 14.6667 8.16667 14.6667H9.5C9.77614 14.6667 10 14.4428 10 14.1667V3.5C10 3.22386 9.77614 3 9.5 3H8.16667ZM10.4634 4.40108C10.2058 4.48697 10.0638 4.76286 10.1437 5.02246L12.9606 14.1775C13.0432 14.4458 13.3303 14.5936 13.5966 14.5048L14.981 14.0434C15.2387 13.9575 15.3807 13.6816 15.3008 13.422L12.4838 4.26691C12.4013 3.99863 12.1141 3.85085 11.8478 3.93961L10.4634 4.40108ZM5.05556 4.55556C4.77941 4.55556 4.55556 4.77941 4.55556 5.05556V14.1667C4.55556 14.4428 4.77941 14.6667 5.05556 14.6667H6.38889C6.66503 14.6667 6.88889 14.4428 6.88889 14.1667V5.05556C6.88889 4.77941 6.66503 4.55556 6.38889 4.55556H5.05556ZM3.5 15.4444C3.22386 15.4444 3 15.6683 3 15.9444V16.5C3 16.7761 3.22386 17 3.5 17H16.5C16.7761 17 17 16.7761 17 16.5V15.9444C17 15.6683 16.7761 15.4444 16.5 15.4444H3.5Z"/>
-                  </svg>
-                  <p class="nav__text">Каталог</p>
-              </a>
-          </li>
-          <li class="nav__item nav__item--disabled">
-              <a class="nav__item-link" href="#">
-                  <svg class="nav__icon" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M14.2857 3H5.71429C5.25963 3 4.82359 3.16389 4.5021 3.45561C4.18061 3.74733 4 4.143 4 4.55556V16.0657C4 16.4651 4.44507 16.7033 4.77735 16.4818L9.72265 13.1849C9.8906 13.0729 10.1094 13.0729 10.2773 13.1849L15.2227 16.4818C15.5549 16.7033 16 16.4651 16 16.0657V4.55556C16 3.69222 15.2286 3 14.2857 3Z"/>
-                  </svg>
-                  <p class="nav__text">Закладки</p>
-              </a>
-          </li>
-          <li class="nav__item nav__item--disabled">
-              <a class="nav__item-link" href="#">
-                  <svg class="nav__icon" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5.33333 13.8889C5.33333 12.3333 8.44444 11.4778 10 11.4778C11.5556 11.4778 14.6667 12.3333 14.6667 13.8889V14.1667C14.6667 14.4428 14.4428 14.6667 14.1667 14.6667H5.83333C5.55719 14.6667 5.33333 14.4428 5.33333 14.1667V13.8889ZM12.3333 7.66667C12.3333 8.28551 12.0875 8.879 11.6499 9.31658C11.2123 9.75417 10.6188 10 10 10C9.38116 10 8.78767 9.75417 8.35008 9.31658C7.9125 8.879 7.66667 8.28551 7.66667 7.66667C7.66667 7.04783 7.9125 6.45434 8.35008 6.01675C8.78767 5.57917 9.38116 5.33333 10 5.33333C10.6188 5.33333 11.2123 5.57917 11.6499 6.01675C12.0875 6.45434 12.3333 7.04783 12.3333 7.66667ZM3 4.55556V15.4444C3 15.857 3.16389 16.2527 3.45561 16.5444C3.74733 16.8361 4.143 17 4.55556 17H15.4444C15.857 17 16.2527 16.8361 16.5444 16.5444C16.8361 16.2527 17 15.857 17 15.4444V4.55556C17 4.143 16.8361 3.74733 16.5444 3.45561C16.2527 3.16389 15.857 3 15.4444 3H4.55556C3.69222 3 3 3.7 3 4.55556Z"/>
-                  </svg>
-                  <p class="nav__text">Профиль</p>
-              </a>
-          </li>
-        </ul>
-      </nav>
-
-      <div class="social__wrapper">
-        <a class="social__policy" href="#">Политика использования платформы</a>
-        
-        <?php 
-          get_template_part( 'templates/menu', 'social' );
-        ?>
-        
-        <a class="social__mail-link" href="mailto:support@medvoice.net">support@medvoice.net</a>
-        <a class="social__phone-link" href="tel:+380963718716">+38 (096) 37 18 716</a>
-      </div>
-    </aside>
+    <?php 
+      get_template_part( 'templates/aside' );
+    ?> 
     
     <div class="content">
       <header class="header">
-        <?php get_search_form(); ?>
+        <div class="header__search">
+          <?php get_search_form(); ?>
+
+          <div class="header-results hidden">
+            <h3 class="header-results__title">
+              Результаты
+            </h3>
+
+            <ul class="header-results__list">
+              <li class="header-results__item">
+                  <a href="#" class="header-results__link">
+                      <div class="header-results__img-box">
+                          <img class="header-results__img" src="img/card-1.jpg" alt="">
+                      </div>
+                      <div class="header-results__text-box">
+                          <p class="header-results__text">
+                              Курс
+                          </p>
+                          <h4 class="header-results__name">
+                              Международный симпозиум по хирургии
+                          </h4>
+                      </div>
+                  </a>
+              </li>
+
+              <li class="header-results__item">
+                  <a href="#" class="header-results__link">
+                      <div class="header-results__img-box">
+                          <img class="header-results__img" src="img/card-3.jpg" alt="">
+                      </div>
+                      <div class="header-results__text-box">
+                          <p class="header-results__text">
+                              Вебинар
+                          </p>
+                          <h4 class="header-results__name">
+                              Международный симпозиум по хирургии
+                          </h4>
+                      </div>
+                  </a>
+              </li>
+
+              <li class="header-results__item">
+                  <a href="#" class="header-results__link">
+                      <div class="header-results__img-box">
+                          <img class="header-results__img" src="img/card-5.jpg" alt="">
+                      </div>
+                      <div class="header-results__text-box">
+                          <p class="header-results__text">
+                              Лекция
+                          </p>
+                          <h4 class="header-results__name">
+                              Всё о хирургии
+                          </h4>
+                      </div>
+                  </a>
+              </li>
+            </ul>
+
+            <a href="search.html" class="button">
+              Смотреть больше
+            </a>
+          </div>
+        </div>
         
-        <div class="header__guest-mode">
-          <a href="#" class="button button--subscribe">Оформить подписку</a>
-          <a href="#" class="button button--login">Log in</a>
-        </div>
-        <div class="header__user hidden">
-          <p class="header__trial-text hidden">
-                  Осталось <span class="header__trial-count">7 дней</span> триала
-          </p>
-          <div class="header-profile">
-              <div class="header-profile__avatar header-profile__avatar--empty">
-                  <div class="header__avatar-img-container">
-                      <img class="header__avatar-img" src="<?= get_template_directory_uri(  ); ?>/assets/img/avatar.jpg" alt="avatar">
-                  </div>
-                  <svg class="header__avatar-default" width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M6 20.6667C6 18 11.3333 16.5333 14 16.5333C16.6667 16.5333 22 18 22 20.6667V21.5C22 21.7761 21.7761 22 21.5 22H6.5C6.22386 22 6 21.7761 6 21.5V20.6667ZM18 10C18 11.0609 17.5786 12.0783 16.8284 12.8284C16.0783 13.5786 15.0609 14 14 14C12.9391 14 11.9217 13.5786 11.1716 12.8284C10.4214 12.0783 10 11.0609 10 10C10 8.93913 10.4214 7.92172 11.1716 7.17157C11.9217 6.42143 12.9391 6 14 6C15.0609 6 16.0783 6.42143 16.8284 7.17157C17.5786 7.92172 18 8.93913 18 10ZM2 4.66667V23.3333C2 24.0406 2.28095 24.7189 2.78105 25.219C3.28115 25.719 3.95942 26 4.66667 26H23.3333C24.0406 26 24.7189 25.719 25.219 25.219C25.719 24.7189 26 24.0406 26 23.3333V4.66667C26 3.95942 25.719 3.28115 25.219 2.78105C24.7189 2.28095 24.0406 2 23.3333 2H4.66667C3.18667 2 2 3.2 2 4.66667Z"/>
-                  </svg>
-              </div>
-              <p class="header-profile__username">
-                  Kseniia Vesta
-              </p>
-          </div>
-          <div class="header-profile__menu hidden">
-              <ul class="header-profile__list">
-                  <li class="header-profile__item">
-                      <a class="header-profile__item-link" href="#">
-                          <svg class="header-profile__icon" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M14.2857 3H5.71429C5.25963 3 4.82359 3.16389 4.5021 3.45561C4.18061 3.74733 4 4.143 4 4.55556V16.0657C4 16.4651 4.44507 16.7033 4.77735 16.4818L9.72265 13.1849C9.8906 13.0729 10.1094 13.0729 10.2773 13.1849L15.2227 16.4818C15.5549 16.7033 16 16.4651 16 16.0657V4.55556C16 3.69222 15.2286 3 14.2857 3Z"/>
-                          </svg>
-                          <p class="header-profile__text">Закладки</p>
-                      </a>
-                  </li>
-                  <li class="header-profile__item">
-                      <a class="header-profile__item-link" href="#">
-                          <svg class="header-profile__icon" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M5.33333 13.8889C5.33333 12.3333 8.44444 11.4778 10 11.4778C11.5556 11.4778 14.6667 12.3333 14.6667 13.8889V14.1667C14.6667 14.4428 14.4428 14.6667 14.1667 14.6667H5.83333C5.55719 14.6667 5.33333 14.4428 5.33333 14.1667V13.8889ZM12.3333 7.66667C12.3333 8.28551 12.0875 8.879 11.6499 9.31658C11.2123 9.75417 10.6188 10 10 10C9.38116 10 8.78767 9.75417 8.35008 9.31658C7.9125 8.879 7.66667 8.28551 7.66667 7.66667C7.66667 7.04783 7.9125 6.45434 8.35008 6.01675C8.78767 5.57917 9.38116 5.33333 10 5.33333C10.6188 5.33333 11.2123 5.57917 11.6499 6.01675C12.0875 6.45434 12.3333 7.04783 12.3333 7.66667ZM3 4.55556V15.4444C3 15.857 3.16389 16.2527 3.45561 16.5444C3.74733 16.8361 4.143 17 4.55556 17H15.4444C15.857 17 16.2527 16.8361 16.5444 16.5444C16.8361 16.2527 17 15.857 17 15.4444V4.55556C17 4.143 16.8361 3.74733 16.5444 3.45561C16.2527 3.16389 15.857 3 15.4444 3H4.55556C3.69222 3 3 3.7 3 4.55556Z"/>
-                          </svg>
-                          <p class="header-profile__text">Профиль</p>
-                      </a>
-                  </li>
-                  <li class="header-profile__item">
-                      <a class="header-profile__item-link" href="#">
-                          <svg class="header-profile__icon" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M15.4444 3H4.55556C3.69222 3 3 3.69222 3 4.55556V7.66667H4.55556V4.55556H15.4444V15.4444H4.55556V12.3333H3V15.4444C3 15.857 3.16389 16.2527 3.45561 16.5444C3.74733 16.8361 4.143 17 4.55556 17H15.4444C15.857 17 16.2527 16.8361 16.5444 16.5444C16.8361 16.2527 17 15.857 17 15.4444V4.55556C17 3.69222 16.3 3 15.4444 3ZM8.50667 12.7844L9.61111 13.8889L13.5 10L9.61111 6.11111L8.50667 7.20778L10.5211 9.22222H3V10.7778H10.5211L8.50667 12.7844Z"/>
-                          </svg>
-                          <p class="header-profile__text">Выйти</p>
-                      </a>
-                  </li>
-              </ul>
-          </div>
-        </div>
+        <?php 
+          get_template_part( 'templates/user' );
+        ?>         
       </header>
 
   

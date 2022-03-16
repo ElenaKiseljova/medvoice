@@ -2,6 +2,9 @@
 /*INCLUDE SETTINGS FUNCTIONS.PHP*/
 require_once( TEMPLATEPATH . '/functions_settings.php' );
 
+/*INCLUDE SEARCH FUNCTIONS.PHP*/
+require_once( TEMPLATEPATH . '/functions_search.php' );
+
 /*INCLUDE CURRENCY BY GEO FUNCTIONS.PHP*/
 require_once( TEMPLATEPATH . '/functions_currency_by_geo.php' );
 
@@ -298,15 +301,18 @@ function medvoice_disabled_some_links ( $query ) {
 /* ==============================================
   ********  //Фильтры ссылок
   =============================================== */
+
+
 add_filter( 'register_url', 'medvoice_register_urf_filter' );
 function medvoice_register_urf_filter( $register ){
-	return '/?action=register';
+	return  get_special_page_url(  ) . '?action=register';
 }
 
 add_filter( 'login_url', 'medvoice_login_url_filter', 10, 3 );
 function medvoice_login_url_filter( $login_url, $redirect, $force_reauth ){
-	return '/?action=login';
+	return get_special_page_url(  ) . '?action=login';
 }
+
 add_filter( 'wp_mail_content_type', 'medvoice_wp_mail_content_type_filter' );
 function medvoice_wp_mail_content_type_filter( $content_type ){
 	return 'text/html';
@@ -315,13 +321,34 @@ function medvoice_wp_mail_content_type_filter( $content_type ){
 add_filter( 'wp_new_user_notification_email', 'wp_new_user_notification_email_filter', 10, 3 );
 function wp_new_user_notification_email_filter( $wp_new_user_notification_email, $medvoice_user, $blogname ){
 	$wp_new_user_notification_email['subject'] = __( 'Регистрация на сайте', 'medvoice' ) .' ' . wp_specialchars_decode( $blogname );
-	$wp_new_user_notification_email['message'] = 
-		get_custom_logo().'<br><br>
-		'. __( 'Добро пожаловать на сайт', 'medvoice' ) .' '. get_bloginfo('name') . '<br>
+	
+  $logo_large = get_theme_mod( 'logo_large' ) ?? '';
+
+  $wp_new_user_notification_email['message'] = 
+		__( 'Добро пожаловать на сайт', 'medvoice' ) .' '. get_bloginfo('name') . '<br>
 		'. __( 'Ваш логин для входа:', 'medvoice' ) .' '.$medvoice_user->user_email.'<br>
-		'. __( 'Вход:', 'medvoice' ) .' <a href="'.home_url('?action=login').'">'.home_url('?action=login').'</a>';
+		'. __( 'Вход:', 'medvoice' ) .' <a href="' . get_special_page_url(  ) . '?action=login">' . __( 'перейти на страницу логирования', "medvoice" ) . '</a>';
 	
 	return $wp_new_user_notification_email;
 }
+
+/* ==============================================
+  ********  //Получение ссылок на спецстраницы
+  =============================================== */
+  
+  function get_special_page_url( $type = 'forms' )
+  {
+    $page_name = $type . '_page_id';
+
+    $page_id = get_field( $page_name, 'options' ) ?? null;
+  
+    if ( function_exists( 'pll_get_post' ) ) {
+      $page_id = pll_get_post( $page_id );
+    }
+  
+    $page_url = get_permalink( $page_id );
+    
+    return $page_url;
+  }
 
 ?>

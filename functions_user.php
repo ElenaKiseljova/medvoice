@@ -150,7 +150,7 @@ function medvoice_ajax_register_mail()
         }        
       }
       
-      $confirm_link = get_home_url(  ) . '/?action=confirm' .
+      $confirm_link = get_forms_page_url(  ) . '?action=confirm' .
                                          '&key=' . $key . 
                                          '&email=' . rawurlencode($info['user_login']) . 
                                          '&name=' . $info['nickname'];
@@ -412,7 +412,7 @@ function medvoice_retrieve_password()
     $message .= '<p>' . sprintf(__('Username: %s'), $user_login) . '</p>';
     $message .= '<p>' . __('If this was a mistake, ignore this email and nothing will happen.') . '</p>';
     $message .= '<p>' . __('To reset your password, visit the following address:') . '</p>';
-    $message .= '<p><a href="' . network_site_url("?action=reset&key=$key&login=" . rawurlencode($user_login), 'login') . '">' . __('Ссылка для установки нового пароля') . '</a></p>';
+    $message .= '<p><a href="' . get_forms_page_url(  ) . '?action=reset&key=$key&login=' . rawurlencode($user_login) . '">' . __('Ссылка для установки нового пароля', 'medvoice') . '</a></p>';
 
     $requester_ip = $_SERVER['REMOTE_ADDR'];
     if ($requester_ip) {

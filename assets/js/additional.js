@@ -121,6 +121,7 @@
                 if (response.success === true) {
                   if (formStatus) {
                     formStatus.innerHTML = response.data.message ?? '';
+                    formStatus.classList.add('success');
                   }
 
                   // Уникальные действия при успехе отправки формы
@@ -143,6 +144,8 @@
                     formStatus.innerHTML = (response.data && response.data.message) ?
                       response.data.message :
                       __('Что-то пошло не так...', 'medvoice');
+
+                    formStatus.classList.add('error');
                   }
 
                   console.error('Ошибка:', response);
@@ -150,9 +153,14 @@
 
                 form.classList.remove('sending');
 
+                if (formStatus) {
+                  formStatus.classList.add('active');
+                }
+
                 setTimeout(() => {
                   if (formStatus) {
                     formStatus.innerHTML = '';
+                    formStatus.classList.remove('active');
                   }
                 }, 2000);
               })
@@ -205,6 +213,7 @@
           } else {
             if (formStatus) {
               formStatus.innerHTML = data.noConditionText ? data.noConditionText : 'Условие не выполнено';
+              formStatus.classList.add('error');
             }
           }
         });
