@@ -23,8 +23,6 @@ require_once( TEMPLATEPATH . '/functions_subscribe.php' );
 add_action('wp_enqueue_scripts', 'medvoice_styles', 3);
 function medvoice_styles () 
 {
-  // wp_enqueue_style('google-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
   wp_enqueue_style('swiper-style', get_template_directory_uri() . '/assets/css/swiper-bundle.min.css');
 
   wp_enqueue_style('medvoice-style', get_stylesheet_uri());    
@@ -36,7 +34,9 @@ function medvoice_scripts ()
 {  
   wp_enqueue_script('swiper-script', get_template_directory_uri() . '/assets/js/swiper-bundle.min.js', $deps = array(), $ver = null, $in_footer = true );
  
-  wp_enqueue_script('main-script', get_template_directory_uri() . '/assets/js/script.js', $deps = array(), $ver = null, $in_footer = true );
+  if ( !is_page( medvoice_get_special_page( 'forms', 'id'  ) ) ) {
+    wp_enqueue_script('main-script', get_template_directory_uri() . '/assets/js/script.js', $deps = array(), $ver = null, $in_footer = true );
+  }
 
   wp_enqueue_script('additional-script', get_template_directory_uri() . '/assets/js/additional.js', $deps = array(), $ver = null, $in_footer = true );
 
@@ -119,6 +119,7 @@ function medvoice_customizer ( $wp_customize )
   )));  
 }
 
+// After_setup_theme
 add_action( 'after_setup_theme', 'medvoice_after_setup_theme_function' );
 
 if (!function_exists('medvoice_after_setup_theme_function')) :
@@ -305,12 +306,12 @@ function medvoice_disabled_some_links ( $query ) {
 
 add_filter( 'register_url', 'medvoice_register_urf_filter' );
 function medvoice_register_urf_filter( $register ){
-	return  get_special_page_url(  ) . '?action=register';
+	return  medvoice_get_special_page( 'forms', 'url'  ) . '?action=register';
 }
 
 add_filter( 'login_url', 'medvoice_login_url_filter', 10, 3 );
 function medvoice_login_url_filter( $login_url, $redirect, $force_reauth ){
-	return get_special_page_url(  ) . '?action=login';
+	return medvoice_get_special_page( 'forms', 'url'  ) . '?action=login';
 }
 
 add_filter( 'wp_mail_content_type', 'medvoice_wp_mail_content_type_filter' );
@@ -327,7 +328,7 @@ function wp_new_user_notification_email_filter( $wp_new_user_notification_email,
   $wp_new_user_notification_email['message'] = 
 		__( 'Добро пожаловать на сайт', 'medvoice' ) .' '. get_bloginfo('name') . '<br>
 		'. __( 'Ваш логин для входа:', 'medvoice' ) .' '.$medvoice_user->user_email.'<br>
-		'. __( 'Вход:', 'medvoice' ) .' <a href="' . get_special_page_url(  ) . '?action=login">' . __( 'перейти на страницу логирования', "medvoice" ) . '</a>';
+		'. __( 'Вход:', 'medvoice' ) .' <a href="' . medvoice_get_special_page( 'forms', 'url'  ) . '?action=login">' . __( 'перейти на страницу логирования', "medvoice" ) . '</a>';
 	
 	return $wp_new_user_notification_email;
 }
@@ -336,19 +337,27 @@ function wp_new_user_notification_email_filter( $wp_new_user_notification_email,
   ********  //Получение ссылок на спецстраницы
   =============================================== */
   
-  function get_special_page_url( $type = 'forms' )
+  function medvoice_get_special_page( $type = 'forms', $format = 'url' )
   {
     $page_name = $type . '_page_id';
 
     $page_id = get_field( $page_name, 'options' ) ?? null;
-  
+    
     if ( function_exists( 'pll_get_post' ) ) {
       $page_id = pll_get_post( $page_id );
     }
-  
-    $page_url = get_permalink( $page_id );
+
+    if ( $format === 'id') {
+      return $page_id;
+    }
+
+    if ( $format === 'url') {
+      $page_url = get_permalink( $page_id );
     
-    return $page_url;
+      return $page_url;
+    }
+  
+    return;
   }
 
 ?>

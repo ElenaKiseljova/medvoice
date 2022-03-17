@@ -98,7 +98,7 @@
               <?= 
                 sprintf(
                   __( '<a href="%s">Забыли пароль</a>', 'medvoice' ),
-                  get_special_page_url(  ) . '?action=forgot'
+                  medvoice_get_special_page( 'forms', 'url'  ) . '?action=forgot'
                 ); 
               ?>  
             </p>
@@ -122,12 +122,12 @@
           <?= 
               sprintf(
                 __( 'Ещё нет аккаунта? 
-                      <a href="%s">Зарегистрируйтесь</a> 
+                      <a href="%s">Оформите подписку</a> 
                       или 
-                      <a href="%s">оформите триальную версию</a>', 'medvoice' 
+                      <a href="%s">триальную версию</a>', 'medvoice' 
                   ),
                   wp_registration_url(),
-                  get_special_page_url(  ) . '?action=trial'
+                  medvoice_get_special_page( 'forms', 'url'  ) . '?action=trial'
               ); 
             ?>  
         <?php else : ?>

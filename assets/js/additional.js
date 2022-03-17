@@ -160,7 +160,7 @@
                 setTimeout(() => {
                   if (formStatus) {
                     formStatus.innerHTML = '';
-                    formStatus.classList.remove('active');
+                    formStatus.classList.remove('active', 'error', 'success');
                   }
                 }, 2000);
               })
@@ -213,7 +213,7 @@
           } else {
             if (formStatus) {
               formStatus.innerHTML = data.noConditionText ? data.noConditionText : 'Условие не выполнено';
-              formStatus.classList.add('error');
+              formStatus.classList.add('active', 'error');
             }
           }
         });
@@ -299,7 +299,7 @@
 
         const callbacks = {
           login() {
-            document.location.reload();
+            window.location.href = window.location.origin;
           },
           register() {
             // Какие-то действия

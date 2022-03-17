@@ -88,6 +88,12 @@ function medvoice_ajax_login()
 ********  //Регистрация
 =============================================== */
 
+// Добавление флага для нового пользователя
+add_action('user_register', 'medvoice_register_add_meta');
+function medvoice_register_add_meta($user_id) { 
+	add_user_meta($user_id, '_new_user', '1');
+}
+
 // Sign up (mail)
 function medvoice_ajax_register_mail() 
 {
@@ -257,19 +263,6 @@ function medvoice_register()
         }
       }
     }    
-  } else if ( is_user_logged_in(  ) ) {
-    $medvoice_user = wp_get_current_user(  );
-
-    $trial = (int) $medvoice_user->get( 'trial' );
-
-    if ( $trial !== 1 ) {
-      $product_id = get_field( 'trial', 'options' ) ?? null;
-
-      if ( isset($product_id) ) {
-        // Вызов ф-и подключения триала при создании нового пользователя
-        medvoice_create_order( $product_id );
-      }	
-    }
   }
 }
 

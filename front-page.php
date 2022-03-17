@@ -10,15 +10,30 @@
 
 
 <main class="main">  
+  <?php 
+  $medvoice_user = wp_get_current_user(  );
+  // update_user_meta($medvoice_user->ID, '_new_user', '1');
+  // update_user_meta($medvoice_user->ID, 'st', time());
+  // delete_metadata( 'user', $medvoice_user->ID, 'subscribed_days' );
+
+    echo medvoice_get_user_subscribe_end_date();
+  ?>
   <section class="banner" id="banner">
     <h1 class="banner__title">
         Международная платформа для обучения врачей
     </h1>
-    <form class="banner__form">
-        <input class="banner__input" type="email" placeholder="Ваш email">
-        <button class="button" type="submit">Оформить триал</button>
-    </form>
+    <?php if ( !is_user_logged_in(  ) ) : ?>
+      <form class="banner__form" method="get" action="<?= medvoice_get_special_page( 'forms', 'url' ); ?>">
+        <input class="banner__input" type="email" placeholder="Ваш email" name="email" required />
+        <input type="hidden" name="action" value="trial">
+        <button class="button" type="submit"><?= __( 'Оформить триал', 'medvoice' ); ?></button>
+      </form>
+    <?php elseif( medvoice_user_have_subscribe() ) : ?>
+    <?php else : ?>
+      <a class="button" href="<?= medvoice_get_special_page( 'tariffs', 'url' ); ?>"><?= __( 'Оформить подписку', 'medvoice' ); ?></a>
+    <?php endif; ?>    
   </section>
+
   <section class="slider" id="courses">
     <div class="swiper swiper-courses">
         <div class="slider__head">

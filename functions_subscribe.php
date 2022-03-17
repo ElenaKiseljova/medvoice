@@ -39,61 +39,7 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
   ********  //Подписка на тариф 
   ********  //(создание заказа WooCommerce)
   =============================================== */
-  
-  if ( is_user_logged_in(  ) ) {
-    add_action( 'wp_ajax_medvoice_create_order_ajax', 'medvoice_create_order_ajax' );
-    add_action( 'wp_ajax_nopriv_medvoice_create_order_ajax', 'medvoice_create_order_ajax' );
-  }  
-
-  function medvoice_create_order_ajax(  ) 
-  {
-    try {
-      // Проверка nonce
-      check_ajax_referer('additional-script.js_nonce', 'security');
-
-      // Получение срока подписки
-      $months = isset($_REQUEST['months']) ? (int) trim( $_REQUEST['months'] ) : null;
-
-      if ( isset($months) ) {
-        // Получить ID Товара из $_REQUEST
-        $product_id = isset($_REQUEST['product_id']) ? (int) trim( $_REQUEST['product_id'] ) : null;
-
-        if ( isset($product_id) ) {
-
-          // Создание заказа
-          medvoice_create_order($product_id, $months);
-               
-        } else {
-          $response = [
-            'message' => __('Товар не существует', 'medvoice'),
-          ];
-
-          wp_send_json_error( $response );
-
-          die(  );
-        } 
-      } else {
-        $response = [
-          'message' => __('Не указан период', 'medvoice'),
-        ];
-
-        wp_send_json_error( $response );        
-      } 
-      
-      die(  );
-    } catch (\Throwable $th) {
-      $response = [
-        'error' => $th,
-        'message' => __('Что-то пошло не так...', 'medvoice'),
-      ];
-
-      wp_send_json_error( $response );
-
-      die(  );
-    }
-  }
-
-  function medvoice_create_order( $product_id = null, $months = null ) 
+  function medvoice_create_order( $product_id = null, $months = null, $medvoice_user_id = null ) 
   {
     // Получить корзину
     $cart = WC()->cart ?? null;
@@ -109,14 +55,14 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
       $medvoice_user = wp_get_current_user();
 
       if ( $medvoice_user instanceof WP_User) {
-        $user_id = $medvoice_user->ID;    
-          
+        $medvoice_user_id = isset($medvoice_user_id) ? $medvoice_user_id : $medvoice_user->ID;    
+        
         // Данные для WooCommerce
         $address = [];
           
         // Создание заказа
         $attr = [
-          'customer_id'   => $user_id,
+          'customer_id'   => $medvoice_user_id,
           'created_via'   => 'medvoice_ajax',
         ];
 
@@ -159,9 +105,7 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
         // Записываю кол-во месяцев в заказ
         if ( isset($months) ) {
           $order->update_meta_data( 'months', $months );
-          $order->update_meta_data( 'trial', '0' );
-        } else {    
-          $order->update_meta_data( 'months', 0 );            
+        } else {             
           $order->update_meta_data( 'trial', '1' );
         }
         
@@ -222,6 +166,78 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
     }     
   }
 
+  // Создание заказа c выбранным Тарифом
+  if ( is_user_logged_in(  ) ) {
+    add_action( 'wp_ajax_medvoice_create_order_ajax', 'medvoice_create_order_ajax' );
+    add_action( 'wp_ajax_nopriv_medvoice_create_order_ajax', 'medvoice_create_order_ajax' );
+  }  
+  function medvoice_create_order_ajax(  ) 
+  {
+    try {
+      // Проверка nonce
+      check_ajax_referer('additional-script.js_nonce', 'security');
+
+      // Получение срока подписки
+      $months = isset($_REQUEST['months']) ? (int) trim( $_REQUEST['months'] ) : null;
+
+      if ( isset($months) ) {
+        // Получить ID Товара из $_REQUEST
+        $product_id = isset($_REQUEST['product_id']) ? (int) trim( $_REQUEST['product_id'] ) : null;
+
+        if ( isset($product_id) ) {
+
+          // Создание заказа
+          medvoice_create_order($product_id, $months);
+               
+        } else {
+          $response = [
+            'message' => __('Товар не существует', 'medvoice'),
+          ];
+
+          wp_send_json_error( $response );
+
+          die(  );
+        } 
+      } else {
+        $response = [
+          'message' => __('Не указан период', 'medvoice'),
+        ];
+
+        wp_send_json_error( $response );        
+      } 
+      
+      die(  );
+    } catch (\Throwable $th) {
+      $response = [
+        'error' => $th,
+        'message' => __('Что-то пошло не так...', 'medvoice'),
+      ];
+
+      wp_send_json_error( $response );
+
+      die(  );
+    }
+  }
+
+  // Создание заказа с Триальным тарифом при первом логировании пользователя
+  add_action( 'wp_login', 'medvoice_create_order_login', 10, 2 );
+  function medvoice_create_order_login( $medvoice_user_login, $medvoice_user )
+  {
+    $new_user = get_user_meta($medvoice_user->ID, '_new_user', true);
+    if ($new_user === '1') {    
+      update_user_meta($medvoice_user->ID, '_new_user', '0');
+
+      $product_id = get_field( 'trial', 'options' ) ?? null;
+
+      if ( isset($product_id) ) {
+        // Вызов ф-и подключения Триала
+        medvoice_create_order( $product_id, null, $medvoice_user->ID );
+      }	
+    }
+  }
+
+  
+
   /* ==============================================
   ********  //Подписка на тариф 
   ********  //(оформление подписки после оплаты заказа WooCommerce или откат подписки при отмене заказа)
@@ -229,12 +245,12 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
   function medvoice_subscribe( $order = null, $direction = 'to' )
   {
     if ( isset($order) ) {
-      $months = (int) $order->get_meta( 'months' );
+      $months = $order->get_meta( 'months' ) ? (int) $order->get_meta( 'months' ) : 0;
       $trial = $order->get_meta( 'trial' );
 
-      $user_id = $order->get_user_id();
+      $medvoice_user_id = $order->get_user_id();
 
-      $medvoice_user = get_user_by( 'id', $user_id );
+      $medvoice_user = get_user_by( 'id', $medvoice_user_id );
 
       if ( $medvoice_user instanceof WP_User) {  
         // Оформление подписки после оплаты заказа
@@ -243,20 +259,22 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
           
           $st = time();
 
-          if ( $months > 0 ) {
-            $st = mktime(date('H', time()), date('i', time()), date('s', time()), date('m', $start_time) + $months, date('d', $start_time), date('Y', $start_time));
+          if ($months === 0) {
+            $trial_days = get_field( 'trial_days', 'options' ) ? (int) get_field( 'trial_days', 'options' ) : 7;
             
-            update_user_meta($medvoice_user->ID, 'trial', '0');
-            update_user_meta($medvoice_user->ID, 'subscribed', '1');
-          } else {
-            $trial_days = get_field( 'trial_days', 'options' ) ?? 7;
-
             $st = mktime(date('H', time()), date('i', time()), date('s', time()), date('m', $start_time), date('d', $start_time) + $trial_days, date('Y', $start_time));
             
-            update_user_meta($medvoice_user->ID, 'trial', '1');
-          }   
+            // Обновление мета полей пользователя
+            update_metadata( 'user', $medvoice_user->ID, 'trial', '1');            
+          } else {
+            $st = mktime(date('H', time()), date('i', time()), date('s', time()), date('m', $start_time) + $months, date('d', $start_time), date('Y', $start_time));
+            
+            // Обновление мета полей пользователя
+            update_metadata( 'user', $medvoice_user->ID, 'subscribed', '1');
+          } 
           
-          update_user_meta($medvoice_user->ID, 'st', $st);
+          // Обновление мета полей пользователя
+          update_metadata( 'user', $medvoice_user->ID, 'st', $st); 
         } 
         
         // Откат подписки при отмене заказа 
@@ -265,13 +283,9 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
           
           $st = mktime(date('H', $end_time), date('i', $end_time), date('s', $end_time), date('m', $end_time) - $months, date('d', $end_time), date('Y', $end_time));
 
-          update_user_meta($medvoice_user->ID, 'st', $st);
-
-          if ( $st <= time() ) {
-            update_user_meta($medvoice_user->ID, 'subscribed', '0');
-          }
-        }
-        
+          // Обновление мета полей пользователя
+          update_metadata( 'user', $medvoice_user->ID, 'st', $st);          
+        }        
       }
     }    
     
@@ -302,18 +316,18 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
 
   /* ==============================================
   ********  //Кол-во оставшихся дней подписки пользователя 
-  ********  //(для личного кабинета)
   =============================================== */
-  function medvoice_get_user_subscribe_days_left() 
+  function medvoice_get_user_subscribe_or_trial_days_left() 
   {
     if ( is_user_logged_in(  ) ) {
       $st = time();
 
       $medvoice_user = wp_get_current_user(  );
 
+      $trial = !empty($medvoice_user->get( 'trial' )) ? $medvoice_user->get( 'trial' ) : '0';
       $subscribed = !empty($medvoice_user->get( 'subscribed' )) ? $medvoice_user->get( 'subscribed' ) : '0';
 
-      if ( $subscribed === '1' ) {
+      if ( $subscribed === '1' || $trial === '1' ) {
         $st = !empty($medvoice_user->get( 'st' )) ? $medvoice_user->get( 'st' ) : $st;
       }
 
@@ -332,38 +346,80 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
 
   /* ==============================================
   ********  //Конечная дата подписки пользователя 
-  ********  //(-)
   =============================================== */
   function medvoice_get_user_subscribe_end_date()
   {
-    if ( is_user_logged_in(  ) ) {
-      $st = time();
-
-      $medvoice_user = wp_get_current_user(  );
-
-      $subscribed = !empty($medvoice_user->get( 'subscribed' )) ? $medvoice_user->get( 'subscribed' ) : '0';
-
-      if ( $subscribed === '1' ) {
-        $st = !empty($medvoice_user->get( 'st' )) ? $medvoice_user->get( 'st' ) : $st;
-      }
-
-      return date('Y-m-d H:i:s', utc_to_usertime($st));
-    }
-
-    return;
-  }
-
-  function medvoice_check_user_subscribe_trial() {
     if ( is_user_logged_in(  ) ) {
       $medvoice_user = wp_get_current_user(  );
 
       $trial = !empty($medvoice_user->get( 'trial' )) ? $medvoice_user->get( 'trial' ) : '0';
       $subscribed = !empty($medvoice_user->get( 'subscribed' )) ? $medvoice_user->get( 'subscribed' ) : '0';
 
-      return get_user_meta( $medvoice_user->ID );
+      if ( $subscribed === '1' || $trial === '1' ) {
+        $st = !empty($medvoice_user->get( 'st' )) ? $medvoice_user->get( 'st' ) : $st;
+
+        return __( 'Подписка действительна до: ', 'medvoice' ) . date('Y-m-d H:i:s', utc_to_usertime($st));
+      } else {
+        return __( 'Подписка аннулирована!', 'medvoice' );
+      }      
     }
 
     return;
+  }
+
+  /* ==============================================
+  ********  //Проверка наличия Триала
+  =============================================== */
+  function medvoice_user_have_subscribe_trial() {
+    if ( is_user_logged_in(  ) ) {
+      $medvoice_user = wp_get_current_user(  );
+
+      $trial = !empty($medvoice_user->get( 'trial' )) ? $medvoice_user->get( 'trial' ) : '0';
+      $subscribed = !empty($medvoice_user->get( 'subscribed' )) ? $medvoice_user->get( 'subscribed' ) : '0';
+
+      return $trial === '1' && $subscribed !== '1';
+    }
+
+    return;
+  }
+
+  /* ==============================================
+  ********  //Проверка наличия Подписки
+  =============================================== */
+  function medvoice_user_have_subscribe() {
+    if ( is_user_logged_in(  ) ) {
+      $medvoice_user = wp_get_current_user(  );
+
+      $subscribed = !empty($medvoice_user->get( 'subscribed' )) ? $medvoice_user->get( 'subscribed' ) : '0';
+
+      return $subscribed === '1';
+    }
+
+    return;
+  }
+
+  /* ==============================================
+  ********  //Проверка даты Подписки у пользователя
+  =============================================== */
+  add_action( 'init', 'medvoice_check_user_subscribe_date', 10, 1 );
+  function medvoice_check_user_subscribe_date()
+  {
+    if ( is_user_logged_in(  ) ) {
+      $medvoice_user = wp_get_current_user(  );
+
+      $st = (!empty($medvoice_user->get('st')) && $medvoice_user->get('st') > time()) ? $medvoice_user->get('st') : time();
+
+      if ( $st <= time() ) {
+        update_metadata( 'user', $medvoice_user->ID, 'subscribed', '0');
+        update_metadata( 'user', $medvoice_user->ID, 'trial', '0');
+
+        return false;
+      } else {
+        return true;
+      }      
+    }
+
+    return;    
   }
 } 
 ?>
