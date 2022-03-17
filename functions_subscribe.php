@@ -225,7 +225,7 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
   {
     $new_user = get_user_meta($medvoice_user->ID, '_new_user', true);
     if ($new_user === '1') {    
-      update_user_meta($medvoice_user->ID, '_new_user', '0');
+      update_metadata( 'user', $medvoice_user->ID, '_new_user', '0');
 
       $product_id = get_field( 'trial', 'options' ) ?? null;
 
@@ -410,8 +410,21 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
       $st = (!empty($medvoice_user->get('st')) && $medvoice_user->get('st') > time()) ? $medvoice_user->get('st') : time();
 
       if ( $st <= time() ) {
-        update_metadata( 'user', $medvoice_user->ID, 'subscribed', '0');
-        update_metadata( 'user', $medvoice_user->ID, 'trial', '0');
+        $new_user = get_user_meta($medvoice_user->ID, '_new_user', true);
+
+        if ($new_user === '1') {    
+          update_metadata( 'user', $medvoice_user->ID, '_new_user', '0');
+
+          $product_id = get_field( 'trial', 'options' ) ?? null;
+
+          if ( isset($product_id) ) {
+            // Вызов ф-и подключения Триала
+            medvoice_create_order( $product_id, null, $medvoice_user->ID );
+          }	
+        } else {
+          update_metadata( 'user', $medvoice_user->ID, 'subscribed', '0');
+          update_metadata( 'user', $medvoice_user->ID, 'trial', '0');
+        }        
 
         return false;
       } else {
