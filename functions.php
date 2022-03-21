@@ -38,6 +38,7 @@ function medvoice_scripts ()
     wp_enqueue_script('main-script', get_template_directory_uri() . '/assets/js/script.js', $deps = array(), $ver = null, $in_footer = true );
   }
 
+  wp_enqueue_script('cookie-edit-script', get_template_directory_uri() . '/assets/js/cookie-edit.js', $deps = array(), $ver = null, $in_footer = true );
   wp_enqueue_script('additional-script', get_template_directory_uri() . '/assets/js/additional.js', $deps = array(), $ver = null, $in_footer = true );
 
   // С переводами
@@ -54,6 +55,7 @@ function medvoice_scripts ()
   $args = array(
     'url' => admin_url('admin-ajax.php'),
     'nonce' => wp_create_nonce('additional-script.js_nonce'),
+    'forms' => medvoice_get_special_page( 'forms', 'url' ) ?? get_home_url(  ),
   );  
 
   if ( $site_key ) {
@@ -360,4 +362,25 @@ function wp_new_user_notification_email_filter( $wp_new_user_notification_email,
     return;
   }
 
+  /* ==============================================
+  ********  //Получение Логотипов
+  =============================================== */
+  /**
+   * $place: nav, usr, tariff
+   */
+  function medvoice_get_logo_html( $place = 'nav' )
+  {
+    $logo_large = get_theme_mod( 'logo_large' ) ?? '';
+    $logo_narrow = get_theme_mod( 'logo_narrow' ) ?? '';
+
+    ?>
+      <a href="<?= get_bloginfo( 'url' ); ?>" class="logo logo--<?= $place; ?>">
+        <img class="logo__img" src="<?= $logo_large; ?>" alt="<?= get_bloginfo( 'name' ); ?>">
+
+        <?php if ( $place === 'nav' ) : ?>
+          <img class="logo__img--short hidden" src="<?= $logo_narrow; ?>" alt="<?= get_bloginfo( 'name' ); ?>">
+        <?php endif; ?>        
+      </a>
+    <?php
+  }
 ?>

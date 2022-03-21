@@ -222,7 +222,7 @@
     // Подписка на тариф
     subscription: {
       init() {
-        const tariffs = document.querySelectorAll('.list__item');
+        const tariffs = document.querySelectorAll('.tariff-card');
 
         if (tariffs && tariffs.length > 0) {
           tariffs.forEach(tariff => {
@@ -231,11 +231,17 @@
               additional.subscription.setData(tariff);
             }
 
-            // Если кликнули по пункту
-            tariff.addEventListener('click', () => {
+            // Если кликнули по кнопке пункта
+
+            const tariffButton = tariff.querySelector('button');
+
+            tariffButton.addEventListener('click', (evt) => {
+              evt.preventDefault();
+
               tariffs.forEach(item => item.classList.remove('active'));
 
               tariff.classList.add('active');
+
               additional.subscription.setData(tariff);
             });
           });
@@ -245,7 +251,7 @@
           id: 'subscription',
           action: 'medvoice_create_order_ajax',
           condition: additional.subscription.checkData,
-          noConditionText: 'Выберите Тариф',
+          noConditionText: __('Выберите Тариф', 'medvoice'),
           callback: additional.subscription.callback
         };
 
@@ -302,16 +308,26 @@
             window.location.href = window.location.origin;
           },
           register() {
-            // Какие-то действия
+            if (medvoice_ajax.forms) {
+              window.location.href = medvoice_ajax.forms + '?action=success&type=register';
+            }
           },
           trial() {
-            // Какие-то действия
+            if (medvoice_ajax.forms) {
+              window.location.href = medvoice_ajax.forms + '?action=success&type=register';
+            }
           },
-          forgot() {
-            // Какие-то действия
+          forgot(form = null, response = null) {
+            if (medvoice_ajax.forms) {
+              const email = (response !== null) ? (response.email ?? '') : '';
+
+              window.location.href = medvoice_ajax.forms + '?action=success&type=forgot&email=' + email;
+            }
           },
           reset() {
-            // Какие-то действия
+            if (medvoice_ajax.forms) {
+              window.location.href = medvoice_ajax.forms + '?action=success&type=reset';
+            }
           }
         };
 
@@ -357,6 +373,31 @@
       } catch (error) {
         console.error('Ошибка:', error);
       }
+    },
+    popups() {
+      const popups = document.querySelectorAll('.popup');
+
+      if (popups.length > 0) {
+        popups.forEach(popup => {
+          const popupCloseButton = popup.querySelector('.popup__close');
+
+          popupCloseButton?.addEventListener('click', () => {
+            popup.classList.remove('active');
+
+            if (popup.dataset.type === 'subscribe-ended') {
+              window.cookieEdit.set('subscribe-ended', '1');
+            }
+          });
+
+          window.addEventListener('load', () => {
+            popup.classList.add('loaded');
+
+            if (popup.dataset.type === 'subscribe-ended' && window.cookieEdit.get('subscribe-ended') !== '1') {
+              popup.classList.add('active');
+            }
+          });
+        });
+      }
     }
   };
 
@@ -367,5 +408,6 @@
 
     additional.setUserTime();
 
+    additional.popups();
   });
 })();

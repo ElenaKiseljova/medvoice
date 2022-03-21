@@ -63,30 +63,63 @@ function medvoice_get_currency_code(  ) {
   return $currency_code;
 } 
 
-function medvoice_get_price_text( $currency_code = 'USD', $price = 0 ) {
+function medvoice_get_currency_code_text(  ) {
+  $currency_code = medvoice_get_currency_code(  );
+
   switch ($currency_code) {
     case 'USD':
-      return '$ ' . $price;
+      return '$';
 
       break;
 
     case 'EUR':
-      return '€ ' . $price;
+      return '€';
       
       break;
     
     case 'RUR':
-      return $price . ' руб';
+      return 'руб';
       
       break;
 
     case 'UAH':
-      return $price . ' грн';
+      return 'грн';
       
       break;
     
     default:
-      return '$ ' . $price;
+      return '$';
+
+      break;
+  }
+}
+
+function medvoice_get_price_side(  ) {
+  $currency_code = medvoice_get_currency_code(  );
+
+  switch ($currency_code) {
+    case 'USD':
+      return 'left';
+
+      break;
+
+    case 'EUR':
+      return 'left';
+      
+      break;
+    
+    case 'RUR':
+      return 'right';
+      
+      break;
+
+    case 'UAH':
+      return 'right';
+      
+      break;
+    
+    default:
+      return 'left';
 
       break;
   }

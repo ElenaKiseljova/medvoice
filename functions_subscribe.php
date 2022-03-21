@@ -126,16 +126,8 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
 
         // Если заказ не триальный - выставляем счет
         if ( isset($months) ) {
-          // Получаем форму WayForPay
-          $new_wc_wayforpay = new WC_wayforpay();
-
-          $wayforpay_form = $new_wc_wayforpay->medvoice_generate_wayforpay_form( $order->id );  
-
-          $response = [
-            'message' => __('Успешно сформирован счет в WayForPay. Идёт перенаправление...', 'medvoice'), 
-            'form' => $wayforpay_form,               
-          ];
-          
+          // Формирование счета в WayForPay
+          $response = medvoice_pay_order_by_wayforpay( $order );          
           
           wp_send_json_success( $response );
         }
@@ -236,7 +228,21 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
     }
   }
 
-  
+  // Оплата через WayForPay
+  function medvoice_pay_order_by_wayforpay( $order )
+  {    
+    $new_wc_wayforpay = new WC_wayforpay();
+
+    // Получаем форму WayForPay
+    $wayforpay_form = $new_wc_wayforpay->medvoice_generate_wayforpay_form( $order->id ) ?? '';  
+
+    $response = [
+      'message' => __('Успешно сформирован счет в WayForPay. Идёт перенаправление...', 'medvoice'), 
+      'form' => $wayforpay_form,               
+    ];
+
+    return $response;
+  }
 
   /* ==============================================
   ********  //Подписка на тариф 
@@ -271,6 +277,7 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
             
             // Обновление мета полей пользователя
             update_metadata( 'user', $medvoice_user->ID, 'subscribed', '1');
+            update_metadata( 'user', $medvoice_user->ID, 'was_subscribed', '1');
           } 
           
           // Обновление мета полей пользователя
@@ -393,6 +400,22 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
       $subscribed = !empty($medvoice_user->get( 'subscribed' )) ? $medvoice_user->get( 'subscribed' ) : '0';
 
       return $subscribed === '1';
+    }
+
+    return;
+  }
+
+  /* ==============================================
+  ********  //Проверка, что Подписка была когда-то 
+  =============================================== */
+  function medvoice_user_was_subscribed()
+  {
+    if ( is_user_logged_in(  ) ) {
+      $medvoice_user = wp_get_current_user(  );
+
+      $was_subscribed = !empty($medvoice_user->get( 'was_subscribed' )) ? $medvoice_user->get( 'was_subscribed' ) : '0';
+
+      return $was_subscribed === '1';
     }
 
     return;

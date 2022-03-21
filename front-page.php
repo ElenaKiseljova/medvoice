@@ -16,24 +16,34 @@
   // update_user_meta($medvoice_user->ID, 'st', time());
   // delete_metadata( 'user', $medvoice_user->ID, 'subscribed_days' );
   // var_dump( get_user_meta( $medvoice_user->ID ) );
+  
+  //echo wp_get_session_token();
+
+  // if ( class_exists('WP_Session_Tokens') ) {
+  //   $manager = WP_Session_Tokens::get_instance( get_current_user_id() );
+
+  //   var_dump($manager);
+  // }
+  
+
+  // echo '<br><br>';
+
+
+  // $wp_sessions = wp_get_all_sessions() ?? [];
+
+  //   foreach ($wp_sessions as $key => $wp_session) {
+  //     var_dump($wp_session);
+  //     echo '<br><br>';
+      
+  //     // echo date('Y-m-d H:i:s', utc_to_usertime($wp_session['expiration'])) . '<br>';
+  //   }
 
     echo medvoice_get_user_subscribe_end_date();
   ?>
-  <section class="banner" id="banner">
-    <h1 class="banner__title">
-        Международная платформа для обучения врачей
-    </h1>
-    <?php if ( !is_user_logged_in(  ) ) : ?>
-      <form class="banner__form" method="get" action="<?= medvoice_get_special_page( 'forms', 'url' ); ?>">
-        <input class="banner__input" type="email" placeholder="Ваш email" name="email" required />
-        <input type="hidden" name="action" value="trial">
-        <button class="button" type="submit"><?= __( 'Оформить триал', 'medvoice' ); ?></button>
-      </form>
-    <?php elseif( medvoice_user_have_subscribe() ) : ?>
-    <?php else : ?>
-      <a class="button" href="<?= medvoice_get_special_page( 'tariffs', 'url' ); ?>"><?= __( 'Оформить подписку', 'medvoice' ); ?></a>
-    <?php endif; ?>    
-  </section>
+  
+  <?php 
+    get_template_part( 'templates/front/banner' );
+  ?>
 
   <section class="slider" id="courses">
     <div class="swiper swiper-courses">

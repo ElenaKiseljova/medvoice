@@ -109,6 +109,8 @@ function medvoice_ajax_register_mail()
       $info['user_password'] = isset($_POST['password']) ? $_POST['password'] : '';
       $info['nickname'] = isset($_POST['nickname']) ? $_POST['nickname'] : '';
 
+      $info['subscribe'] = isset($_POST['subscribe']) ? (int) $_POST['subscribe'] : 0;
+
       if ( empty($info['user_login']) || !filter_var($info['user_login'], FILTER_VALIDATE_EMAIL) || !is_email($info['user_login']) ) {
         wp_send_json_error(['type' => 'email', 'message' => __('Введите правильный адрес электронной почты', 'medvoice')]);
 
@@ -159,7 +161,8 @@ function medvoice_ajax_register_mail()
       $confirm_link = get_forms_page_url(  ) . '?action=confirm' .
                                          '&key=' . $key . 
                                          '&email=' . rawurlencode($info['user_login']) . 
-                                         '&name=' . $info['nickname'];
+                                         '&name=' . $info['nickname'] .
+                                         '&subscribe=' . $info['subscribe'];
 
       $confirm_text = get_custom_logo() . '<br><br>';
       $confirm_text .= '<p>' . __( 'Приветствуем Вас, ', 'medvoice' ) . '<b>' . $info['nickname'] . '</b></p>';
@@ -254,7 +257,16 @@ function medvoice_register()
 
             wp_set_current_user( $user_signon->ID, $user_signon->user_login );   
 
-            wp_redirect( get_home_url(  ) );
+            // Проверка желаемого типа подписки
+            $subscribe = $_GET['subscribe'] ? (int) $_GET['subscribe'] : 0;
+
+            $redirect_url = get_home_url(  );
+            
+            if ( $subscribe === 1 ) {
+              $redirect_url = medvoice_get_special_page( 'tariffs', 'url'  ) ?? get_home_url(  );
+            }
+
+            wp_redirect( $redirect_url );
 
             exit();
           } else {
@@ -292,12 +304,8 @@ function medvoice_ajax_forgot_password()
         die( );
       } else {
         wp_send_json_success([
-          'retrieve_password' => true,
-          'message' => sprintf(
-            /* translators: %s: Link to the login page. */
-            __('Check your email for the confirmation link, then visit the <a href="%s">login page</a>.', 'medvoice' ),
-            add_query_arg('action', 'login', home_url())
-          ),
+          'message' => __('Форма отправлена!', 'medvoice' ),
+          'email' => $email,
         ]);
       }
     } else {
@@ -307,7 +315,8 @@ function medvoice_ajax_forgot_password()
     die();
   } catch (\Throwable $th) {
     wp_send_json_error( [
-      'message' => $th
+      'message' => __( 'Что-то пошло не так...', 'medvoice'),
+      'data' => $th
     ] );
 
     die();

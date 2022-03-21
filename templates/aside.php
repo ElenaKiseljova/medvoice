@@ -1,7 +1,5 @@
 <aside class="nav">      
-  <?php 
-    get_template_part( 'templates/logo' );
-  ?> 
+  <?php medvoice_get_logo_html( 'nav' ); ?>
 
   <button class="nav__btn">
     <svg class="nav__btn-arrow" width="6" height="10" viewBox="0 0 6 10" xmlns="http://www.w3.org/2000/svg">

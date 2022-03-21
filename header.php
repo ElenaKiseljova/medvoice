@@ -73,7 +73,7 @@
         </div>
         
         <?php 
-          get_template_part( 'templates/user' );
+          get_template_part( 'templates/profile' );
         ?>         
       </header>
 
