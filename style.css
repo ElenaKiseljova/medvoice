@@ -125,3 +125,7 @@
 
   border-radius: 50%;
 }
+
+.form__row.disabled {
+  pointer-events: none;
+}

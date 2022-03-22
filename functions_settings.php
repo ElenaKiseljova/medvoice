@@ -1,4 +1,7 @@
 <?php 
+/* ==============================================
+********  //Валюты по зонам
+=============================================== */
   $currency_zones = [
     'EUR' => [
       'AT', 
@@ -30,4 +33,32 @@
   ];
 
   update_site_option('currency_zones', $currency_zones);
+
+/* ==============================================
+********  //Специальности
+=============================================== */
+  $specializations = [
+    [
+      'label' => __( 'Хирург', 'medvoice' ),
+      'value' => 'surgeon',
+    ],
+    [
+      'label' => __( 'Стоматолог', 'medvoice' ),
+      'value' => 'stomatologist',
+    ],
+    [
+      'label' => __( 'Офтальмолог', 'medvoice' ),
+      'value' => 'ophthalmologist',
+    ],
+    [
+      'label' => __( 'Травматолог', 'medvoice' ),
+      'value' => 'traumatologist',
+    ],
+    [
+      'label' => __( 'Диетолог', 'medvoice' ),
+      'value' => 'nutritionist',
+    ],
+  ];
+
+  update_site_option('specializations', $specializations);
 ?>

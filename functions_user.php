@@ -15,7 +15,10 @@ if( wp_doing_ajax() ) {
     add_action('wp_ajax_nopriv_medvoice_ajax_forgot_password', 'medvoice_ajax_forgot_password');
 
     add_action('wp_ajax_medvoice_ajax_reset_password', 'medvoice_ajax_reset_password');
-    add_action('wp_ajax_nopriv_medvoice_ajax_reset_password', 'medvoice_ajax_reset_password');
+    add_action('wp_ajax_nopriv_medvoice_ajax_reset_password', 'medvoice_ajax_reset_password');     
+  } else {
+    add_action('wp_ajax_medvoice_ajax_edit_user_info', 'medvoice_ajax_edit_user_info');
+    add_action('wp_ajax_nopriv_medvoice_ajax_edit_user_info', 'medvoice_ajax_edit_user_info');   
   }
 }
 
@@ -115,17 +118,39 @@ function medvoice_ajax_register_mail()
         wp_send_json_error(['type' => 'email', 'message' => __('Введите правильный адрес электронной почты', 'medvoice')]);
 
         die(  );  
-      } else if( username_exists($info['user_login']) || email_exists( $info['user_login'] ) ) {
+      } 
+      
+      if( username_exists($info['user_login']) || email_exists( $info['user_login'] ) ) {
         wp_send_json_error(['type' => 'email', 'message' => __('Такой e-mail уже зарегистрирован ранее', 'medvoice')]);
 
         die(  );  
       }
 
+      if ( 4 > strlen( $nickname ) ) {
+        wp_send_json_error(['type' => 'nickname', 'message' => __('Никнейм должен быть не менее 5 символов', 'medvoice')]);
+
+        die(  ); 
+      }
+
+      if ( 25 < strlen( $nickname ) ) {
+        wp_send_json_error(['type' => 'nickname', 'message' => __('Никнейм должен быть не более 25 символов', 'medvoice')]);
+
+        die(  ); 
+      }
+
+      if ( !validate_username( $nickname ) ) {
+        wp_send_json_error(['type' => 'nickname', 'message' => __('Некорректный никнейм', 'medvoice', 'medvoice')]);
+
+        die(  ); 
+      }
+      
       if ( empty($info['user_password']) ) {
         wp_send_json_error(['type' => 'password', 'message' => __('Введите пароль', 'medvoice')]);
 
         die(  );  
-      } else if( 7 >= mb_strlen($info['user_password']) ) {
+      } 
+      
+      if( 7 >= mb_strlen($info['user_password']) ) {
         wp_send_json_error(['type' => 'password', 'message' => __('Пароль должен быть не менее 8 символов.', 'medvoice')]);
 
         die(  );  
@@ -547,6 +572,210 @@ function medvoice_ajax_reset_password()
 }
 
 /* ==============================================
+********  //Обновление информации о подписчике
+=============================================== */
+function medvoice_ajax_edit_user_info()
+{
+  try {
+    // Первым делом проверяем параметр безопасности
+    check_ajax_referer('additional-script.js_nonce', 'security');
+
+    if($_POST['antibot'] == 1) {
+      $medvoice_user = wp_get_current_user();
+
+      // Получаем данные из полей формы и проверяем их
+      $info = [];
+
+      $info['ID'] = $medvoice_user->ID;
+
+      $info['first_name'] = isset($_POST['first_name']) ? htmlspecialchars($_POST['first_name']) : '';
+      $info['last_name'] = isset($_POST['last_name']) ? htmlspecialchars($_POST['last_name']) : '';
+      $info['user_email'] = isset($_POST['user_email']) ? filter_var($_POST['user_email'], FILTER_SANITIZE_EMAIL) : '';
+            
+      if ( empty($info['user_email']) || !filter_var($info['user_email'], FILTER_VALIDATE_EMAIL) || !is_email($info['user_email']) ) {
+        wp_send_json_error([
+          'type' => 'email', 
+          'message' => __('Введите правильный адрес электронной почты', 'medvoice')
+        ]);
+
+        die(  );  
+      } 
+
+      $user_updated = wp_update_user( $info );
+
+      if ( is_wp_error( $user_updated ) ) {
+        wp_send_json_error([
+          'message' => __('Произошла ошибка, возможно такого пользователя не существует.', 'medvoice')
+        ]);
+
+        die(  );
+      } else {
+        $info_meta = [];
+        $info_meta['specialization'] = isset($_POST['specialization']) ? htmlspecialchars($_POST['specialization']) : '';
+  
+        $info_meta['billing_country'] = isset($_POST['billing_country']) ? htmlspecialchars($_POST['billing_country']) : '';
+        $info_meta['billing_city'] = isset($_POST['billing_city']) ? htmlspecialchars($_POST['billing_city']) : '';
+
+        foreach ($info_meta as $key => $value) {
+          $meta_value = get_metadata( 'user', $medvoice_user->ID, $key, true );
+
+          if ( $meta_value !== $value ) {
+            $meta_updated = update_metadata( 'user', $medvoice_user->ID, $key, $value );
+
+            if ($meta_updated === false) {
+              wp_send_json_error([
+                'message' => __('Не удалось обновить: ', 'medvoice') . $key
+              ]);
+
+              die();
+            }
+          }          
+        }
+
+        // Аватар
+        if ( !empty($_FILES) && !empty($_FILES['avatar']['tmp_name']) ) {
+          // ограничим вес загружаемой картинки
+          $filesize = $_FILES['avatar']['size'];
+          $max_filesize_mb = 4;
+          $max_filesize = $max_filesize_mb * 1024 * 1024;
+
+          if ($filesize > $max_filesize) {
+            wp_send_json_error([
+              'message' => __('Фото не должно быть больше ', 'medvoice') . $max_filesize_mb . 'Mb.'
+            ]);
+
+            die(  );  
+          }
+
+          // ограничим размер загружаемой картинки
+          $sizedata = getimagesize($_FILES['avatar']['tmp_name']);
+          $max_size = 4000;
+
+          if ($sizedata[0]/*width*/ > $max_size || $sizedata[1]/*height*/ > $max_size) {
+            wp_send_json_error([
+              'message' => __('Фото не должно быть больше ', 'medvoice') . $max_size . __('px в ширину или высоту.', 'medvoice')
+            ]);
+
+            die(  );  
+          }
+
+          //разрешим только картинки
+          if ($_FILES['avatar']['type'] !== 'image/jpeg' && $_FILES['avatar']['type'] !== 'image/png') {
+            wp_send_json_error([
+              'message' => __('Тип файла не подходит по соображениям безопасности.', 'medvoice')
+            ]);
+
+            die(  );  
+          } 
+
+          // обрабатываем загрузку файла
+          require_once ABSPATH . 'wp-admin/includes/image.php';
+          require_once ABSPATH . 'wp-admin/includes/file.php';
+          require_once ABSPATH . 'wp-admin/includes/media.php';
+  
+          // фильтр допустимых типов файлов - разрешим только картинки
+          add_filter('upload_mimes', function ($mimes) {
+              return [
+                'jpg|jpeg|jpe' => 'image/jpeg',
+                // 'gif' => 'image/gif',
+                'png' => 'image/png',
+              ];
+          });
+  
+          $uploaded_imgs = [];
+          $attach = [];
+     
+          foreach ($_FILES as $file_id => $data) {
+            $attach_id = media_handle_upload($file_id, 0);
+
+            if ( is_wp_error($attach_id) ) {
+              $uploaded_imgs[] = __('Ошибка загрузки файла', 'medvoice') . '`' . $data['name'] . '`: ' . $attach_id->get_error_message();
+            } else {      
+              $attach[] = $attach_id;
+            }
+          }
+
+          if ( !empty($uploaded_imgs) ) {
+            wp_send_json_error([
+              'message' => implode('<br>', $uploaded_imgs),
+            ]);
+
+            die(  );  
+          }
+
+          $avatar_updated = null;
+          if ( !empty($attach) ) {
+            $avatar_updated = update_metadata( 'user', $medvoice_user->ID, 'avatar', $attach[0] );
+
+            if ( $avatar_updated === false ) {
+              wp_send_json_error([
+                'message' => __('Не удалось обновить аватар! ', 'medvoice')
+              ]);
+  
+              die(  ); 
+            }
+          }
+        }
+
+        wp_send_json_success([
+          'message' => __('Данные успешно обновлены!', 'medvoice'), 'avatar' => $avatar_updated
+        ]);
+
+        die();
+      }      
+    } else {
+      wp_send_json_error(['message' => __('Подтвердите, что Вы не робот', 'medvoice')]);
+    }   
+
+    die();
+  } catch (\Throwable $th) {
+    wp_send_json_error( [
+      'message' => $th
+    ] );
+
+    die();
+  }
+}
+
+/* ==============================================
+********  //Проверка наличия Аватара
+=============================================== */
+function medvoice_have_user_avatar()
+{
+  if ( is_user_logged_in(  ) ) {
+    $medvoice_user = wp_get_current_user(  );
+    
+    $medvoice_user_avatar = $medvoice_user->get( 'avatar' );
+
+    if ( isset($medvoice_user_avatar) && !empty($medvoice_user_avatar) ) {
+      return true;
+    }
+  }  
+
+  return false;
+}
+
+/* ==============================================
+********  //Получение Аватара
+=============================================== */
+function medvoice_get_user_avatar( $size = 'thumbnail' )
+{
+  if ( is_user_logged_in(  ) ) {
+    $medvoice_user = wp_get_current_user(  );
+    
+    $medvoice_user_avatar = $medvoice_user->get( 'avatar' );
+
+    if ( isset($medvoice_user_avatar) && !empty($medvoice_user_avatar) ) {
+      $medvoice_user_avatar = wp_get_attachment_image_src( $medvoice_user_avatar, $size );
+
+      return is_array($medvoice_user_avatar) ? $medvoice_user_avatar[0] : get_avatar_url( $medvoice_user->ID );
+    }
+  }  
+
+  return false;
+}
+
+/* ==============================================
 ********  //Класс для операций с БД
 =============================================== */
 class Medvoice
@@ -619,5 +848,80 @@ class Medvoice
     } 
   }
 }
+
+/* ==============================================
+********  //Добавление селекта со специальностями в редактирование профиля в админке
+=============================================== */
+add_action( 'show_user_profile', 'medvoice_specialization_profile_field' );
+add_action( 'edit_user_profile', 'medvoice_specialization_profile_field' );
+
+function medvoice_specialization_profile_field( $user ) 
+{
+  $specializations = get_site_option( 'specializations' ) ?? [];
+  $specialization = $user->get( 'specialization' );
+  ?>
+      <h3 class="heading"><?= __( 'Специальность', 'medvoice' ); ?></h3>
+
+      <table class="form-table">
+          <tr>
+              <th></th>
+
+              <td>
+                <select id="specialization" name="specialization" size="">
+                  <?php if (isset($specialization) && empty($specialization)) : ?>
+                    <option value="0" selected>
+                      <?= __( 'Выберите специальность', 'medvoice' ); ?>
+                    </option>
+                  <?php endif; ?>
+                  <?php foreach ($specializations as $key => $item) : ?>
+                    <option value="<?= $item['value']; ?>" <?php selected( $specialization, $item['value'] ) ?>><?= $item['label']; ?></option>
+                  <?php endforeach; ?>                  
+                </select>
+              </td>
+          </tr>
+      </table>
+  <?php
+} 
+
+add_action( 'personal_options_update', 'medvoice_save_specialization_profile_field' );
+add_action( 'edit_user_profile_update', 'medvoice_save_specialization_profile_field' );
+
+function medvoice_save_specialization_profile_field( $user_id ) 
+{
+
+    if ( ! current_user_can( 'edit_user', $user_id ) ) {
+        return false;
+    }
+
+    update_usermeta( $user_id, 'specialization', esc_attr( $_POST['specialization'] ) );
+}
+
+/**
+ * Change default gravatar.
+ */
+
+// add_filter( 'avatar_defaults', 'new_gravatar' );
+// function new_gravatar ($avatar_defaults) {
+// $myavatar = 'http://mysite.com/wp-content/uploads/';
+// $avatar_defaults[$myavatar] = "Default Gravatar";
+// return $avatar_defaults;
+// }
+
+// add_filter("get_avatar", "wpse_228870_custom_user_avatar", 1, 5);
+
+// function wpse_228870_custom_user_avatar($avatar, $id_or_email, $size, $alt, $args){
+
+//   // determine which user we're asking about - this is the hard part!
+//   // ........
+
+//   // get your custom field here, using the user's object to get the correct one
+//   // ........
+
+//   // enter your custom image output here
+//   $avatar = '<img alt="' . $alt . '" src="image.png" width="' . $size . '" height="' . $size . '" />';
+
+//   return $avatar;
+
+// }
 
 ?>

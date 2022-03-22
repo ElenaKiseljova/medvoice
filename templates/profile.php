@@ -16,8 +16,15 @@
     <?php endif; ?>
     
     <div class="profile">
-      <div class="profile__avatar profile__avatar--empty">
-        <img class="profile__avatar-img" src="<?= get_template_directory_uri(  ); ?>/assets/img/avatar-default.svg" alt="<?= $medvoice_user->nickname; ?>">         
+      <?php 
+        $medvoice_avatar = $medvoice_user->get( 'avatar' );
+      ?>
+      <div class="profile__avatar <?= medvoice_have_user_avatar(  ) ? '' : 'profile__avatar--empty'; ?>">
+        <?php if( medvoice_have_user_avatar(  ) ) : ?>
+          <img class="profile__avatar-img" src="<?= medvoice_get_user_avatar(  ); ?>" alt="<?= $medvoice_user->nickname; ?>">
+        <?php else : ?>
+          <img class="profile__avatar-img" src="<?= get_template_directory_uri(  ); ?>/assets/img/avatar-default.svg" alt="<?= $medvoice_user->nickname; ?>">
+        <?php endif; ?>                 
       </div>
       <p class="profile__username">
         <?= $medvoice_user->nickname; ?>

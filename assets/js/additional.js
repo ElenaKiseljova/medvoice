@@ -301,6 +301,7 @@
           trial: 'medvoice_ajax_register_mail',
           forgot: 'medvoice_ajax_forgot_password',
           reset: 'medvoice_ajax_reset_password',
+          editinfo: 'medvoice_ajax_edit_user_info'
         };
 
         const callbacks = {
@@ -328,6 +329,9 @@
             if (medvoice_ajax.forms) {
               window.location.href = medvoice_ajax.forms + '?action=success&type=reset';
             }
+          },
+          editinfo() {
+
           }
         };
 
@@ -404,7 +408,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     additional.subscription.init();
 
-    additional.user.init(['login', 'register', 'trial', 'forgot', 'reset']);
+    additional.user.init(['login', 'register', 'trial', 'forgot', 'reset', 'editinfo', 'editpassword']);
 
     additional.setUserTime();
 

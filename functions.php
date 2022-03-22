@@ -39,6 +39,7 @@ function medvoice_scripts ()
   }
 
   wp_enqueue_script('cookie-edit-script', get_template_directory_uri() . '/assets/js/cookie-edit.js', $deps = array(), $ver = null, $in_footer = true );
+  wp_enqueue_script('files-script', get_template_directory_uri() . '/assets/js/files.js', $deps = array(), $ver = null, $in_footer = true );
   wp_enqueue_script('additional-script', get_template_directory_uri() . '/assets/js/additional.js', $deps = array(), $ver = null, $in_footer = true );
 
   // С переводами
@@ -366,7 +367,7 @@ function wp_new_user_notification_email_filter( $wp_new_user_notification_email,
   ********  //Получение Логотипов
   =============================================== */
   /**
-   * $place: nav, usr, tariff
+   * $place: nav, user, tariff
    */
   function medvoice_get_logo_html( $place = 'nav' )
   {

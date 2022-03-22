@@ -16,10 +16,18 @@
   }
 ?>
 
-<main class="main">  
-  <h1 class="banner__title">
-    <?= get_the_title(  ); ?>
-  </h1>
+<main class="main-account">
+  <section class="account">
+    <?php 
+      get_template_part( 'templates/profile/tabs' );
+
+      get_template_part( 'templates/profile/tab', 'info' );
+
+      get_template_part( 'templates/profile/tab', 'password' );
+
+      get_template_part( 'templates/profile/tab', 'history' );
+    ?>
+  </section>
 </main>
 
 <?php 
