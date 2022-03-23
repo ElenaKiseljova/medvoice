@@ -33,7 +33,7 @@
       <div class="profile__menu hidden">
         <ul class="profile__list">
           <li class="profile__item">
-            <a class="profile__item-link" href="<?= medvoice_get_special_page( 'bookmarks', 'url' ); ?>?user=<?= $medvoice_user->ID; ?>">
+            <a class="profile__item-link" href="<?= medvoice_get_special_page( 'bookmarks', 'url' ); ?>">
               <svg class="profile__icon" width="20" height="20">
                 <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#bookmarks"></use>
               </svg>
@@ -41,7 +41,7 @@
             </a>
           </li>
           <li class="profile__item">
-            <a class="profile__item-link" href="<?= medvoice_get_special_page( 'profile', 'url' ); ?>?user=<?= $medvoice_user->ID; ?>">
+            <a class="profile__item-link" href="<?= medvoice_get_special_page( 'profile', 'url' ); ?>">
               <svg class="profile__icon" width="20" height="20">
                 <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#profile"></use>
               </svg>

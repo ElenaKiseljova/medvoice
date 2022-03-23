@@ -34,9 +34,15 @@
     },
     drawError(field, valid) {
       if (valid) {
-        field.parentNode.classList.remove('error');
+        field.closest('.form__row').classList.remove('error');
+
+        let nextElement = field.closest('.form__row').nextElementSibling;
+
+        if (nextElement && nextElement.classList.contains('error-span')) {
+          nextElement.remove();
+        }
       } else {
-        field.parentNode.classList.add('error');
+        field.closest('.form__row').classList.add('error');
       }
     },
     start(form) {
@@ -59,6 +65,8 @@
           valid = validation.password(field.value);
 
           validation.drawError(field, valid);
+        } else {
+          validation.drawError(field, true);
         }
       };
 
@@ -78,7 +86,7 @@
             validation.drawError(field, valid);
           }
 
-          let nextElement = field.parentNode.nextElementSibling;
+          let nextElement = field.closest('.form__row').nextElementSibling;
 
           if (nextElement && nextElement.classList.contains('error-span')) {
             nextElement.remove();
@@ -133,12 +141,25 @@
                     const field = form.querySelector(`input[name="${response.data.type}"]`);
 
                     if (field) {
-                      const errorSpan = document.createElement('span');
-                      errorSpan.classList.add('error-span');
-                      errorSpan.textContent = response.data.message;
-                      errorSpan.style.color = 'red';
+                      // Проверяю: существует ли уже поле с ошибкой
+                      const errorSpanExists = field.closest('.form__row').nextElementSibling ?
+                        field.closest('.form__row').nextElementSibling.classList.contains('error-span') :
+                        false;
 
-                      field.parentNode.insertAdjacentElement('afterend', errorSpan);
+                      if (errorSpanExists === false) {
+                        const errorSpan = document.createElement('span');
+                        errorSpan.classList.add('error-span');
+                        errorSpan.textContent = response.data.message;
+                        errorSpan.style.color = 'red';
+
+                        field.closest('.form__row').insertAdjacentElement('afterend', errorSpan);
+                      } else {
+                        const errorSpan = field.closest('.form__row').nextElementSibling;
+
+                        errorSpan.textContent = response.data.message;
+                      }
+
+                      field.closest('.form__row').classList.add('error');
                     }
                   } else if (formStatus) {
                     formStatus.innerHTML = (response.data && response.data.message) ?
@@ -301,7 +322,8 @@
           trial: 'medvoice_ajax_register_mail',
           forgot: 'medvoice_ajax_forgot_password',
           reset: 'medvoice_ajax_reset_password',
-          editinfo: 'medvoice_ajax_edit_user_info'
+          editinfo: 'medvoice_ajax_edit_user_info',
+          editpassword: 'medvoice_ajax_edit_password'
         };
 
         const callbacks = {
@@ -331,8 +353,11 @@
             }
           },
           editinfo() {
-
-          }
+            window.location.reload();
+          },
+          editpassword() {
+            window.location.reload();
+          },
         };
 
         ids.forEach(id => {

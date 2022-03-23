@@ -27,7 +27,7 @@
         }
       ?>
       <li class="nav__item <?= $current; ?> <?= (is_null($medvoice_user) && ($svg_sufix === 'profile' || $svg_sufix === 'bookmarks'))  ? 'nav__item--disabled' : ''; ?>">
-        <a class="nav__item-link" href="<?= $menu_item->url; ?><?= (isset($medvoice_user) && ($svg_sufix === 'profile' || $svg_sufix === 'bookmarks'))  ? ('?user=' . $medvoice_user->ID) : ''; ?>">
+        <a class="nav__item-link" href="<?= $menu_item->url; ?>">
           <svg aria-labelledby="<?= $menu_item->title; ?>" class="nav__icon" width="24" height="24">
             <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#<?= $svg_sufix; ?>"></use>            
           </svg>  

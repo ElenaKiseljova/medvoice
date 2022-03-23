@@ -129,3 +129,14 @@
 .form__row.disabled {
   pointer-events: none;
 }
+
+.error-span {
+  position: absolute;
+
+  margin-top: 2px;
+
+  font-size: 12px;
+  line-height: 120%;
+
+  color: red;
+}

@@ -19,6 +19,9 @@ if( wp_doing_ajax() ) {
   } else {
     add_action('wp_ajax_medvoice_ajax_edit_user_info', 'medvoice_ajax_edit_user_info');
     add_action('wp_ajax_nopriv_medvoice_ajax_edit_user_info', 'medvoice_ajax_edit_user_info');   
+
+    add_action('wp_ajax_medvoice_ajax_edit_password', 'medvoice_ajax_edit_password');
+    add_action('wp_ajax_nopriv_medvoice_ajax_edit_password', 'medvoice_ajax_edit_password');      
   }
 }
 
@@ -126,13 +129,13 @@ function medvoice_ajax_register_mail()
         die(  );  
       }
 
-      if ( 4 > strlen( $nickname ) ) {
+      if ( 4 > mb_strlen( $nickname ) ) {
         wp_send_json_error(['type' => 'nickname', 'message' => __('Никнейм должен быть не менее 5 символов', 'medvoice')]);
 
         die(  ); 
       }
 
-      if ( 25 < strlen( $nickname ) ) {
+      if ( 25 < mb_strlen( $nickname ) ) {
         wp_send_json_error(['type' => 'nickname', 'message' => __('Никнейм должен быть не более 25 символов', 'medvoice')]);
 
         die(  ); 
@@ -509,26 +512,30 @@ function medvoice_ajax_reset_password()
       $user = check_password_reset_key($key, $login);
 
       if (is_wp_error($user)) {
-          //		$errors = $user;
-          $errors->add('invalid_key', sprintf(
-              __('Некорректные данные для смены пароля. Проверьте, правильно ли вы скопировали ссылку из письма или отправьте <a href="%s">ещё одно</a>.'),
-              add_query_arg('action', 'forgot', home_url())
-          ));
+        $errors->add('invalid_key', sprintf(
+          __('Некорректные данные для смены пароля. Проверьте, правильно ли вы скопировали ссылку из письма или отправьте <a href="%s">ещё одно</a>.'),
+          add_query_arg('action', 'forgot', medvoice_get_special_page( 'forms', 'url' ))
+        ));
       }
         /*else {
         echo 'Ключ прошел проверку. Можно высылать новый пароль на почту.';
       }*/
 
       // check to see if user added some string
-      if (empty($pass1) || empty($pass2)) {
-          $errors->add('password_required', __('Введите пароль.', 'medvoice'));
+      if (empty($pass1)) {
+          $errors->add('password', __('Введите пароль.', 'medvoice'));
       }
-      if (7 >= strlen($pass1)) {
-        $errors->add('password_short', __('Пароль должен быть не менее 8 символов.', 'medvoice'));
+
+      if (empty($pass2)) {
+        $errors->add('password-confirm', __('Введите подтверждение пароля.', 'medvoice'));
+      }
+
+      if (7 >= mb_strlen($pass1)) {
+        $errors->add('password', __('Пароль должен быть не менее 8 символов.', 'medvoice'));
       }
       // is pass1 and pass2 match?
       if ($pass1 != $pass2) {
-        $errors->add('password_reset_mismatch', __('The passwords do not match.', 'medvoice'));
+        $errors->add('password-confirm', __('Пароли не совпадают.', 'medvoice'));
       }
 
       /**
@@ -543,17 +550,18 @@ function medvoice_ajax_reset_password()
 
       if ((!$errors->get_error_code()) && isset($pass1) && !empty($pass1)) {
           reset_password($user, $pass1);
-
-          /*		$errors->add( 'password_reset',
-        sprintf(
-          __( 'Check your email for the confirmation link, then visit the <a href="%s">login page</a>.' ),
-          add_query_arg( 'action', 'login', home_url() ) ) );*/
-          $errors->add('password_reset', __('Your password has been reset.'));
       }
 
       // display error message
       if ($errors->get_error_code()) {
-        wp_send_json_error(['message' => $errors->get_error_message($errors->get_error_code())]);
+        wp_send_json_error([
+          'type' => $errors->get_error_code(),
+          'message' => $errors->get_error_message($errors->get_error_code())
+        ]);
+      } else {
+        wp_send_json_success([
+          'message' => __( 'Ваш пароль успешно изменен!', 'medvoice' )
+        ]);
       }
 
       die( );
@@ -588,18 +596,36 @@ function medvoice_ajax_edit_user_info()
 
       $info['ID'] = $medvoice_user->ID;
 
-      $info['first_name'] = isset($_POST['first_name']) ? htmlspecialchars($_POST['first_name']) : '';
-      $info['last_name'] = isset($_POST['last_name']) ? htmlspecialchars($_POST['last_name']) : '';
+      $info['first_name'] = isset($_POST['first_name']) ? htmlspecialchars(trim($_POST['first_name'])) : '';
+      $info['last_name'] = isset($_POST['last_name']) ? htmlspecialchars(trim($_POST['last_name'])) : '';
       $info['user_email'] = isset($_POST['user_email']) ? filter_var($_POST['user_email'], FILTER_SANITIZE_EMAIL) : '';
             
       if ( empty($info['user_email']) || !filter_var($info['user_email'], FILTER_VALIDATE_EMAIL) || !is_email($info['user_email']) ) {
         wp_send_json_error([
-          'type' => 'email', 
+          'type' => 'user_email', 
           'message' => __('Введите правильный адрес электронной почты', 'medvoice')
         ]);
 
         die(  );  
       } 
+
+      if ( 25 < mb_strlen( $info['first_name'] ) ) {
+        wp_send_json_error([
+          'type' => 'first_name', 
+          'message' => __('Имя должно быть не более 25 символов', 'medvoice')
+        ]);
+
+        die(  );  
+      } 
+
+      if ( 25 < mb_strlen( $info['last_name'] ) ) {
+        wp_send_json_error([
+          'type' => 'last_name', 
+          'message' => __('Фамилия должна быть не более 25 символов', 'medvoice')
+        ]);
+
+        die(  );  
+      }      
 
       $user_updated = wp_update_user( $info );
 
@@ -718,7 +744,8 @@ function medvoice_ajax_edit_user_info()
         }
 
         wp_send_json_success([
-          'message' => __('Данные успешно обновлены!', 'medvoice'), 'avatar' => $avatar_updated
+          'message' => __('Данные успешно обновлены!', 'medvoice'), 
+          //'avatar' => $avatar_updated
         ]);
 
         die();
@@ -735,6 +762,132 @@ function medvoice_ajax_edit_user_info()
 
     die();
   }
+}
+
+function medvoice_ajax_edit_password()
+{  
+  try {
+    // Первым делом проверяем параметр безопасности
+    check_ajax_referer('additional-script.js_nonce', 'security');
+
+    if($_POST['antibot'] == 1) {  
+      $medvoice_user = wp_get_current_user(  );
+
+      $errors = new WP_Error();
+
+      // Получаем данные из полей формы и проверяем их  
+      $pass1 = $_POST['password'];
+      $pass2 = $_POST['password-confirm'];
+
+      $pass_old = $_POST['password-old'];
+
+      // Проверка старого пароля
+      $result = wp_check_password($pass_old, $medvoice_user->user_pass, $medvoice_user->ID);
+
+      if ($result === false) {
+        $errors->add('password-old', __('Вы ввели неправильный старый пароль.', 'medvoice'));
+      }
+
+      // check to see if user added some string
+      if ( empty($pass1) ) {
+        $errors->add('password', __('Введите пароль.', 'medvoice'));
+      }
+
+      if ( empty($pass2) ) {
+        $errors->add('password-confirm', __('Введите подтверждение пароля.', 'medvoice'));
+      }
+
+      if ( 7 >= mb_strlen($pass1) ) {
+        $errors->add('password', __('Пароль должен быть не менее 8 символов.', 'medvoice'));
+      }
+
+      // is pass1 and pass2 match?
+      if ( $pass1 != $pass2 ) {
+        $errors->add('password-confirm', __('Пароли не совпадают.', 'medvoice'));
+      }
+
+      if ((!$errors->get_error_code()) && isset($pass1) && !empty($pass1)) {
+        wp_set_password( $pass1, $medvoice_user->ID );
+
+        // Log-in again.
+        wp_set_auth_cookie($medvoice_user->ID);
+        wp_set_current_user($medvoice_user->ID);
+
+        do_action('wp_login', $medvoice_user->user_login, $medvoice_user);
+      }
+
+      // display error message
+      if ($errors->get_error_code()) {
+        wp_send_json_error([
+          'type' => $errors->get_error_code(),
+          'message' => $errors->get_error_message($errors->get_error_code())
+        ]);
+      } else {
+        wp_send_json_success([
+          'message' => __( 'Ваш пароль успешно изменен!', 'medvoice' )
+        ]);
+      }
+
+      die( );     
+    } else {
+      wp_send_json_error(['message' => __('Подтвердите, что Вы не робот', 'medvoice')]);
+    }   
+
+    die();
+  } catch (\Throwable $th) {
+    wp_send_json_error( [
+      'message' => $th
+    ] );
+
+    die();
+  }
+}
+
+/* ==============================================
+********  //Добавление селекта со специальностями в редактирование профиля в админке
+=============================================== */
+add_action( 'show_user_profile', 'medvoice_specialization_profile_field' );
+add_action( 'edit_user_profile', 'medvoice_specialization_profile_field' );
+
+function medvoice_specialization_profile_field( $user ) 
+{
+  $specializations = get_site_option( 'specializations' ) ?? [];
+  $specialization = $user->get( 'specialization' );
+  ?>
+      <h3 class="heading"><?= __( 'Специальность', 'medvoice' ); ?></h3>
+
+      <table class="form-table">
+          <tr>
+              <th></th>
+
+              <td>
+                <select id="specialization" name="specialization" size="">
+                  <?php if (isset($specialization) && empty($specialization)) : ?>
+                    <option value="0" selected>
+                      <?= __( 'Выберите специальность', 'medvoice' ); ?>
+                    </option>
+                  <?php endif; ?>
+                  <?php foreach ($specializations as $key => $item) : ?>
+                    <option value="<?= $item['value']; ?>" <?php selected( $specialization, $item['value'] ) ?>><?= $item['label']; ?></option>
+                  <?php endforeach; ?>                  
+                </select>
+              </td>
+          </tr>
+      </table>
+  <?php
+} 
+
+add_action( 'personal_options_update', 'medvoice_save_specialization_profile_field' );
+add_action( 'edit_user_profile_update', 'medvoice_save_specialization_profile_field' );
+
+function medvoice_save_specialization_profile_field( $user_id ) 
+{
+
+    if ( ! current_user_can( 'edit_user', $user_id ) ) {
+        return false;
+    }
+
+    update_usermeta( $user_id, 'specialization', esc_attr( $_POST['specialization'] ) );
 }
 
 /* ==============================================
@@ -773,6 +926,33 @@ function medvoice_get_user_avatar( $size = 'thumbnail' )
   }  
 
   return false;
+}
+
+/* ==============================================
+********  //Фильтр дефолтного Аватара
+=============================================== */
+add_filter('get_avatar', 'medvoice_custom_user_avatar_filter', 1, 5);
+
+function medvoice_custom_user_avatar_filter($avatar, $id_or_email, $size, $alt, $args) 
+{
+  $medvoice_user = get_user_by( 'id', $id_or_email );
+
+  if ( $medvoice_user instanceof WP_User ) {
+    $medvoice_user_avatar = $medvoice_user->get( 'avatar' );
+
+    if ( isset($medvoice_user_avatar) && !empty($medvoice_user_avatar) ) {
+      $size_avatar = 'thumbnail';
+
+      $medvoice_user_avatar = wp_get_attachment_image_src( $medvoice_user_avatar, $size_avatar );
+
+      $medvoice_user_avatar_src = is_array($medvoice_user_avatar) ? $medvoice_user_avatar[0] : get_avatar_url( $medvoice_user->ID );
+
+      // enter your custom image output here
+      $avatar = '<img alt="' . $alt . '" src="' . $medvoice_user_avatar_src . '" width="' . $size . '" height="' . $size . '" />';
+    }
+  }
+
+  return $avatar;
 }
 
 /* ==============================================
@@ -848,80 +1028,4 @@ class Medvoice
     } 
   }
 }
-
-/* ==============================================
-********  //Добавление селекта со специальностями в редактирование профиля в админке
-=============================================== */
-add_action( 'show_user_profile', 'medvoice_specialization_profile_field' );
-add_action( 'edit_user_profile', 'medvoice_specialization_profile_field' );
-
-function medvoice_specialization_profile_field( $user ) 
-{
-  $specializations = get_site_option( 'specializations' ) ?? [];
-  $specialization = $user->get( 'specialization' );
-  ?>
-      <h3 class="heading"><?= __( 'Специальность', 'medvoice' ); ?></h3>
-
-      <table class="form-table">
-          <tr>
-              <th></th>
-
-              <td>
-                <select id="specialization" name="specialization" size="">
-                  <?php if (isset($specialization) && empty($specialization)) : ?>
-                    <option value="0" selected>
-                      <?= __( 'Выберите специальность', 'medvoice' ); ?>
-                    </option>
-                  <?php endif; ?>
-                  <?php foreach ($specializations as $key => $item) : ?>
-                    <option value="<?= $item['value']; ?>" <?php selected( $specialization, $item['value'] ) ?>><?= $item['label']; ?></option>
-                  <?php endforeach; ?>                  
-                </select>
-              </td>
-          </tr>
-      </table>
-  <?php
-} 
-
-add_action( 'personal_options_update', 'medvoice_save_specialization_profile_field' );
-add_action( 'edit_user_profile_update', 'medvoice_save_specialization_profile_field' );
-
-function medvoice_save_specialization_profile_field( $user_id ) 
-{
-
-    if ( ! current_user_can( 'edit_user', $user_id ) ) {
-        return false;
-    }
-
-    update_usermeta( $user_id, 'specialization', esc_attr( $_POST['specialization'] ) );
-}
-
-/**
- * Change default gravatar.
- */
-
-// add_filter( 'avatar_defaults', 'new_gravatar' );
-// function new_gravatar ($avatar_defaults) {
-// $myavatar = 'http://mysite.com/wp-content/uploads/';
-// $avatar_defaults[$myavatar] = "Default Gravatar";
-// return $avatar_defaults;
-// }
-
-// add_filter("get_avatar", "wpse_228870_custom_user_avatar", 1, 5);
-
-// function wpse_228870_custom_user_avatar($avatar, $id_or_email, $size, $alt, $args){
-
-//   // determine which user we're asking about - this is the hard part!
-//   // ........
-
-//   // get your custom field here, using the user's object to get the correct one
-//   // ........
-
-//   // enter your custom image output here
-//   $avatar = '<img alt="' . $alt . '" src="image.png" width="' . $size . '" height="' . $size . '" />';
-
-//   return $avatar;
-
-// }
-
 ?>

@@ -347,7 +347,7 @@ function wp_new_user_notification_email_filter( $wp_new_user_notification_email,
     $page_id = get_field( $page_name, 'options' ) ?? null;
     
     if ( function_exists( 'pll_get_post' ) ) {
-      $page_id = pll_get_post( $page_id );
+      $page_id = pll_get_post( $page_id ) ?? $page_id;
     }
 
     if ( $format === 'id') {
