@@ -235,6 +235,11 @@
             if (formStatus) {
               formStatus.innerHTML = data.noConditionText ? data.noConditionText : 'Условие не выполнено';
               formStatus.classList.add('active', 'error');
+
+              setTimeout(() => {
+                formStatus.innerHTML = '';
+                formStatus.classList.remove('active', 'error');
+              }, 2000);
             }
           }
         });
@@ -253,7 +258,6 @@
             }
 
             // Если кликнули по кнопке пункта
-
             const tariffButton = tariff.querySelector('button');
 
             tariffButton.addEventListener('click', (evt) => {

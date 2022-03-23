@@ -302,23 +302,78 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
   ********  //Список подписок пользователя 
   ********  //(для личного кабинета)
   =============================================== */
-  function medvoice_get_user_subscribe_list(  )
+  function medvoice_get_user_subscribe_array( $limit = -1 )
   {
     if ( is_user_logged_in(  ) ) {
       $medvoice_user = wp_get_current_user(  );
 
+      $subscribe_array = [];
+
       $args = [
         'customer_id' => $medvoice_user->ID,
         'status' => ['wc-completed'],
-        'return' => 'object'
+        'return' => 'objects',
+        'orderby' => 'date',
+        'order' => 'DESC',
+        'limit' => $limit,
       ];
 
       $orders = wc_get_orders( $args );
 
-      return $orders;
+      foreach ($orders as $key => $order) {
+        $order_date = $order->get_date_completed();
+
+        $order_type = '';
+        $order_price = 0;
+
+        $order_items = $order->get_items() ?? [];            
+        foreach ($order_items as $key => $order_item) {
+          if ( function_exists( 'pll_get_post' ) ) {
+            $order_item_id = pll_get_post( $order_item->get_product_id() );
+
+            $order_item = $order_item_id ? wc_get_product( $order_item_id ) : wc_get_product( $order_item->get_product_id() );
+
+            $order_type = $order_item->get_title();
+            $order_price = $order_item->get_price();
+          } else {
+            $order_type = $order_item->get_name();
+            $order_price = $order_item->get_total();
+          }
+
+          break;
+        }
+
+        if ( medvoice_get_price_side() === 'left' ) {
+          $order_price = medvoice_get_currency_code_text() . ' ' . medvoice_get_converted_price( $order_price );
+        } else {
+          $order_price = medvoice_get_converted_price( $order_price ) . ' ' . medvoice_get_currency_code_text();
+        }
+
+        if ( $limit === 1 ) {
+          $subscribe_array = [
+            'date' => [
+              $order_date->date('d/m/Y'),
+              $order_date->date('H:i'),
+            ],
+            'type' => $order_type,
+            'price' => $order_price
+          ];
+        } else {
+          $subscribe_array[] = [
+            'date' => [
+              $order_date->date('d/m/Y'),
+              $order_date->date('H:i'),
+            ],
+            'type' => $order_type,
+            'price' => $order_price
+          ];
+        }        
+      }
+
+      return $subscribe_array;
     }
 
-    return;
+    return false;
   }
 
   /* ==============================================
@@ -354,7 +409,7 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
   /* ==============================================
   ********  //Конечная дата подписки пользователя 
   =============================================== */
-  function medvoice_get_user_subscribe_end_date()
+  function medvoice_get_user_subscribe_end_date( $format = 'Y-m-d H:i:s' )
   {
     if ( is_user_logged_in(  ) ) {
       $medvoice_user = wp_get_current_user(  );
@@ -365,9 +420,9 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
       if ( $subscribed === '1' || $trial === '1' ) {
         $st = !empty($medvoice_user->get( 'st' )) ? $medvoice_user->get( 'st' ) : $st;
 
-        return __( 'Подписка действительна до: ', 'medvoice' ) . date('Y-m-d H:i:s', utc_to_usertime($st));
+        return date($format, utc_to_usertime($st));
       } else {
-        return __( 'Подписка аннулирована!', 'medvoice' );
+        return '-';
       }      
     }
 
@@ -377,7 +432,8 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
   /* ==============================================
   ********  //Проверка наличия Триала
   =============================================== */
-  function medvoice_user_have_subscribe_trial() {
+  function medvoice_user_have_subscribe_trial() 
+  {
     if ( is_user_logged_in(  ) ) {
       $medvoice_user = wp_get_current_user(  );
 

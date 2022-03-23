@@ -18,6 +18,10 @@
 }
 
 /* Стили для ответов сервера */
+.text--right {
+  margin-left: auto;
+}
+
 .text--ajax {
   text-align: center;
 }

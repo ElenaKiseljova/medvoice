@@ -10,6 +10,8 @@
   <nav class="nav__wrapper">
     <?php 
       get_template_part( 'templates/menu', 'main' );
+
+      get_template_part( 'templates/languages' );
     ?>        
   </nav>     
 
@@ -24,8 +26,4 @@
       get_template_part( 'templates/contact' );
     ?>
   </div>
-    
-  <?php if ( function_exists( 'pll_the_languages' ) ) : ?>
-    <ul style="margin-top: 40px;"><?php pll_the_languages( [ 'show_names' => 0, 'show_flags' => 1 ]);?></ul>
-  <?php endif; ?>      
 </aside>

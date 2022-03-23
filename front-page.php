@@ -38,7 +38,7 @@
   //     // echo date('Y-m-d H:i:s', utc_to_usertime($wp_session['expiration'])) . '<br>';
   //   }
 
-    echo medvoice_get_user_subscribe_end_date();
+    // echo medvoice_get_user_subscribe_end_date();
   ?>
   
   <?php 

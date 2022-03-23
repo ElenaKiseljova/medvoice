@@ -1,79 +1,68 @@
+<?php 
+  // $user = wp_get_current_user(  );
+
+  // update_metadata( 'user', $user->ID, 'subscribed', '0' );
+  // update_metadata( 'user', $user->ID, 'trial', '0' );
+  // update_metadata( 'user', $user->ID, '_new_user', '1' );
+  // update_metadata( 'user', $user->ID, 'st', time() );
+
+  $subscriptions = medvoice_get_user_subscribe_array() ?? [];
+
+  $subscription_current = medvoice_get_user_subscribe_array( 1 ) ?? [];
+?>
 <div class="tab">
   <div class="tab__head">
     <div class="tab__title-box">
       <h3 class="tab__title">
         <?= __( 'Текущая подписка:', 'medvoice' ); ?>
         <span class="tab__subtitle">
-          1 месяц
+          <?= $subscription_current['type'] ?? '-'; ?>
         </span>
       </h3>
 
       <h3 class="tab__title">
         <?= __( 'Дата окончания:', 'medvoice' ); ?>
         <span class="tab__subtitle">
-          31.01.2022
+          <?= medvoice_get_user_subscribe_end_date( 'd.m.Y' ); ?> 
         </span>
       </h3>
     </div>
 
-    <a class="button" href="#">
-      <?= __( 'Продлить подписку', 'medvoice' ); ?>
+    <a class="button" href="<?= medvoice_get_special_page( 'tariffs', 'url'  ); ?>">
+      <?php if ( medvoice_user_have_subscribe_trial() || medvoice_user_have_subscribe() ) : ?>
+        <?= __( 'Продлить подписку', 'medvoice' ); ?>
+      <?php else : ?>
+        <?= __( 'Оформить подписку', 'medvoice' ); ?>
+      <?php endif; ?>      
     </a>
   </div>
 
-  <table class="tab__table">
-    <thead>
-      <tr>
-        <td><?= __( 'Дата транзакции', 'medvoice' ); ?></td>
-        <td><?= __( 'Тип подписки', 'medvoice' ); ?></td>
-        <td><?= __( 'Сумма', 'medvoice' ); ?></td>
-      </tr>
-    </thead>
+  <?php if ($subscriptions && is_array($subscriptions) && !empty($subscriptions)) : ?>
+    <table class="tab__table">
+      <thead>
+        <tr>
+          <td><?= __( 'Дата транзакции', 'medvoice' ); ?></td>
+          <td><?= __( 'Тип подписки', 'medvoice' ); ?></td>
+          <td><?= __( 'Сумма', 'medvoice' ); ?></td>
+        </tr>
+      </thead>
 
-    <tbody>
-      <tr>
-        <td>
-          10/20/2021
-          <span class="tab__time">
-            19:00 PM
-          </span>
-        </td>
-        <td>1 месяц</td>
-        <td>270 грн</td>
-      </tr>
-
-      <tr>
-        <td>
-          10/20/2021
-          <span class="tab__time">
-            19:00 PM
-          </span>
-        </td>
-        <td>12 месяцев</td>
-        <td>2600 грн</td>
-      </tr>
-
-      <tr>
-        <td>
-          10/20/2021
-          <span class="tab__time">
-            19:00 PM
-          </span>
-        </td>
-        <td>1 месяц</td>
-        <td>270 грн</td>
-      </tr>
-
-      <tr>
-        <td>
-          10/20/2021
-          <span class="tab__time">
-            19:00 PM
-          </span>
-        </td>
-        <td>1 месяц</td>
-        <td>270 грн</td>
-      </tr>
-    </tbody>
-  </table>
+      <tbody>
+        <?php foreach ($subscriptions as $key => $subscription) : ?>     
+          <tr>
+            <td>
+              <?= $subscription['date'][0]; ?>
+              <span class="tab__time">
+                <?= $subscription['date'][1]; ?>
+              </span>
+            </td>
+            <td><?= $subscription['type']; ?></td>
+            <td>
+              <?= $subscription['price']; ?>           
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  <?php endif; ?>  
 </div>
