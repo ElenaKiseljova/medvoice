@@ -862,11 +862,9 @@ function medvoice_specialization_profile_field( $user )
 
               <td>
                 <select id="specialization" name="specialization" size="">
-                  <?php if (isset($specialization) && empty($specialization)) : ?>
-                    <option value="0" selected>
-                      <?= __( 'Выберите специальность', 'medvoice' ); ?>
-                    </option>
-                  <?php endif; ?>
+                  <option value="0" <?= (empty($specialization) || $specialization == '0') ? 'selected' : ''; ?>>
+                    <?= __( 'Выберите специальность', 'medvoice' ); ?>
+                  </option>
                   <?php foreach ($specializations as $key => $item) : ?>
                     <option value="<?= $item['value']; ?>" <?php selected( $specialization, $item['value'] ) ?>><?= $item['label']; ?></option>
                   <?php endforeach; ?>                  
