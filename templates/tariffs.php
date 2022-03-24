@@ -2,14 +2,6 @@
   $title = get_field( 'title' ) ?? '';
 
   $tariffs = get_field( 'tariffs' ) ?? [];
-
-  $args = array(
-    'include' => $tariffs,
-    'orderby' => 'menu_order',
-    'order' => 'ASC'
-  );
-
-  $tariffs = wc_get_products( $args );
 ?>
 
 <section class="tariff">
@@ -24,11 +16,28 @@
         <?php if ($tariffs && !empty($tariffs) && !is_wp_error( $tariffs )) : ?>
           <div class="tariff__cards">
             <?php foreach ($tariffs as $key => $tariff) : ?>
+              <?php 
+                $discount = 0;
+
+                $tariff = wc_get_product( $tariff ); 
+
+                if ( $tariff instanceof WC_Product ) {
+                  $discount = get_field( 'discount', $tariff->get_id() );
+                } else {
+                  break;
+                }
+              ?>
               <div class="tariff-card" data-product-id="<?= $tariff->get_id(); ?>" data-months="<?= (int) $tariff->name; ?>">
                 <div class="tariff-card__head">
                   <h2 class="tariff-card__duration">
                     <?= $tariff->name; ?>
                   </h2>
+
+                  <?php if ( $discount > 0 ) : ?>
+                    <div class="tariff-card__discount">                    
+                      <?= __( 'Скидка', 'medvoice' ) . ' ' . $discount . '%'; ?>
+                    </div>
+                  <?php endif; ?>                  
                 </div>
 
                 <div class="tariff-card__price tariff-card__price--<?= medvoice_get_price_side( ); ?>">

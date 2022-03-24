@@ -1,6 +1,7 @@
 <?php 
   /**
    * Template Name: Формы
+   * Template Post Type: page
    */
 ?>
 

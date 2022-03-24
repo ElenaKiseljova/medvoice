@@ -1,6 +1,7 @@
 <?php 
   /**
    * Template Name: Тарифы
+   * Template Post Type: page
    */
 ?>
 

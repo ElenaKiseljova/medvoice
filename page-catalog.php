@@ -1,6 +1,7 @@
 <?php 
   /**
    * Template Name: Каталог
+   * Template Post Type: page
    */
 ?>
 

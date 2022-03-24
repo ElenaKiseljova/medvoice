@@ -158,94 +158,145 @@ endif;
 add_action( 'init', 'medvoice_init_function' );
   
 if (!function_exists('medvoice_init_function')) :
-  function medvoice_init_function () {
+  function medvoice_init_function () 
+  {
     /* ==============================================
     ********  //Регистрация кастомных типов постов
     =============================================== */
-    function register_custom_post_types () {
-      // Услуги
-      // register_post_type( 'services', [
-      //   'label'  => null,
-      //   'labels' => [
-      //     'name'               => 'Услуги', // основное название для типа записи
-      //     'singular_name'      => 'Услуга', // название для одной записи этого типа
-      //     'add_new'            => 'Добавить услугу', // для добавления новой записи
-      //     'add_new_item'       => 'Добавление услуги', // заголовка у вновь создаваемой записи в админ-панели.
-      //     'edit_item'          => 'Редактирование услуги', // для редактирования типа записи
-      //     'new_item'           => 'Новая услуга', // текст новой записи
-      //     'view_item'          => 'Показать услугу', // для просмотра записи этого типа.
-      //     'search_items'       => 'Искать услугу', // для поиска по этим типам записи
-      //     'not_found'          => 'Услуга не найдена', // если в результате поиска ничего не было найдено
-      //     'not_found_in_trash' => 'Услуга не найдена в корзине', // если не было найдено в корзине
-      //     'parent_item_colon'  => '', // для родителей (у древовидных типов)
-      //     'menu_name'          => 'Услуги', // название меню
-      //   ],
-      //   'description'         => 'Это наши услуги',
-      //   'public'              => true,
-      //   'publicly_queryable'  => true, // зависит от public
-      //   'exclude_from_search' => true, // зависит от public
-      //   'show_ui'             => true, // зависит от public
-      //   'show_in_nav_menus'   => true, // зависит от public
-      //   'show_in_menu'        => true, // показывать ли в меню адмнки
-      //   'show_in_admin_bar'   => true, // зависит от show_in_menu
-      //   'show_in_rest'        => true, // добавить в REST API. C WP 4.7
-      //   'rest_base'           => null, // $post_type. C WP 4.7
-      //   'menu_position'       => 19,
-      //   'menu_icon'           => 'dashicons-media-document',
-      //   //'capability_type'   => 'post',
-      //   //'capabilities'      => 'post', // массив дополнительных прав для этого типа записи
-      //   //'map_meta_cap'      => null, // Ставим true чтобы включить дефолтный обработчик специальных прав
-      //   'hierarchical'        => true,
-      //   'supports'            => ['title', 'editor', 'thumbnail','excerpt', 'page-attributes' ], // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
-      //   'taxonomies'          => [],
-      //   'has_archive'         => true,
-      //   'rewrite'             => true,
-      //   'query_var'           => true,
-      // ] );
-    }   
+    function register_custom_post_types () 
+    {
+      // Видео
+      register_post_type( 'videos', [
+        'label'  => null,
+        'labels' => [
+          'name'               => 'Видео', // основное название для типа записи
+          'singular_name'      => 'Видео', // название для одной записи этого типа
+          'add_new'            => 'Добавить видео', // для добавления новой записи
+          'add_new_item'       => 'Добавление видео', // заголовка у вновь создаваемой записи в админ-панели.
+          'edit_item'          => 'Редактирование видео', // для редактирования типа записи
+          'new_item'           => 'Новое видео', // текст новой записи
+          'view_item'          => 'Показать видео', // для просмотра записи этого типа.
+          'search_items'       => 'Искать видео', // для поиска по этим типам записи
+          'not_found'          => 'Видео не найдено', // если в результате поиска ничего не было найдено
+          'not_found_in_trash' => 'Видео не найдено в корзине', // если не было найдено в корзине
+          'parent_item_colon'  => 'Родительское видео', // для родителей (у древовидных типов) [P.S.ЧЕРТОВА СТРОЧКА РЕАЛЬНО ВАЖНАЯ!!]
+          'menu_name'          => 'Видео', // название меню
+        ],
+        'description'         => 'Это наши видео',
+        'public'              => true,
+        'publicly_queryable'  => true, // зависит от public
+        'exclude_from_search' => true, // зависит от public
+        'show_ui'             => true, // зависит от public
+        'show_in_nav_menus'   => true, // зависит от public
+        'show_in_menu'        => true, // показывать ли в меню адмнки
+        'show_in_admin_bar'   => true, // зависит от show_in_menu
+        'show_in_rest'        => true, // добавить в REST API. C WP 4.7
+        'rest_base'           => null, // $post_type. C WP 4.7
+        'menu_position'       => 20,
+        'menu_icon'           => 'dashicons-playlist-video',
+        'hierarchical'        => true,
+        'supports'            => [ 'title', 'editor', 'thumbnail', 'page-attributes', 'custom-fields', 'author' ], // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
+        'taxonomies'          => [ 'sections', 'tags', 'format' ],
+        'has_archive'         => true,
+        'rewrite'             => true,
+        'query_var'           => true,
+      ] );
+    }       
     
     register_custom_post_types();
     
     /* ==============================================
     ********  //Регистрация кастомных таксономий 
     =============================================== */
-    function register_custom_taxonomy () {
-      // // Категории публикаций
-      // register_taxonomy( 'publications-category', [ 'publications' ], [
-      //   'label'                 => '', // определяется параметром $labels->name
-      //   'labels'                => [
-      //     'name'              => 'Категории публикаций',
-      //     'singular_name'     => 'Категория',
-      //     'search_items'      => 'Найти категорию',
-      //     'all_items'         => 'Все категории',
-      //     'view_item '        => 'Посмотреть категорию',
-      //     'parent_item'       => 'Родительская услуга',
-      //     'parent_item_colon' => 'Родительская категория:',
-      //     'edit_item'         => 'Редактировать категорию',
-      //     'update_item'       => 'Обновить категорию',
-      //     'add_new_item'      => 'Добавить новую категорию',
-      //     'new_item_name'     => 'Название новой категории',
-      //     'menu_name'         => 'Категории публикаций',
-      //   ],
-      //   'description'           => 'Категории публикаций', // описание таксономии
-      //   'public'                => true,
-      //   'publicly_queryable'    => true, // равен аргументу public
-      //   // 'show_in_nav_menus'     => true, // равен аргументу public
-      //   'show_ui'               => true, // равен аргументу public
-      //    'show_in_menu'          => true, // равен аргументу show_ui
-      //   // 'show_tagcloud'         => true, // равен аргументу show_ui
-      //   // 'show_in_quick_edit'    => null, // равен аргументу show_ui
-      //   'hierarchical'          => true,
-      //   'rewrite'               => true,
-      //   //'query_var'             => $taxonomy, // название параметра запроса
-      //   // 'capabilities'          => array(),
-      //   // 'meta_box_cb'           => null, // html метабокса. callback: `post_categories_meta_box` или `post_tags_meta_box`. false — метабокс отключен.
-      //   // 'show_admin_column'     => false, // авто-создание колонки таксы в таблице ассоциированного типа записи. (с версии 3.5)
-      //   'show_in_rest'          => true, // добавить в REST API
-      //   // 'rest_base'             => null, // $taxonomy
-      //   // '_builtin'              => false,
-      //   //'update_count_callback' => '_update_post_term_count',
-      // ] );
+    function register_custom_taxonomy () 
+    {
+      // Категории
+      register_taxonomy( 'sections', [ 'videos' ], [
+        'label'                 => '', // определяется параметром $labels->name
+        'labels'                => [
+          'name'              => 'Категории',
+          'singular_name'     => 'Категория',
+          'search_items'      => 'Найти категорию',
+          'all_items'         => 'Все категории',
+          'view_item '        => 'Посмотреть категорию',
+          'parent_item'       => 'Родительская категория',
+          'parent_item_colon' => 'Родительская категория:',
+          'edit_item'         => 'Редактировать категорию',
+          'update_item'       => 'Обновить категорию',
+          'add_new_item'      => 'Добавить новую категорию',
+          'new_item_name'     => 'Название новой категории',
+          'menu_name'         => 'Категории',
+        ],
+        'description'           => 'Категории видео', // описание таксономии
+        'public'                => false,
+        'publicly_queryable'    => true, // равен аргументу public
+        'show_ui'               => true, // равен аргументу public
+        'show_in_menu'          => true, // равен аргументу show_ui
+        'show_in_rest'          => true,
+        'hierarchical'          => true,
+        'rewrite'               => true,
+      ] );
+
+      // Теги
+      register_taxonomy( 'tags', [ 'videos' ], [
+        'label'                 => '', // определяется параметром $labels->name
+        'labels'                => [
+          'name'              => 'Теги',
+          'singular_name'     => 'Тег',
+          'search_items'      => 'Найти тег',
+          'all_items'         => 'Все теги',
+          'view_item '        => 'Посмотреть тег',
+          'parent_item'       => 'Родительский тег',
+          'parent_item_colon' => 'Родительский тег:',
+          'edit_item'         => 'Редактировать тег',
+          'update_item'       => 'Обновить тег',
+          'add_new_item'      => 'Добавить новый тег',
+          'new_item_name'     => 'Название нового тега',
+          'menu_name'         => 'Теги',
+        ],
+        'description'           => 'Теги видео', // описание таксономии
+        'public'                => false,
+        'publicly_queryable'    => false, // равен аргументу public
+        'show_ui'               => true, // равен аргументу public
+        'show_in_menu'          => true, // равен аргументу show_ui
+        'show_in_rest'          => true, 
+        'hierarchical'          => false,
+        'rewrite'               => true,
+      ] );
+
+      // Тип
+      register_taxonomy( 'format', [ 'videos' ], [
+        'label'                 => '', // определяется параметром $labels->name
+        'labels'                => [
+          'name'              => 'Типы',
+          'singular_name'     => 'Тип',
+          'search_items'      => 'Найти тип',
+          'all_items'         => 'Все типы',
+          'view_item '        => 'Посмотреть тип',
+          'parent_item'       => 'Родительский тип',
+          'parent_item_colon' => 'Родительский тип:',
+          'edit_item'         => 'Редактировать тип',
+          'update_item'       => 'Обновить тип',
+          'add_new_item'      => 'Добавить новый тип',
+          'new_item_name'     => 'Название нового типа',
+          'menu_name'         => 'Типы',
+        ],
+        'description'           => 'Типы видео', // описание таксономии
+        'public'                => false,
+        'publicly_queryable'    => false, // равен аргументу public
+        'show_ui'               => true, // равен аргументу public
+        'show_in_menu'          => true, // равен аргументу show_ui
+        'show_in_rest'          => true, 
+        'hierarchical'          => true,
+        'rewrite'               => true,
+      ] );
+      
+      unregister_taxonomy( 'type' ); 
+      unregister_taxonomy( 'types' ); 
+
+      // Убираю Категории продуктов из карты сайта
+      unregister_taxonomy( 'product_cat' );  
+      
     }   
   
     register_custom_taxonomy();
@@ -253,7 +304,6 @@ if (!function_exists('medvoice_init_function')) :
     /* ==============================================
     ********  //ACF опциональные страницы
     =============================================== */
-
     function medvoice_create_acf_pages() {
       if(function_exists('acf_add_options_page')) {
         acf_add_options_page(array(
@@ -262,7 +312,7 @@ if (!function_exists('medvoice_init_function')) :
           'menu_slug' 	=> 'medvoice-settings',
           'capability'	=> 'edit_posts',
           'icon_url' => 'dashicons-admin-settings',
-          'position' => 22,
+          'position' => 23,
           'redirect'		=> false,
         ));
       }    
@@ -273,11 +323,30 @@ if (!function_exists('medvoice_init_function')) :
 endif;
 
 /* ==============================================
+  ********  //Фильтр polylang для добавления 
+  ********  //перевоыдов непубликуемым таксономиям
+  =============================================== */
+
+  add_filter( 'pll_get_taxonomies', 'add_tax_to_pll', 10, 2 );
+  
+  function add_tax_to_pll( $taxonomies, $is_settings ) {
+      if ( $is_settings ) {
+        
+      } else {
+        $taxonomies['sections'] = 'sections';
+        $taxonomies['tags'] = 'tags';
+        $taxonomies['format'] = 'format';
+      }
+
+      return $taxonomies;
+  }
+
+/* ==============================================
   ********  //ACF редактирование набора инструментов редактора
   =============================================== */
 
-add_filter( 'acf/fields/wysiwyg/toolbars' , 'my_toolbars'  );
-function my_toolbars( $toolbars )
+add_filter( 'acf/fields/wysiwyg/toolbars' , 'medvoice_acf_custom_toolbars'  );
+function medvoice_acf_custom_toolbars( $toolbars )
 {
   
   array_push($toolbars['Full' ][1], 'underline');
@@ -295,7 +364,7 @@ function medvoice_disabled_some_links ( $query ) {
   
   $cur_query = $query->query_vars;
 
-  if( ($query->is_singular && $cur_query['post_type'] === 'product') ) {
+  if( ($query->is_singular && $cur_query['post_type'] === 'product') || is_category(  ) ) {
     wp_redirect( home_url() );
 
     exit;
@@ -339,7 +408,9 @@ function wp_new_user_notification_email_filter( $wp_new_user_notification_email,
 /* ==============================================
   ********  //Получение ссылок на спецстраницы
   =============================================== */
-  
+  /**
+   * $type: forms, catalog, profile, tariffs, bookmarks
+   */
   function medvoice_get_special_page( $type = 'forms', $format = 'url' )
   {
     $page_name = $type . '_page_id';

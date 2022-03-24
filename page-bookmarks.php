@@ -1,6 +1,7 @@
 <?php 
   /**
    * Template Name: Закладки
+   * Template Post Type: page
    */
 ?>
 

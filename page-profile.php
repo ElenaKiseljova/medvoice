@@ -1,6 +1,7 @@
 <?php 
   /**
    * Template Name: Профиль
+   * Template Post Type: page
    */
 ?>
 
