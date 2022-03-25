@@ -891,8 +891,20 @@ function medvoice_save_specialization_profile_field( $user_id )
 /* ==============================================
 ********  //Проверка наличия Аватара
 =============================================== */
-function medvoice_have_user_avatar()
+function medvoice_have_user_avatar( $user_id = null )
 {
+  if ( isset($user_id) ) {
+    $medvoice_user = get_user_by( 'id', $user_id );
+
+    if ( $medvoice_user instanceof WP_User ) {
+      $medvoice_user_avatar = $medvoice_user->get( 'avatar' );
+
+      if ( isset($medvoice_user_avatar) && !empty($medvoice_user_avatar) ) {
+        return true;
+      }
+    }
+  }
+
   if ( is_user_logged_in(  ) ) {
     $medvoice_user = wp_get_current_user(  );
     
@@ -909,8 +921,22 @@ function medvoice_have_user_avatar()
 /* ==============================================
 ********  //Получение Аватара
 =============================================== */
-function medvoice_get_user_avatar( $size = 'thumbnail' )
+function medvoice_get_user_avatar( $size = 'thumbnail', $user_id = null )
 {
+  if ( isset($user_id) ) {
+    $medvoice_user = get_user_by( 'id', $user_id );
+
+    if ( $medvoice_user instanceof WP_User ) {
+      $medvoice_user_avatar = $medvoice_user->get( 'avatar' );
+
+      if ( isset($medvoice_user_avatar) && !empty($medvoice_user_avatar) ) {
+        $medvoice_user_avatar = wp_get_attachment_image_src( $medvoice_user_avatar, $size );
+  
+        return is_array($medvoice_user_avatar) ? $medvoice_user_avatar[0] : get_avatar_url( $medvoice_user->ID );
+      }
+    }
+  }
+
   if ( is_user_logged_in(  ) ) {
     $medvoice_user = wp_get_current_user(  );
     
@@ -951,6 +977,21 @@ function medvoice_custom_user_avatar_filter($avatar, $id_or_email, $size, $alt, 
   }
 
   return $avatar;
+}
+
+/* ==============================================
+********  //Получение названия специализации
+=============================================== */
+function medvoice_get_specialization_label( $value = '' )
+{
+  // Получаем список всех специализаций
+  $specializations = get_site_option( 'specializations' ) ?? [];
+
+  foreach ($specializations as $key => $specialization) {
+   if ( $specialization['value'] === $value) {
+     return $specialization['label'];
+   }
+  }
 }
 
 /* ==============================================

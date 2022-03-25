@@ -1,5 +1,5 @@
 <?php 
-  global $video;
+  global $video, $place;
 
   $video_id = null;
 
@@ -13,14 +13,20 @@
   // Если ИД нет
   if ( is_null($video_id) ) {
     return;
-  }
-
-  // Проперка подписки пользователя  
-  $video_block = true;
+  }  
+  
+  $video_block = true;  
+  
+  // Проверка подписки пользователя    
   if ( medvoice_user_have_subscribe_trial() || medvoice_user_have_subscribe() ) {
     $video_block = false;
   }
 
+  // Проверка на бесплатность видео
+  if ( medvoice_is_free_video( $video_id ) ) {
+    $video_block = false;
+  }
+  
   // Проверка залогиненности
   $video_bookmarks_block = true;
   if ( is_user_logged_in(  ) ) {
@@ -29,32 +35,41 @@
 
   // Формат Видео
   $video_format = '';
-  $video_format_terms = wp_get_post_terms( $video_id, 'format', ['names']) ?? [];
-  $video_format_term = ( !is_wp_error( $video_format_terms ) && !empty($video_format_terms) ) ? $video_format_terms[0] : null;
-
-  if ( $video_format_term instanceof WP_Term ) {
-    $video_format = $video_format_term->name;
-  }
+  $video_format_terms = wp_get_post_terms( $video_id, 'format', ['fields' => 'names']) ?? [];
+  $video_format = ( !is_wp_error( $video_format_terms ) && !empty($video_format_terms) ) ? $video_format_terms[0] : null;
 
   // Проверка наличия дочерних Видео (если есть, то это - Курс)
-  $args = array(
+  $video_children_count = 0;
+
+  $args = [
     'post_parent' => $video_id,
-  );
+    'post_type' => 'videos',
+  ];
 
   $video_children = get_children( $args );
 
-  if ( !empty($video_children) && $video_format === '' ) {
-    $video_format = __( 'Курс', 'medvoice' );
+  if ( isset($video_children) && !empty($video_children) ) {
+    if (empty($video_format)) {
+      $video_format = __( 'Курс', 'medvoice' );
+    }    
+
+    $video_children_count = count($video_children);
+  }
+
+  // Класс для карточки
+  $video_class = 'swiper-slide';  
+  if ( $place === 'list') {
+    $video_class = 'card--search';
   }
 ?>
 
-<a href="<?= get_permalink( $video_id ); ?>" class="swiper-slide card <?= $video_block ? 'card--block' : ''; ?>">
+<a href="<?= get_permalink( $video_id ); ?>" class="<?= $video_class; ?> card <?= $video_block ? 'card--block' : ''; ?>">
   <div class="card__link-box">
     <?php if ( has_post_thumbnail( $video_id )) : ?>
       <img class="card__img" src="<?= get_the_post_thumbnail_url( $video_id, 'video_card' ); ?>" alt="<?= strip_tags( get_the_title( $video_id ) ); ?>">
     <?php endif; ?>
     
-    <div class="card__btn">  
+    <div class="card__btn <?= $video_block ? 'card__btn--lock' : ''; ?>">  
       <?php if ( $video_block ) : ?>
         <svg aria-labelledby="<?= __( 'Заблокировано', 'medvoice' ); ?>" width="22" height="27">
           <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#block"></use>            
@@ -81,18 +96,16 @@
         <?php if ( !empty($video_children) ) : ?>
           <p class="card__description-text">            
             <?=
-              $video_children_count = count($video_children);
-              
               medvoice_pluralize($video_children_count, __('лекция', 'medvoice'), __('лекции', 'medvoice'),
-                      __('лекций', 'medvoice'))
+                      __('лекций', 'medvoice'));
             ?>
           </p>
         <?php endif; ?>        
       </div>
 
-      <button class="card__description-link <?= $video_bookmarks_block ? 'card__description-link--block' : ''; ?>">
+      <button class="bookmarks <?= $video_bookmarks_block ? 'bookmarks--block' : ''; ?>">
         <svg aria-labelledby="<?= __( 'Добавить в закладки', 'medvoice' ); ?>" width="16" height="20">
-          <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#bookmarks-2"></use>            
+          <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#bookmark-2"></use>            
         </svg>
       </button>
     </div>

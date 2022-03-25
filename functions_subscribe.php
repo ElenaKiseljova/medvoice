@@ -513,5 +513,33 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
 
     return;    
   }
+
+  /* ==============================================
+  ********  //Проверка бесплатности видео
+  =============================================== */
+  function medvoice_is_free_video( $video_id = null ) {
+    if ( isset($video_id) ) {
+      $video_sections_free_id = get_field( 'sections_free_id', 'options' );
+      if ( $video_sections_free_id ) {
+        if ( function_exists( 'pll_get_term' ) ) {
+          $video_sections_free_id  = pll_get_term( $video_sections_free_id ) ?? $video_sections_free_id;
+        }
+
+        $video_sections_terms_ids = wp_get_post_terms( $video_id, 'sections', ['fields' => 'ids']) ?? [];
+
+        if ( !empty($video_sections_terms_ids)  && !is_wp_error( $video_sections_terms_ids ) ) {
+          foreach ($video_sections_terms_ids as $key => $video_sections_terms_id) {
+            if ( $video_sections_terms_id === $video_sections_free_id ) {
+              return true;
+
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    return false;    
+  }
 } 
 ?>

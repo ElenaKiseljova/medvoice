@@ -199,7 +199,7 @@ if (!function_exists('medvoice_init_function')) :
         'menu_icon'           => 'dashicons-playlist-video',
         'hierarchical'        => true,
         'supports'            => [ 'title', 'editor', 'thumbnail', 'page-attributes', 'custom-fields', 'author' ], // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
-        'taxonomies'          => [ 'sections', 'tags', 'format' ],
+        'taxonomies'          => [ 'sections', 'labels', 'format' ],
         'has_archive'         => true,
         'rewrite'             => [ 'slug' => 'katalog','with_front' => false ],
         'query_var'           => true,
@@ -241,7 +241,7 @@ if (!function_exists('medvoice_init_function')) :
       ] );
 
       // Теги
-      register_taxonomy( 'tags', [ 'videos' ], [
+      register_taxonomy( 'labels', [ 'videos' ], [
         'label'                 => '', // определяется параметром $labels->name
         'labels'                => [
           'name'              => 'Теги',
@@ -293,9 +293,6 @@ if (!function_exists('medvoice_init_function')) :
         'hierarchical'          => true,
         'rewrite'               => true,
       ] );
-      
-      unregister_taxonomy( 'type' ); 
-      unregister_taxonomy( 'types' ); 
 
       // Убираю Категории продуктов из карты сайта
       unregister_taxonomy( 'product_cat' );  
@@ -337,7 +334,7 @@ endif;
         
       } else {
         $taxonomies['sections'] = 'sections';
-        $taxonomies['tags'] = 'tags';
+        $taxonomies['labels'] = 'labels';
         $taxonomies['format'] = 'format';
       }
 
@@ -465,23 +462,26 @@ function wp_new_user_notification_email_filter( $wp_new_user_notification_email,
   function medvoice_pluralize($string, $ch1, $ch2, $ch3)
   {
       $ff = array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+
       if (substr($string, -2, 1) == 1 and strlen($string) > 1) {
-          $ry = array("0 $ch3", "1 $ch3", "2 $ch3", "3 $ch3", "4 $ch3", "5 $ch3", "6 $ch3", "7 $ch3", "8 $ch3", "9 $ch3");
+        $ry = array("0 $ch3", "1 $ch3", "2 $ch3", "3 $ch3", "4 $ch3", "5 $ch3", "6 $ch3", "7 $ch3", "8 $ch3", "9 $ch3");
       } else {
-          $ry = array(
-              "0 $ch3",
-              "1 $ch1",
-              "2 $ch2",
-              "3 $ch2",
-              "4 $ch2",
-              "5 $ch3",
-              " 6 $ch3",
-              "7 $ch3",
-              "8 $ch3",
-              " 9 $ch3"
-          );
+        $ry = array(
+          "0 $ch3",
+          "1 $ch1",
+          "2 $ch2",
+          "3 $ch2",
+          "4 $ch2",
+          "5 $ch3",
+          "6 $ch3",
+          "7 $ch3",
+          "8 $ch3",
+          "9 $ch3"
+        );
       }
+
       $string1 = substr($string, 0, -1) . str_replace($ff, $ry, substr($string, -1, 1));
+
       return $string1;
   }
 ?>

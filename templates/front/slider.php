@@ -29,18 +29,22 @@
           <?php 
             $video = $video_item;
 
-            get_template_part( 'templates/video' );
+            get_template_part( 'templates/card' );
           ?>
         <?php endforeach; ?>
       </div>
 
       <div class="slider__btn-box">
-        <svg aria-labelledby="<?= __( 'Предыдущий слайд', 'medvoice' ); ?>" class="slider__btn-prev" width="30" height="30">
-          <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#prev"></use>            
-        </svg> 
-        <svg aria-labelledby="<?= __( 'Следующий слайд', 'medvoice' ); ?>" class="slider__btn-next" width="30" height="30">
-          <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#next"></use>            
-        </svg>
+        <button class="slider__btn">
+          <svg aria-labelledby="<?= __( 'Предыдущий слайд', 'medvoice' ); ?>" class="slider__btn-prev" width="30" height="30">
+            <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#prev"></use>            
+          </svg> 
+        </button>
+        <button class="slider__btn">
+          <svg aria-labelledby="<?= __( 'Следующий слайд', 'medvoice' ); ?>" class="slider__btn-next" width="30" height="30">
+            <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#next"></use>            
+          </svg>
+        </button>   
       </div>
     <?php endif; ?>  
   </div>

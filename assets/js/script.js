@@ -224,6 +224,97 @@ document.addEventListener("DOMContentLoaded", function (event) {
     });
   }
 
+  // Фильтр на странице "Каталог"
+  let buttonFilter = document.querySelector('.button--filter');
+
+  if(buttonFilter) {
+    let filterBlock = document.querySelector('.catalog__filter');
+
+    buttonFilter.addEventListener('click', function() {
+      filterBlock.classList.toggle('hidden');
+    })
+  }
+
+  // Чекбоксы
+  let dropdownHead = document.querySelectorAll('.dropdown__header');
+
+  if (dropdownHead) {
+    dropdownHead.forEach(item => {
+      item.addEventListener('click', function() {
+        this.parentElement.classList.toggle('dropdown--active');
+      });
+    });
+  }
+
+  // Вид карточек на странице "Каталог"
+  let iconRow = document.querySelector('.catalog__icon-row');
+  let iconGrid = document.querySelector('.catalog__icon-grid');
+
+  let catalogCards = document.querySelector('.catalog__cards');
+  let cards = document.querySelectorAll('.card');
+
+  if(catalogCards) {
+    iconRow.addEventListener('click', function() {
+      catalogCards.classList.add('catalog__cards--row');
+      cards.forEach(item => {
+        item.classList.add('card--row');
+      });
+    });
+
+    iconGrid.addEventListener('click', function() {
+      catalogCards.classList.remove('catalog__cards--row');
+      cards.forEach(item => {
+        item.classList.remove('card--row');
+      });
+    });
+  }
+
+  // Табы на странице "Автор"
+  let authorTabName = document.querySelectorAll('.banner__item');
+  let authorTab = document.querySelectorAll('.author__tab');
+
+  if (authorTab) {
+    authorTabName.forEach(function (item) {
+      item.addEventListener('click', function () {
+        for (let i = 0; i < authorTabName.length; i++) {
+          authorTabName[i].classList.remove('banner__item--active');
+          authorTab[i].classList.remove('author__tab--active');
+        };
+        item.classList.add('banner__item--active');
+
+        for (let j = 0; j < authorTabName.length; j++) {
+          if (authorTabName[j].classList.contains('banner__item--active')) {
+            authorTab[j].classList.add('author__tab--active');
+          }
+        };
+      });
+    });
+  }
+
+  // Табы на странице "Курс"
+  let courseTabName = document.querySelectorAll('.banner__item');
+  let courseTab = document.querySelectorAll('.course__tab');
+
+  if (courseTab) {
+    courseTabName.forEach(function (item) {
+      item.addEventListener('click', function () {
+        for (let i = 0; i < courseTabName.length; i++) {
+          courseTabName[i].classList.remove('banner__item--active');
+          courseTab[i].classList.remove('course__tab--active');
+        };
+        item.classList.add('banner__item--active');
+
+        for (let j = 0; j < courseTabName.length; j++) {
+          if (courseTabName[j].classList.contains('banner__item--active')) {
+            courseTab[j].classList.add('course__tab--active');
+          }
+        };
+      });
+    });
+  }
+
+
+
 
 
 
