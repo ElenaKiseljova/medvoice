@@ -42,10 +42,10 @@
   ?>
   
   <?php 
-    get_template_part( 'templates/front/banner' );
+    // get_template_part( 'templates/front/banner' );
   ?>
 
-  <section class="slider" id="courses">
+  <!-- <section class="slider" id="courses">
     <div class="swiper swiper-courses">
         <div class="slider__head">
             <h2 class="slider__title">
@@ -320,8 +320,8 @@
             </svg>
         </div>
     </div>
-  </section>
-  <section class="slider" id="webinars">
+  </section> -->
+  <!-- <section class="slider" id="webinars">
     <div class="swiper swiper-webinar">
         <div class="slider__head">
             <h2 class="slider__title">
@@ -746,7 +746,33 @@
             </svg>
         </div>
     </div>
-  </section>
+  </section> -->
+
+  <?php 
+    // Check value exists.
+    if( have_rows('content') ):
+
+      // Loop through rows.
+      while ( have_rows('content') ) : the_row();
+
+          // Case: Banner layout.
+          if( get_row_layout() == 'banner' ):
+              get_template_part( 'templates/front/banner' );
+          
+          // Case: Slider layout.
+          elseif( get_row_layout() == 'slider' ):
+            get_template_part( 'templates/front/slider' );   
+                    
+          endif;
+
+      // End loop.
+      endwhile;
+
+    // No value.
+    else :
+      // Do something...
+    endif;
+  ?>  
 </main>
 
 <?php 

@@ -149,8 +149,11 @@ if (!function_exists('medvoice_after_setup_theme_function')) :
     /* ==============================================
     ********  //Размеры картирок
     =============================================== */
-    /* Main */
-    // add_image_size( 'main_bg_large', 1600, 916, false);
+    /* Видео (карточка) */
+    add_image_size( 'video_card', 245, 160, false);
+
+    /* Видео (постер) */
+    add_image_size( 'video_poster', 655, 380, false);
   }
 endif;
 
@@ -198,7 +201,7 @@ if (!function_exists('medvoice_init_function')) :
         'supports'            => [ 'title', 'editor', 'thumbnail', 'page-attributes', 'custom-fields', 'author' ], // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
         'taxonomies'          => [ 'sections', 'tags', 'format' ],
         'has_archive'         => true,
-        'rewrite'             => true,
+        'rewrite'             => [ 'slug' => 'katalog','with_front' => false ],
         'query_var'           => true,
       ] );
     }       
@@ -264,26 +267,26 @@ if (!function_exists('medvoice_init_function')) :
         'rewrite'               => true,
       ] );
 
-      // Тип
+      // Формат
       register_taxonomy( 'format', [ 'videos' ], [
         'label'                 => '', // определяется параметром $labels->name
         'labels'                => [
-          'name'              => 'Типы',
-          'singular_name'     => 'Тип',
-          'search_items'      => 'Найти тип',
-          'all_items'         => 'Все типы',
-          'view_item '        => 'Посмотреть тип',
-          'parent_item'       => 'Родительский тип',
-          'parent_item_colon' => 'Родительский тип:',
-          'edit_item'         => 'Редактировать тип',
-          'update_item'       => 'Обновить тип',
-          'add_new_item'      => 'Добавить новый тип',
-          'new_item_name'     => 'Название нового типа',
-          'menu_name'         => 'Типы',
+          'name'              => 'Форматы видео',
+          'singular_name'     => 'Формат',
+          'search_items'      => 'Найти формат',
+          'all_items'         => 'Все форматы',
+          'view_item '        => 'Посмотреть формат',
+          'parent_item'       => 'Родительский формат',
+          'parent_item_colon' => 'Родительский формат:',
+          'edit_item'         => 'Редактировать формат',
+          'update_item'       => 'Обновить формат',
+          'add_new_item'      => 'Добавить новый формат',
+          'new_item_name'     => 'Название нового формата',
+          'menu_name'         => 'Форматы видео',
         ],
-        'description'           => 'Типы видео', // описание таксономии
-        'public'                => false,
-        'publicly_queryable'    => false, // равен аргументу public
+        'description'           => 'Форматы видео', // описание таксономии
+        'public'                => true,
+        'publicly_queryable'    => true, // равен аргументу public
         'show_ui'               => true, // равен аргументу public
         'show_in_menu'          => true, // равен аргументу show_ui
         'show_in_rest'          => true, 
@@ -454,5 +457,31 @@ function wp_new_user_notification_email_filter( $wp_new_user_notification_email,
         <?php endif; ?>        
       </a>
     <?php
+  }
+
+  /* ==============================================
+  ********  //Правильные окончания для слов
+  =============================================== */
+  function medvoice_pluralize($string, $ch1, $ch2, $ch3)
+  {
+      $ff = array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+      if (substr($string, -2, 1) == 1 and strlen($string) > 1) {
+          $ry = array("0 $ch3", "1 $ch3", "2 $ch3", "3 $ch3", "4 $ch3", "5 $ch3", "6 $ch3", "7 $ch3", "8 $ch3", "9 $ch3");
+      } else {
+          $ry = array(
+              "0 $ch3",
+              "1 $ch1",
+              "2 $ch2",
+              "3 $ch2",
+              "4 $ch2",
+              "5 $ch3",
+              " 6 $ch3",
+              "7 $ch3",
+              "8 $ch3",
+              " 9 $ch3"
+          );
+      }
+      $string1 = substr($string, 0, -1) . str_replace($ff, $ry, substr($string, -1, 1));
+      return $string1;
   }
 ?>
