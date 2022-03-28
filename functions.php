@@ -152,6 +152,8 @@ if (!function_exists('medvoice_after_setup_theme_function')) :
     /* Видео (карточка) */
     add_image_size( 'video_card', 245, 160, false);
 
+    add_image_size( 'video_side', 140, 80, false);
+
     /* Видео (постер) */
     add_image_size( 'video_poster', 655, 380, false);
   }
@@ -483,5 +485,44 @@ function wp_new_user_notification_email_filter( $wp_new_user_notification_email,
       $string1 = substr($string, 0, -1) . str_replace($ff, $ry, substr($string, -1, 1));
 
       return $string1;
+  }
+
+  /* ==============================================
+  ********  //Получение единичного названия Формата видео
+  =============================================== */
+  /**
+   * $what: [ name, link ]
+   */
+  function medvoice_get_single_format_video_arr( $video_id = null, $what = ['name'], $single = true )
+  {
+    if ( isset($video_id) ) {
+      $video_format = [
+        'name' => '',
+        'link' => ''
+      ];
+      
+      $video_format_terms = wp_get_post_terms( $video_id, 'format' ) ?? [];
+      $video_format_term = ( !is_wp_error( $video_format_terms ) && !empty($video_format_terms) ) ? $video_format_terms[0] : null;
+      
+      if ( isset($video_format_term) && $video_format_term instanceof WP_Term ) {
+        if ( in_array( 'name', $what ) ) {
+          if ( $single ) {
+            $video_format_name = get_field( 'single', $video_format_term ) ?? $video_format_term->name;
+
+            $video_format['name'] = $video_format_name ?? '';
+          } else {
+            $video_format['name'] = $video_format_term->name ?? '';
+          }
+        }
+
+        if ( in_array( 'link', $what ) ) {
+          $video_format['link'] = get_term_link( $video_format_term ) ?? '';
+        }  
+      }
+      
+      return $video_format;
+    }
+
+    return false;
   }
 ?>

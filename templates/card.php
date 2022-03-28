@@ -33,10 +33,16 @@
     $video_bookmarks_block = false;
   }
 
-  // Формат Видео
-  $video_format = '';
-  $video_format_terms = wp_get_post_terms( $video_id, 'format', ['fields' => 'names']) ?? [];
-  $video_format = ( !is_wp_error( $video_format_terms ) && !empty($video_format_terms) ) ? $video_format_terms[0] : null;
+  // Длительность Видео  
+  $video_duration = '';
+
+  // Формат видео
+  $video_format = medvoice_get_single_format_video_arr( $video_id, ['name'] );
+
+  $video_format_name = '';
+  if ( $video_format && is_array($video_format) && !is_wp_error( $video_format ) ) {
+    $video_format_name = $video_format['name'] ?? '';
+  }
 
   // Проверка наличия дочерних Видео (если есть, то это - Курс)
   $video_children_count = 0;
@@ -48,12 +54,20 @@
 
   $video_children = get_children( $args );
 
-  if ( isset($video_children) && !empty($video_children) ) {
-    if (empty($video_format)) {
-      $video_format = __( 'Курс', 'medvoice' );
+  $video_have_children = isset($video_children) && !empty($video_children);
+
+  if ( $video_have_children ) {
+    if (empty($video_format_name)) {
+      $video_format_name = __( 'Курс', 'medvoice' );
     }    
 
     $video_children_count = count($video_children);
+  } else {
+    if (empty($video_format_name)) {
+      $video_format_name = __( 'Лекция', 'medvoice' );
+    } 
+
+    $video_duration = get_field( 'duration', $video_id ) ?? '';    
   }
 
   // Класс для карточки
@@ -90,20 +104,22 @@
     <div class="card__description">
       <div class="card__description-box">
         <p class="card__description-name">
-          <?= $video_format; ?>
+          <?= $video_format_name; ?>
         </p>
 
-        <?php if ( !empty($video_children) ) : ?>
-          <p class="card__description-text">            
+        <p class="card__description-text">      
+          <?php if ( !empty($video_children) ) : ?>
             <?=
               medvoice_pluralize($video_children_count, __('лекция', 'medvoice'), __('лекции', 'medvoice'),
                       __('лекций', 'medvoice'));
             ?>
-          </p>
-        <?php endif; ?>        
+          <?php else : ?>
+            <?= $video_duration; ?>
+          <?php endif; ?> 
+        </p>              
       </div>
 
-      <button class="bookmarks <?= $video_bookmarks_block ? 'bookmarks--block' : ''; ?>">
+      <button data-video-id="<?= $video_id; ?>" class="bookmarks <?= $video_bookmarks_block ? 'bookmarks--block' : ''; ?>">
         <svg aria-labelledby="<?= __( 'Добавить в закладки', 'medvoice' ); ?>" width="16" height="20">
           <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#bookmark-2"></use>            
         </svg>

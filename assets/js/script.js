@@ -259,6 +259,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
       cards.forEach(item => {
         item.classList.add('card--row');
       });
+      iconGrid.classList.remove('active');
+      iconRow.classList.add('active');
     });
 
     iconGrid.addEventListener('click', function() {
@@ -266,24 +268,26 @@ document.addEventListener("DOMContentLoaded", function (event) {
       cards.forEach(item => {
         item.classList.remove('card--row');
       });
+      iconRow.classList.remove('active');
+      iconGrid.classList.add('active');
     });
   }
 
   // Табы на странице "Автор"
-  let authorTabName = document.querySelectorAll('.banner__item');
+  let tabTitle = document.querySelectorAll('.banner__item');
   let authorTab = document.querySelectorAll('.author__tab');
 
   if (authorTab) {
-    authorTabName.forEach(function (item) {
+    tabTitle.forEach(function (item) {
       item.addEventListener('click', function () {
-        for (let i = 0; i < authorTabName.length; i++) {
-          authorTabName[i].classList.remove('banner__item--active');
+        for (let i = 0; i < authorTab.length; i++) {
+          tabTitle[i].classList.remove('active');
           authorTab[i].classList.remove('author__tab--active');
         };
-        item.classList.add('banner__item--active');
+        item.classList.add('active');
 
-        for (let j = 0; j < authorTabName.length; j++) {
-          if (authorTabName[j].classList.contains('banner__item--active')) {
+        for (let j = 0; j < authorTab.length; j++) {
+          if (tabTitle[j].classList.contains('active')) {
             authorTab[j].classList.add('author__tab--active');
           }
         };
@@ -292,20 +296,19 @@ document.addEventListener("DOMContentLoaded", function (event) {
   }
 
   // Табы на странице "Курс"
-  let courseTabName = document.querySelectorAll('.banner__item');
   let courseTab = document.querySelectorAll('.course__tab');
 
   if (courseTab) {
-    courseTabName.forEach(function (item) {
+    tabTitle.forEach(function (item) {
       item.addEventListener('click', function () {
-        for (let i = 0; i < courseTabName.length; i++) {
-          courseTabName[i].classList.remove('banner__item--active');
+        for (let i = 0; i < courseTab.length; i++) {
+          tabTitle[i].classList.remove('active');
           courseTab[i].classList.remove('course__tab--active');
         };
-        item.classList.add('banner__item--active');
+        item.classList.add('active');
 
-        for (let j = 0; j < courseTabName.length; j++) {
-          if (courseTabName[j].classList.contains('banner__item--active')) {
+        for (let j = 0; j < courseTab.length; j++) {
+          if (tabTitle[j].classList.contains('active')) {
             courseTab[j].classList.add('course__tab--active');
           }
         };

@@ -17,7 +17,7 @@
   }
 ?>
 
-<main class="main-account">
+<main class="main main--account">
   <section class="account">
     <?php 
       get_template_part( 'templates/profile/tabs' );

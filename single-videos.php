@@ -15,35 +15,37 @@
     exit();
   }
 
-  // Формат Видео
-  global $video_format;
-
-  $video_format = '';
-  $video_format_terms = wp_get_post_terms( $video_id, 'format', ['fields' => 'names']) ?? [];
-  $video_format = ( !is_wp_error( $video_format_terms ) && !empty($video_format_terms) ) ? $video_format_terms[0] : null;
-
-
   // Проверка наличия дочерних Видео (если есть, то это - Курс)
-  global $video_children;
+  global $video_arr, $video_have_children;
   
   $args = array(
     'post_parent' => $video_id,
     'post_type' => 'videos',
+    'orderby' => 'menu_order',
   );
 
   $video_children = get_children( $args );
+
+  $video_have_children = isset($video_children) && !empty($video_children);
+
+  // Присваиваю глобальной переменной массив с видео
+  $video_arr = $video_children;
 ?>
 
 <?php 
   get_header(  );
 ?>
 
-<main class="main">
+<main class="main <?= $video_have_children ? '' : 'main--lection'; ?>">
   <?php 
-    if ( isset($video_children) && !empty($video_children) ) {
+    if ( $video_have_children ) {
       get_template_part( 'templates/video/banner' );
 
       get_template_part( 'templates/video/course' );
+    } else {
+      get_template_part( 'templates/video/lection' );
+
+      get_template_part( 'templates/video/side' );
     }
   ?>  
 </main>

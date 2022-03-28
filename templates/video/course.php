@@ -1,32 +1,18 @@
 <section class="course">
   <div class="course__tab course__tab--active">
-    <div class="catalog">
-      <div class="catalog__head">
-        <div class="catalog__icon-box">
-          <svg class="catalog__icon-row" width="25" height="20">
-            <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#row"></use>
-          </svg>
-
-          <svg class="catalog__icon-grid" width="20" height="20">
-              <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#grid"></use>
-          </svg>
-        </div>
-      </div>
-
-      <?php 
-        get_template_part( 'templates/video/cards' );
-      ?>
-    </div>
+    <?php 
+      get_template_part( 'templates/catalog' );
+    ?>
   </div>
 
   <div class="course__tab">
     <div class="course__about">
       <div class="course__info">
         <?php 
-          get_template_part( 'templates/video/labels' );
+          get_template_part( 'templates/video/tags' );
         ?>
 
-        <div class="course__text">
+        <div class="course__content">
           <?= get_the_content(  ); ?>
         </div>
       </div>

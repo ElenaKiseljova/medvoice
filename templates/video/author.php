@@ -25,14 +25,14 @@
   $author_url = get_author_posts_url( $author_id ) ?? '';
 ?>
 <div class="creator">
-  <h3 class="creator__title">Автор курса</h3>
+  <h3 class="creator__title"><?= __( 'Автор', 'medvoice' ); ?></h3>
 
   <div class="creator__block">
     <div class="creator__avatar">
       <?php if ( medvoice_have_user_avatar( $author_id ) ) : ?>
         <img class="creator__avatar-img" src="<?= medvoice_get_user_avatar(  ); ?>" alt="<?= $author_name; ?>">
       <?php else : ?>
-        <img class="creator__avatar-img" src="<?= get_template_directory_uri(  ); ?>/assets/img/avatar-default.svg" alt="<?= $medvoice_user->nickname; ?>">
+        <img class="creator__avatar-img" src="<?= get_template_directory_uri(  ); ?>/assets/img/avatar-default.svg" alt="<?= $author_name; ?>">
       <?php endif; ?> 
     </div>
 

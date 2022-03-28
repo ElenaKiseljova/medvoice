@@ -9,7 +9,7 @@
   get_header( 'empty' );
 ?>
 
-<main class="main-user">
+<main class="main main--user">
   <section class="user">
     <div class="user__wrapper">
       <?php medvoice_get_logo_html( 'user' ); ?>

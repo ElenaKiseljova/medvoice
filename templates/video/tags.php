@@ -1,5 +1,5 @@
 <?php 
-  global $video_id;
+  global $video_id, $video_have_children;
 
   if ( !isset($video_id) ) {
     return;
@@ -11,9 +11,10 @@
     return;
   }
 ?>
-<ul class="course__tag-list">
+
+<ul class="<?= $video_have_children ? 'course__tags' : 'lection__tags'; ?> tags">
   <?php foreach ($video_tags_terms as $key => $video_tags_term) : ?>
-    <li class="course__tag">
+    <li class="tags__item">
       <a class="button button--tag" href="#">
         <?= $video_tags_term->name; ?>
       </a>

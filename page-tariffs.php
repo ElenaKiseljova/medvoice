@@ -17,7 +17,7 @@
   }
 ?>
 
-<main class="main-tariff">
+<main class="main main--tariff">
   <?php 
     get_template_part( 'templates/tariffs' );
   ?>
