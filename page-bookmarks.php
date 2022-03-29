@@ -15,6 +15,8 @@
 
     exit();
   }
+
+  $medvoice_user_bookmarks = medvoice_get_user_bookmarks();
 ?>
 
 <main class="main">  

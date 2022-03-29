@@ -1,5 +1,5 @@
 <?php 
-  global $video_side;
+  global $video_id;
 
   $video_id = get_the_ID(  );
 
@@ -49,7 +49,15 @@
     <?= $video_title; ?>
   </h2>
 
-  <?php 
-    get_template_part( 'templates/video/list' );
-  ?>
+  <div class="side__block">
+    <ul class="side__list">
+      <?php foreach ($video_side as $key => $video_side_item) : ?>
+        <?php 
+          $video_id =  $video_side_item->ID;  
+
+          get_template_part( 'templates/card', 'side' );
+        ?>    
+      <?php endforeach; ?>  
+    </ul>
+  </div>
 </section>

@@ -1,8 +1,4 @@
 <?php 
-/* ==============================================
-********  //Логин
-=============================================== */
-
 if( wp_doing_ajax() ) {
   if (!is_user_logged_in()) {
     add_action('wp_ajax_medvoice_ajax_login', 'medvoice_ajax_login');
@@ -30,6 +26,10 @@ if( wp_doing_ajax() ) {
     add_action('wp_ajax_nopriv_medvoice_ajax_remove_from_bookmarks', 'medvoice_ajax_remove_from_bookmarks'); 
   }
 }
+
+/* ==============================================
+********  //Логин
+=============================================== */
 
 // Signin
 function medvoice_ajax_login()
@@ -1013,20 +1013,22 @@ function medvoice_ajax_add_to_bookmarks()
       $video_id = isset($_POST['video_id']) ? (int) $_POST['video_id'] : null;
 
       if ( isset($video_id) ) {
+        $video_ids = medvoice_get_post_languages_arr( $video_id );
+
         $bookmarks = [];
 
         $medvoice_user = wp_get_current_user(  );
       
         $medvoice_user_bookmarks = $medvoice_user->get( 'bookmarks' );
 
-        if ( empty($medvoice_user_bookmarks) ) {
-          $bookmarks[] = $video_id;
-        } else {
+        if ( !empty($medvoice_user_bookmarks) ) {
           $bookmarks = json_decode( $medvoice_user_bookmarks, true );
-          
+        }
+
+        foreach ($video_ids as $key => $video_id) {
           if ( !in_array($video_id, $bookmarks) ) {
             $bookmarks[] = $video_id;
-          }          
+          }
         }
 
         $bookmarks = json_encode( $bookmarks );
@@ -1047,7 +1049,7 @@ function medvoice_ajax_add_to_bookmarks()
         }
       } else {
         wp_send_json_error( [
-          'message' => __( 'Нет ID видео!', 'medvoice' ),
+          'message' => __('Нет ID видео!', 'medvoice'),
         ]);
       }     
     }
@@ -1073,6 +1075,8 @@ function medvoice_ajax_remove_from_bookmarks()
       $video_id = isset($_POST['video_id']) ? (int) $_POST['video_id'] : null;
 
       if ( isset($video_id) ) {
+        $video_ids = medvoice_get_post_languages_arr( $video_id );
+
         $medvoice_user = wp_get_current_user(  );
       
         $medvoice_user_bookmarks = $medvoice_user->get( 'bookmarks' );
@@ -1080,13 +1084,12 @@ function medvoice_ajax_remove_from_bookmarks()
         if ( !empty($medvoice_user_bookmarks) ) {
           $bookmarks = json_decode( $medvoice_user_bookmarks, true );
 
-          $bookmarks_keys = array_keys( $bookmarks, $video_id);
+          foreach ($video_ids as $key => $video_id) {
+            $bookmarks_key = array_search($video_id, $bookmarks);
 
-          if ( !empty($bookmarks_keys) ) {
-            // Беру первый элемент массива, т.к.он всего 1 должен быть теоретически
-            $bookmarks_key = $bookmarks_keys[0];
-
-            unset( $bookmarks[$bookmarks_key] );
+            if ( $bookmarks_key ) {
+              unset( $bookmarks[$bookmarks_key] );
+            }
           }
 
           $bookmarks = json_encode( $bookmarks );

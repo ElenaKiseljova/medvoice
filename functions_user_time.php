@@ -8,6 +8,9 @@ add_action( 'wp_ajax_nopriv_medvoice_set_user_time', 'medvoice_set_user_time' );
 function medvoice_set_user_time()
 {
   try {
+    // Первым делом проверяем параметр безопасности
+    check_ajax_referer('additional-script.js_nonce', 'security');
+    
     if (isset($_POST['offset']) && (!isset($_COOKIE['medvoice_user_time_offset']) || $_COOKIE['medvoice_user_time_offset'] !== $_POST['offset'])) {
       setcookie('medvoice_user_time_offset', $_POST['offset'], time() + 60 * 60 * 24, "/");
     }

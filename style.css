@@ -41,7 +41,8 @@
 }
 
 .form.sending button[type="submit"],
-.bookmarks.sending {
+.bookmarks.sending,
+#catalog-ajax.sending {
   position: relative;
 
   pointer-events: none;
@@ -50,7 +51,8 @@
 }
 
 .form.sending button[type="submit"]::after,
-.bookmarks.sending::after {
+.bookmarks.sending::after,
+#catalog-ajax.sending::after {
   content: '';
 
   position: absolute;

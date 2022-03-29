@@ -36,7 +36,7 @@
           <?php if ( medvoice_have_user_avatar(  ) ) : ?>
             <img class="form__avatar-img" src="<?= medvoice_get_user_avatar(  ); ?>" alt="<?= $medvoice_user->nickname; ?>">
           <?php else : ?>
-            <img class="form__avatar-img" src="<?= get_template_directory_uri(  ); ?>/assets/img/avatar-default.svg" alt="<?= $medvoice_user->nickname; ?>">
+            <img class="form__avatar-img" src="<?= get_template_directory_uri(  ); ?>/assets/img/avatar-default-2.svg" alt="<?= $medvoice_user->nickname; ?>">
           <?php endif; ?>          
         </div>
         <div class="form__row hidden">

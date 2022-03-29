@@ -34,13 +34,14 @@ function medvoice_scripts ()
 {  
   wp_enqueue_script('swiper-script', get_template_directory_uri() . '/assets/js/swiper-bundle.min.js', $deps = array(), $ver = null, $in_footer = true );
  
-  if ( !is_page( medvoice_get_special_page( 'forms', 'id'  ) ) ) {
+  if ( !is_page( medvoice_get_special_page( 'forms', 'id'  ) ) && !is_page( medvoice_get_special_page( 'tariffs', 'id'  ) ) ) {
     wp_enqueue_script('main-script', get_template_directory_uri() . '/assets/js/script.js', $deps = array(), $ver = null, $in_footer = true );
   }
 
   wp_enqueue_script('cookie-edit-script', get_template_directory_uri() . '/assets/js/cookie-edit.js', $deps = array(), $ver = null, $in_footer = true );
   wp_enqueue_script('files-script', get_template_directory_uri() . '/assets/js/files.js', $deps = array(), $ver = null, $in_footer = true );
   wp_enqueue_script('additional-script', get_template_directory_uri() . '/assets/js/additional.js', $deps = array(), $ver = null, $in_footer = true );
+  wp_enqueue_script('filters-script', get_template_directory_uri() . '/assets/js/filters.js', $deps = array(), $ver = null, $in_footer = true );
 
   // С переводами
   wp_set_script_translations( 'additional-script', 'medvoice' );
@@ -524,5 +525,28 @@ function wp_new_user_notification_email_filter( $wp_new_user_notification_email,
     }
 
     return false;
+  }
+
+  /* ==============================================
+  ********  //Получение массива ИД с переводами поста
+  =============================================== */
+  function medvoice_get_post_languages_arr( $post_id = null )
+  {
+    $post_ids = [];
+
+    if ( isset($post_id) ) {
+      $args = [
+        'hide_empty' => 0,
+        'fields' => 'slug',
+      ];
+    
+      $languages = pll_languages_list($args) ?? [];
+
+      foreach ($languages as $key => $language) {
+        $post_ids[] = pll_get_post( $post_id, $language );
+      }
+    }
+
+    return $post_ids; 
   }
 ?>

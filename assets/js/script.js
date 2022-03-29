@@ -226,11 +226,11 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
   // Фильтр на странице "Каталог"
   let buttonFilter = document.querySelector('.button--filter');
+  let filterBlock = document.querySelector('.catalog__filter');
 
-  if(buttonFilter) {
-    let filterBlock = document.querySelector('.catalog__filter');
-
-    buttonFilter.addEventListener('click', function() {
+  if (buttonFilter) {
+    buttonFilter.addEventListener('click', function () {
+      buttonFilter.classList.toggle('active');
       filterBlock.classList.toggle('hidden');
     })
   }
@@ -240,7 +240,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
   if (dropdownHead) {
     dropdownHead.forEach(item => {
-      item.addEventListener('click', function() {
+      item.addEventListener('click', function () {
         this.parentElement.classList.toggle('dropdown--active');
       });
     });
@@ -253,8 +253,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
   let catalogCards = document.querySelector('.catalog__cards');
   let cards = document.querySelectorAll('.card');
 
-  if(catalogCards) {
-    iconRow.addEventListener('click', function() {
+  if (iconRow && iconGrid && catalogCards && cards.length > 0) {
+    iconRow.addEventListener('click', function () {
       catalogCards.classList.add('catalog__cards--row');
       cards.forEach(item => {
         item.classList.add('card--row');
@@ -263,7 +263,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
       iconRow.classList.add('active');
     });
 
-    iconGrid.addEventListener('click', function() {
+    iconGrid.addEventListener('click', function () {
       catalogCards.classList.remove('catalog__cards--row');
       cards.forEach(item => {
         item.classList.remove('card--row');

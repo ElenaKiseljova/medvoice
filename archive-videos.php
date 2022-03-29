@@ -1,3 +1,10 @@
+
+<?php 
+  /**
+   * Template Name: Каталог
+   */
+?>
+
 <?php 
   get_header(  );
 ?>
@@ -6,7 +13,7 @@
   <?php 
     get_template_part( 'templates/archive/banner' );
 
-    get_template_part( 'templates/archive/catalog' );
+    get_template_part( 'templates/catalog' );
   ?>
 </main>
 
