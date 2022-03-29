@@ -1,5 +1,5 @@
 <?php 
-  global $video_children;
+  global $video_id, $video_children;
 
   $video_id = get_the_ID(  );
 
@@ -15,12 +15,6 @@
   $video_children_count = 0;
   if ( isset($video_children) && !empty($video_children) ) {
     $video_children_count = count($video_children);
-  }
-
-  // Проверка залогиненности
-  $video_bookmarks_block = true;
-  if ( is_user_logged_in(  ) ) {
-    $video_bookmarks_block = false;
   }
 ?>
 <section class="banner banner--course" id="banner">
@@ -38,11 +32,9 @@
         </li>
       </ul>
 
-      <button data-video-id="<?= $video_id; ?>" class="bookmarks <?= $video_bookmarks_block ? 'bookmarks--block' : ''; ?>">
-        <svg aria-labelledby="<?= __( 'Добавить в закладки', 'medvoice' ); ?>" width="16" height="20">
-          <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#bookmark-2"></use>            
-        </svg>
-      </button>
+      <?php 
+        get_template_part( 'templates/bookmarks' );
+      ?>
     </div>
 
     <h1 class="banner__name">

@@ -1,14 +1,17 @@
+<?php 
+  global $video_id;
+
+  $video_id = get_the_ID(  );
+?>
 <section class="lection">
   <div class="lection__head">
     <?php 
       get_template_part( 'templates/video/breadcrumb' );
     ?>
 
-    <button class="bookmarks">
-      <svg width="16" height="20">
-        <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#bookmark-2"></use>
-      </svg>
-    </button>
+    <?php 
+      get_template_part( 'templates/bookmarks' );
+    ?>
   </div>
 
   <h1 class="lection__title">

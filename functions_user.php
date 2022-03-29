@@ -21,7 +21,13 @@ if( wp_doing_ajax() ) {
     add_action('wp_ajax_nopriv_medvoice_ajax_edit_user_info', 'medvoice_ajax_edit_user_info');   
 
     add_action('wp_ajax_medvoice_ajax_edit_password', 'medvoice_ajax_edit_password');
-    add_action('wp_ajax_nopriv_medvoice_ajax_edit_password', 'medvoice_ajax_edit_password');      
+    add_action('wp_ajax_nopriv_medvoice_ajax_edit_password', 'medvoice_ajax_edit_password');    
+    
+    add_action('wp_ajax_medvoice_ajax_add_to_bookmarks', 'medvoice_ajax_add_to_bookmarks');
+    add_action('wp_ajax_nopriv_medvoice_ajax_add_to_bookmarks', 'medvoice_ajax_add_to_bookmarks'); 
+
+    add_action('wp_ajax_medvoice_ajax_remove_from_bookmarks', 'medvoice_ajax_remove_from_bookmarks');
+    add_action('wp_ajax_nopriv_medvoice_ajax_remove_from_bookmarks', 'medvoice_ajax_remove_from_bookmarks'); 
   }
 }
 
@@ -992,6 +998,147 @@ function medvoice_get_specialization_label( $value = '' )
      return $specialization['label'];
    }
   }
+}
+
+/* ==============================================
+********  //Добавление/удаление в/из закладки (-ок)
+=============================================== */
+function medvoice_ajax_add_to_bookmarks() 
+{
+  try {
+    // Первым делом проверяем параметр безопасности
+    check_ajax_referer('additional-script.js_nonce', 'security');
+
+    if ( is_user_logged_in(  ) ) {
+      $video_id = isset($_POST['video_id']) ? (int) $_POST['video_id'] : null;
+
+      if ( isset($video_id) ) {
+        $bookmarks = [];
+
+        $medvoice_user = wp_get_current_user(  );
+      
+        $medvoice_user_bookmarks = $medvoice_user->get( 'bookmarks' );
+
+        if ( empty($medvoice_user_bookmarks) ) {
+          $bookmarks[] = $video_id;
+        } else {
+          $bookmarks = json_decode( $medvoice_user_bookmarks, true );
+          
+          if ( !in_array($video_id, $bookmarks) ) {
+            $bookmarks[] = $video_id;
+          }          
+        }
+
+        $bookmarks = json_encode( $bookmarks );
+
+        $bookmarks_updated = update_metadata( 'user', $medvoice_user->ID, 'bookmarks', $bookmarks );
+
+        if ( $bookmarks_updated === false ) {
+          wp_send_json_error([
+            'message' => __('Не удалось обновить закладки!', 'medvoice'),
+          ]);
+
+          die();
+        } else {
+          wp_send_json_success([
+            'message' => __('Видео успешно добавлено в закладки!', 'medvoice'),
+            'bookmarks' => $bookmarks,
+          ]);
+        }
+      } else {
+        wp_send_json_error( [
+          'message' => __( 'Нет ID видео!', 'medvoice' ),
+        ]);
+      }     
+    }
+
+    die();
+  } catch (\Throwable $th) {
+    wp_send_json_error( [
+      'message' => __( 'Что-то пошло не так...', 'medvoice' ),
+      'error' => $th,
+    ]);
+
+    die();
+  }
+}
+
+function medvoice_ajax_remove_from_bookmarks() 
+{
+  try {
+    // Первым делом проверяем параметр безопасности
+    check_ajax_referer('additional-script.js_nonce', 'security');
+
+    if ( is_user_logged_in(  ) ) {
+      $video_id = isset($_POST['video_id']) ? (int) $_POST['video_id'] : null;
+
+      if ( isset($video_id) ) {
+        $medvoice_user = wp_get_current_user(  );
+      
+        $medvoice_user_bookmarks = $medvoice_user->get( 'bookmarks' );
+
+        if ( !empty($medvoice_user_bookmarks) ) {
+          $bookmarks = json_decode( $medvoice_user_bookmarks, true );
+
+          $bookmarks_keys = array_keys( $bookmarks, $video_id);
+
+          if ( !empty($bookmarks_keys) ) {
+            // Беру первый элемент массива, т.к.он всего 1 должен быть теоретически
+            $bookmarks_key = $bookmarks_keys[0];
+
+            unset( $bookmarks[$bookmarks_key] );
+          }
+
+          $bookmarks = json_encode( $bookmarks );
+
+          $bookmarks_updated = update_metadata( 'user', $medvoice_user->ID, 'bookmarks', $bookmarks );
+
+          if ( $bookmarks_updated === false ) {
+            wp_send_json_error([
+              'message' => __('Не удалось обновить закладки!', 'medvoice'),
+            ]);
+
+            die();
+          } else {
+            wp_send_json_success([
+              'message' => __('Видео успешно удалено из закладок!', 'medvoice'),
+              'bookmarks' => $bookmarks,
+            ]);
+          }
+        }
+      } else {
+        wp_send_json_error( [
+          'message' => __( 'Нет ID видео!', 'medvoice' ),
+        ]);
+      }     
+    }
+
+    die();
+  } catch (\Throwable $th) {
+    wp_send_json_error( [
+      'message' => __( 'Что-то пошло не так...', 'medvoice' ),
+      'error' => $th,
+    ]);
+
+    die();
+  }
+}
+
+function medvoice_get_user_bookmarks()
+{
+  $bookmarks = [];
+
+  if ( is_user_logged_in(  ) ) {
+    $medvoice_user = wp_get_current_user(  );
+    
+    $medvoice_user_bookmarks = $medvoice_user->get( 'bookmarks' );
+
+    if ( !empty($medvoice_user_bookmarks) ) {
+      $bookmarks = json_decode( $medvoice_user_bookmarks, true );
+    }
+  }  
+
+  return $bookmarks;
 }
 
 /* ==============================================

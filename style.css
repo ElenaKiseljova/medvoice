@@ -13,10 +13,6 @@
   border-color: red;
 }
 
-.list__item.active {
-  border: 1px dashed gray;
-}
-
 /* Стили для ответов сервера */
 .text--right {
   margin-left: auto;
@@ -44,7 +40,8 @@
   100% { transform: rotate(360deg); }
 }
 
-.form.sending button[type="submit"] {
+.form.sending button[type="submit"],
+.bookmarks.sending {
   position: relative;
 
   pointer-events: none;
@@ -52,7 +49,8 @@
   opacity: 0.5;
 }
 
-.form.sending button[type="submit"]::after {
+.form.sending button[type="submit"]::after,
+.bookmarks.sending::after {
   content: '';
 
   position: absolute;
@@ -76,6 +74,7 @@
   animation: spin 2s linear infinite;
 }
 
+/* Popup */
 .popup {
   position: fixed;
 

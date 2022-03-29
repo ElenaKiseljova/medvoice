@@ -407,6 +407,76 @@
         console.error('Ошибка:', error);
       }
     },
+    bookmarks() {
+      const changeUserBookmarks = (bookmark, type = 'add') => {
+        const videoId = bookmark.dataset.videoId ?? false;
+
+        if (videoId) {
+          const dataForm = new FormData();
+
+          if (type === 'add') {
+            dataForm.append('action', 'medvoice_ajax_add_to_bookmarks');
+          } else {
+            dataForm.append('action', 'medvoice_ajax_remove_from_bookmarks');
+          }
+
+          dataForm.append('video_id', videoId);
+          dataForm.append('security', medvoice_ajax.nonce);
+
+          try {
+            const url = medvoice_ajax.url;
+
+            bookmark.classList.add('sending');
+
+            fetch(url, {
+              method: 'POST',
+              credentials: 'same-origin',
+              body: dataForm
+            })
+              .then((response) => response.json())
+              .then((response) => {
+                if (response.success === true) {
+                  if (type === 'add') {
+                    bookmark.classList.add('saved');
+                  } else {
+                    bookmark.classList.remove('saved');
+                  }
+
+                  console.log('Успех:', response);
+                } else {
+                  console.error('Ошибка:', response);
+                }
+
+                bookmark.classList.remove('sending');
+              })
+              .catch((error) => {
+                console.error('Ошибка:', error);
+
+                bookmark.classList.remove('sending');
+              });
+          } catch (error) {
+            console.error('Ошибка:', error);
+
+            bookmark.classList.remove('sending');
+          }
+        }
+      };
+
+      const bookmarks = document.querySelectorAll('.bookmarks ');
+      if (bookmarks.length > 0) {
+        bookmarks.forEach(bookmark => {
+          bookmark.addEventListener('click', (evt) => {
+            evt.preventDefault();
+
+            if (bookmark.classList.contains('saved')) {
+              changeUserBookmarks(bookmark, 'remove');
+            } else {
+              changeUserBookmarks(bookmark, 'add');
+            }
+          });
+        });
+      }
+    },
     popups() {
       const popups = document.querySelectorAll('.popup');
 
@@ -442,5 +512,7 @@
     additional.setUserTime();
 
     additional.popups();
+
+    additional.bookmarks();
   });
 })();

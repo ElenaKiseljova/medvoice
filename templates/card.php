@@ -1,5 +1,5 @@
 <?php 
-  global $video, $place;
+  global $video, $video_id, $place;
 
   $video_id = null;
 
@@ -25,12 +25,6 @@
   // Проверка на бесплатность видео
   if ( medvoice_is_free_video( $video_id ) ) {
     $video_block = false;
-  }
-  
-  // Проверка залогиненности
-  $video_bookmarks_block = true;
-  if ( is_user_logged_in(  ) ) {
-    $video_bookmarks_block = false;
   }
 
   // Длительность Видео  
@@ -119,11 +113,9 @@
         </p>              
       </div>
 
-      <button data-video-id="<?= $video_id; ?>" class="bookmarks <?= $video_bookmarks_block ? 'bookmarks--block' : ''; ?>">
-        <svg aria-labelledby="<?= __( 'Добавить в закладки', 'medvoice' ); ?>" width="16" height="20">
-          <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#bookmark-2"></use>            
-        </svg>
-      </button>
+      <?php 
+        get_template_part( 'templates/bookmarks' );
+      ?>
     </div>
   </div>
 </a>
