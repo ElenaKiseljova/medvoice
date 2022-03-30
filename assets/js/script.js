@@ -70,6 +70,43 @@ document.addEventListener("DOMContentLoaded", function (event) {
         prevEl: '.slider__btn-prev',
       },
     });
+
+    const selectSlides = document.querySelectorAll('.swiper-select');
+    if (selectSlides.length > 0) {
+      const swiperSelect = new Swiper('.swiper-select', {
+        direction: "vertical",
+        slidesPerView: "auto",
+        freemode: true,
+        allowTouchMove: false,
+
+        scrollbar: {
+          el: ".scrollbar",
+          dragClass: "scrollbar__drag",
+          draggable: true,
+          snapOnRelease: false
+        },
+        mousewheel: true,
+      });
+    }
+
+    const side = document.querySelector('.swiper-side');
+    if (side) {
+      const swiperSide = new Swiper('.swiper-side', {
+        direction: "vertical",
+        slidesPerView: "auto",
+        freemode: true,
+        allowTouchMove: false,
+
+        scrollbar: {
+          el: ".scrollbar",
+          dragClass: "scrollbar__drag",
+          draggable: true,
+          dragSize: 75,
+          snapOnRelease: false
+        },
+        mousewheel: true,
+      });
+    }
   }
 
 
@@ -231,7 +268,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
   if (buttonFilter) {
     buttonFilter.addEventListener('click', function () {
       buttonFilter.classList.toggle('active');
-      filterBlock.classList.toggle('hidden');
+      filterBlock.classList.toggle('active');
     })
   }
 

@@ -9,6 +9,10 @@
 
 @import url('assets/css/style.min.css');
 
+* {
+  overflow-wrap: normal!important;
+}
+
 .error input {
   border-color: red;
 }

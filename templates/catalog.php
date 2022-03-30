@@ -53,7 +53,7 @@
     </script>
   <?php endif; ?>
 
-  <div class="catalog__head">
+  <div class="catalog__head <?= ($is_search_page || $is_bookmarks_page) ? 'catalog__head--search' : ''; ?>">
     <?php if ( $is_search_page ) : ?>
       <h1 class="catalog__title">
         <?= 

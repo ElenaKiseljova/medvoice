@@ -40,7 +40,7 @@
       $paged = (int) $_POST['paged'];
 
       $response = [
-        'post' => $_POST,
+        // 'post' => $_POST,
       ];
 
       ob_start();
@@ -96,7 +96,11 @@
 
       wp_reset_postdata();
     } else {
-      echo __( 'По вашему запросу результатов не найдено', 'medvoice' );
+      ?>
+        <p class="results__empty">
+          <?= __( 'По вашему запросу результатов не найдено', 'medvoice' ); ?>
+        </p>
+      <?php
     } 
   }
 
@@ -115,8 +119,7 @@
       $bookmarks = (int) $_POST['bookmarks'];
 
       $response = [
-        'post' => $_POST,
-        'bkms' => (int) $_POST['bookmarks']
+        // 'post' => $_POST,
       ];
 
       ob_start();
@@ -154,8 +157,6 @@
 
       $args['post__in'] = $ids;
     }
-
-    
 
     // Категории
     if ( !empty($taxonomies) ) {

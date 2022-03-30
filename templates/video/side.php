@@ -49,15 +49,20 @@
     <?= $video_title; ?>
   </h2>
 
-  <div class="side__block">
-    <ul class="side__list">
-      <?php foreach ($video_side as $key => $video_side_item) : ?>
-        <?php 
-          $video_id =  $video_side_item->ID;  
+  <div class="side__body swiper swiper-side">
+    <div class="side__block swiper-wrapper">
+      <ul class="side__list swiper-slide">
+        <?php foreach ($video_side as $key => $video_side_item) : ?>
+          <?php 
+            $video_id =  $video_side_item->ID;  
 
-          get_template_part( 'templates/card', 'side' );
-        ?>    
-      <?php endforeach; ?>  
-    </ul>
+            get_template_part( 'templates/card', 'side' );
+          ?>    
+        <?php endforeach; ?>  
+      </ul>
+    </div>
+    <div class="scrollbar">
+      <div class="scrollbar__drag"></div>
+    </div>
   </div>
 </section>

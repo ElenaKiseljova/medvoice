@@ -13,9 +13,7 @@
 
   $author = $authors[0];
 
-  if ( $author instanceof WP_Term ) {
-    # code...
-  } else {
+  if ( !is_a( $author, 'WP_Term' ) ) {
     return;
   }
 

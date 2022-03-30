@@ -4,11 +4,10 @@
   $video_id = null;
 
   // Если не пост
-  if ( $video instanceof WP_Post ) {
-    $video_id = $video->ID ?? null;
-  } else {
+  if ( !is_a( $video, 'WP_Post' ) ) {
     return;
   }    
+  $video_id = $video->ID ?? null;
 
   // Если ИД нет
   if ( is_null($video_id) ) {

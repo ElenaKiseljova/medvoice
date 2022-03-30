@@ -39,10 +39,10 @@
             <img class="form__avatar-img" src="<?= get_template_directory_uri(  ); ?>/assets/img/avatar-default-2.svg" alt="<?= $medvoice_user->nickname; ?>">
           <?php endif; ?>          
         </div>
-        <div class="form__row hidden">
+        <p class="form__row hidden">
           <label class="form__upload" for="avatar"></label>
           <input type="file" id="avatar" name="avatar" hidden>
-        </div>
+        </p>
       </div>
 
       <div class="form__content form__content--account">
@@ -77,12 +77,19 @@
               </svg>
             </div>
 
-            <ul class="select__body">
-              <li class="select__item" data-value="0"><?= __( 'Выберите специальность', 'medvoice' ); ?></li>
-              <?php foreach ($specializations as $key => $item) : ?>
-                <li class="select__item" data-value="<?= $item['value']; ?>"><?= $item['label']; ?></li>
-              <?php endforeach; ?>  
-            </ul>
+            <div class="select__body swiper swiper-select">
+              <div class="select__block swiper-wrapper">
+                <ul class="select__list swiper-slide">
+                  <li class="select__item" data-value="0"><?= __( 'Выберите специальность', 'medvoice' ); ?></li>
+                  <?php foreach ($specializations as $key => $item) : ?>
+                    <li class="select__item" data-value="<?= $item['value']; ?>"><?= $item['label']; ?></li>
+                  <?php endforeach; ?>  
+                </ul>
+              </div>
+              <div class="scrollbar scrollbar--select">
+                <div class="scrollbar__drag"></div>
+              </div>
+            </div>
 
             <select class="select__field" name="specialization" id="specialization">
               <option value="0" <?= (empty($specialization) || $specialization == '0') ? 'selected' : ''; ?>>
@@ -108,12 +115,19 @@
               </svg>
             </div>
 
-            <ul class="select__body">
-              <li class="select__item" data-value="0"><?= __( 'Укажите свою страну', 'medvoice' ); ?></li>
-              <?php foreach ($countries as $key => $country) : ?>
-                <li class="select__item" data-value="<?= $key; ?>"><?= $country; ?></li>
-              <?php endforeach; ?>  
-            </ul>
+            <div class="select__body swiper swiper-select">
+              <div class="select__block swiper-wrapper">
+                <ul class="select__list swiper-slide">
+                  <li class="select__item" data-value="0"><?= __( 'Укажите свою страну', 'medvoice' ); ?></li>
+                  <?php foreach ($countries as $key => $country) : ?>
+                    <li class="select__item" data-value="<?= $key; ?>"><?= $country; ?></li>
+                  <?php endforeach; ?>  
+                </ul>
+              </div>
+              <div class="scrollbar scrollbar--select">
+                <div class="scrollbar__drag"></div>
+              </div>
+            </div>
 
             <select class="select__field" name="billing_country" id="billing_country">
               <option value="0" <?= (empty($medvoice_user_country) || $medvoice_user_country == '0') ? 'selected' : ''; ?>>

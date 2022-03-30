@@ -218,9 +218,9 @@ if (!function_exists('medvoice_init_function')) :
     {
       // Категории
       register_taxonomy( 'sections', [ 'videos' ], [
-        'label'                 => '', // определяется параметром $labels->name
+        'label'                 => __( 'Категория', 'medvoice' ), // определяется параметром $labels->name
         'labels'                => [
-          'name'              => 'Категории',
+          'name'              => __( 'Категория', 'medvoice' ),
           'singular_name'     => 'Категория',
           'search_items'      => 'Найти категорию',
           'all_items'         => 'Все категории',
@@ -245,9 +245,9 @@ if (!function_exists('medvoice_init_function')) :
 
       // Теги
       register_taxonomy( 'labels', [ 'videos' ], [
-        'label'                 => '', // определяется параметром $labels->name
+        'label'                 => __( 'Теги проблематики', 'medvoice' ), // определяется параметром $labels->name
         'labels'                => [
-          'name'              => 'Теги',
+          'name'              => __( 'Теги проблематики', 'medvoice' ),
           'singular_name'     => 'Тег',
           'search_items'      => 'Найти тег',
           'all_items'         => 'Все теги',
@@ -272,9 +272,9 @@ if (!function_exists('medvoice_init_function')) :
 
       // Формат
       register_taxonomy( 'format', [ 'videos' ], [
-        'label'                 => '', // определяется параметром $labels->name
+        'label'                 => __( 'Формат', 'medvoice' ),  // определяется параметром $labels->name
         'labels'                => [
-          'name'              => 'Форматы видео',
+          'name'              => __( 'Формат', 'medvoice' ),
           'singular_name'     => 'Формат',
           'search_items'      => 'Найти формат',
           'all_items'         => 'Все форматы',
@@ -299,9 +299,9 @@ if (!function_exists('medvoice_init_function')) :
 
       // Автор
       register_taxonomy( 'authors', [ 'videos' ], [
-        'label'                 => '', // определяется параметром $labels->name
+        'label'                 => __( 'Автор', 'medvoice' ), // определяется параметром $labels->name
         'labels'                => [
-          'name'              => 'Авторы видео',
+          'name'              => __( 'Автор', 'medvoice' ),
           'singular_name'     => 'Автор',
           'search_items'      => 'Найти автора',
           'all_items'         => 'Все авторы',
@@ -326,9 +326,9 @@ if (!function_exists('medvoice_init_function')) :
 
       // Языки
       register_taxonomy( 'langs', [ 'videos' ], [
-        'label'                 => '', // определяется параметром $labels->name
+        'label'                 => __( 'Язык', 'medvoice' ), // определяется параметром $labels->name
         'labels'                => [
-          'name'              => 'Языки видео',
+          'name'              => __( 'Язык', 'medvoice' ),
           'singular_name'     => 'Язык',
           'search_items'      => 'Найти язык',
           'all_items'         => 'Все языки',
