@@ -15,17 +15,13 @@
 
     exit();
   }
-
-  $medvoice_user_bookmarks = medvoice_get_user_bookmarks();
 ?>
 
-<main class="main">  
-  <h1 class="banner__title">
-    <?= get_the_title(  ); ?>
-  </h1>
+<main class="main">
+  <?php 
+    get_template_part( 'templates/catalog' );
+  ?>
 </main>
-  
-</div>
 
 <?php 
   get_footer(  );

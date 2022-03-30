@@ -1,8 +1,14 @@
 <?php 
-  $author = get_queried_object();
+  global $author;
 
-  $content = get_field( 'content', $author ); 
+  if ( $author instanceof WP_Term ) {
+    # code...
+  } else {
+    return;
+  }
+ 
+  $author_description = term_description();
 ?>
 <div class="author__content">
-  <?= $content; ?>
+  <?= $author_description; ?>
 </div>

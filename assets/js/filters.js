@@ -172,6 +172,7 @@
           dataForm.append('paged', paged);
           dataForm.append('taxonomies', window.taxonomies);
           dataForm.append('s', window.s);
+          dataForm.append('bookmarks', window.bookmarks);
 
           window.filters.onAjax(dataForm, dataAjaxContainer);
         }

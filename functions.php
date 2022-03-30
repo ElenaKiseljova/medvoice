@@ -202,7 +202,7 @@ if (!function_exists('medvoice_init_function')) :
         'menu_icon'           => 'dashicons-playlist-video',
         'hierarchical'        => true,
         'supports'            => [ 'title', 'editor', 'thumbnail', 'page-attributes', 'custom-fields', 'author' ], // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
-        'taxonomies'          => [ 'sections', 'labels', 'format' ],
+        'taxonomies'          => [ 'sections', 'labels', 'format', 'authors', 'langs' ],
         'has_archive'         => true,
         'rewrite'             => [ 'slug' => 'katalog','with_front' => false ],
         'query_var'           => true,
@@ -285,7 +285,7 @@ if (!function_exists('medvoice_init_function')) :
           'update_item'       => 'Обновить формат',
           'add_new_item'      => 'Добавить новый формат',
           'new_item_name'     => 'Название нового формата',
-          'menu_name'         => 'Форматы видео',
+          'menu_name'         => 'Форматы',
         ],
         'description'           => 'Форматы видео', // описание таксономии
         'public'                => true,
@@ -297,9 +297,62 @@ if (!function_exists('medvoice_init_function')) :
         'rewrite'               => true,
       ] );
 
+      // Автор
+      register_taxonomy( 'authors', [ 'videos' ], [
+        'label'                 => '', // определяется параметром $labels->name
+        'labels'                => [
+          'name'              => 'Авторы видео',
+          'singular_name'     => 'Автор',
+          'search_items'      => 'Найти автора',
+          'all_items'         => 'Все авторы',
+          'view_item '        => 'Посмотреть автора',
+          'parent_item'       => 'Родительский автор',
+          'parent_item_colon' => 'Родительский автор:',
+          'edit_item'         => 'Редактировать автора',
+          'update_item'       => 'Обновить автора',
+          'add_new_item'      => 'Добавить нового автора',
+          'new_item_name'     => 'Название нового автора',
+          'menu_name'         => 'Авторы',
+        ],
+        'description'           => 'Авторы видео', // описание таксономии
+        'public'                => true,
+        'publicly_queryable'    => true, // равен аргументу public
+        'show_ui'               => true, // равен аргументу public
+        'show_in_menu'          => true, // равен аргументу show_ui
+        'show_in_rest'          => true, 
+        'hierarchical'          => true,
+        'rewrite'               => true,
+      ] );
+
+      // Языки
+      register_taxonomy( 'langs', [ 'videos' ], [
+        'label'                 => '', // определяется параметром $labels->name
+        'labels'                => [
+          'name'              => 'Языки видео',
+          'singular_name'     => 'Язык',
+          'search_items'      => 'Найти язык',
+          'all_items'         => 'Все языки',
+          'view_item '        => 'Посмотреть язык',
+          'parent_item'       => 'Родительский язык',
+          'parent_item_colon' => 'Родительский язык:',
+          'edit_item'         => 'Редактировать язык',
+          'update_item'       => 'Обновить язык',
+          'add_new_item'      => 'Добавить новый язык',
+          'new_item_name'     => 'Название нового языка',
+          'menu_name'         => 'Языки',
+        ],
+        'description'           => 'Языки видео', // описание таксономии
+        'public'                => false,
+        'publicly_queryable'    => false, // равен аргументу public
+        'show_ui'               => true, // равен аргументу public
+        'show_in_menu'          => true, // равен аргументу show_ui
+        'show_in_rest'          => true, 
+        'hierarchical'          => true,
+        'rewrite'               => true,
+      ] );
+
       // Убираю Категории продуктов из карты сайта
       unregister_taxonomy( 'product_cat' );  
-      
     }   
   
     register_custom_taxonomy();
@@ -339,6 +392,7 @@ endif;
         $taxonomies['sections'] = 'sections';
         $taxonomies['labels'] = 'labels';
         $taxonomies['format'] = 'format';
+        $taxonomies['authors'] = 'authors';
       }
 
       return $taxonomies;

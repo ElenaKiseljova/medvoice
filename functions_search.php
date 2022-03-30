@@ -96,7 +96,7 @@
 
       wp_reset_postdata();
     } else {
-      echo __( 'По данному запросу видео не найдены.', 'medvoice' );
+      echo __( 'По вашему запросу результатов не найдено', 'medvoice' );
     } 
   }
 
@@ -112,13 +112,16 @@
       $posts_per_page = (int) $_POST['posts_per_page'];
       $paged = (int) $_POST['paged'];
 
+      $bookmarks = (int) $_POST['bookmarks'];
+
       $response = [
         'post' => $_POST,
+        'bkms' => (int) $_POST['bookmarks']
       ];
 
       ob_start();
 
-      medvoice_videos_cards_html( $taxonomies, $posts_per_page, $paged, $s );
+      medvoice_videos_cards_html( $taxonomies, $posts_per_page, $paged, $s, $bookmarks );
   
       $response['content'] = ob_get_contents();
   
@@ -133,7 +136,7 @@
   /**
    * $taxonomies = '[['slug' => 'slug1', 'terms' => '1,2,3'], ...]';
    */
-  function medvoice_videos_cards_html( $taxonomies = '', $posts_per_page = 2, $paged = 1, $s = '' ) 
+  function medvoice_videos_cards_html( $taxonomies = '', $posts_per_page = 8, $paged = 1, $s = '', $bookmarks = 0 ) 
   {
     // Каталог
     $args = [
@@ -144,6 +147,15 @@
       'posts_per_page' => $posts_per_page,
       'paged' => $paged,
     ];
+
+    // Закладки
+    if ( $bookmarks === 1 ) {
+      $ids = medvoice_get_user_bookmarks();
+
+      $args['post__in'] = $ids;
+    }
+
+    
 
     // Категории
     if ( !empty($taxonomies) ) {
@@ -311,7 +323,7 @@
 
       wp_reset_postdata();
     } else {
-      echo __( 'По данному запросу видео не найдены.', 'medvoice' );
+      echo __( 'По вашему запросу результатов не найдено', 'medvoice' );
     } 
   }  
 ?>

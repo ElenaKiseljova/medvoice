@@ -5,32 +5,34 @@
     return;
   }
 
-  $author_id = get_the_author_ID();
+  $authors = wp_get_post_terms( $video_id, 'authors' ) ?? [];
 
-  if ( !isset($author_id) ) {
+  if ( empty($authors) ) {
     return;
   }
 
-  $author_firstname = get_the_author_meta( 'user_firstname', $author_id ) ?? '';
-  $author_lastname = get_the_author_meta( 'user_lastname', $author_id ) ?? '';
+  $author = $authors[0];
 
-  $author_name = ( !empty($author_firstname) && !empty($author_lastname) ) ? 
-                 ($author_firstname . ' ' . $author_lastname) :
-                 get_the_author_meta( 'nickname', $author_id );
+  if ( $author instanceof WP_Term ) {
+    # code...
+  } else {
+    return;
+  }
 
-  $author_description = get_the_author_meta( 'description', $author_id ) ?? '';
-
-  $author_specialization = get_the_author_meta( 'specialization', $author_id ) ?? '';
-
-  $author_url = get_author_posts_url( $author_id ) ?? '';
+  $author_name = $author->name;
+  $author_url = get_term_link( $author );
+  
+  $author_short_description = get_field( 'short_description', $author );
+  $author_avatar = get_field( 'avatar', $author );
+  $author_specialization = get_field( 'specialization', $author );
 ?>
 <div class="creator">
   <h3 class="creator__title"><?= __( 'Автор', 'medvoice' ); ?></h3>
 
   <div class="creator__block">
     <div class="creator__avatar">
-      <?php if ( medvoice_have_user_avatar( $author_id ) ) : ?>
-        <img class="creator__avatar-img" src="<?= medvoice_get_user_avatar(  ); ?>" alt="<?= $author_name; ?>">
+      <?php if ( $author_avatar ) : ?>
+        <img class="creator__avatar-img" src="<?= $author_avatar; ?>" alt="<?= $author_name; ?>">
       <?php else : ?>
         <img class="creator__avatar-img" src="<?= get_template_directory_uri(  ); ?>/assets/img/avatar-default.svg" alt="<?= $author_name; ?>">
       <?php endif; ?> 
@@ -38,12 +40,12 @@
 
     <div class="creator__info">
       <p class="creator__name"><?= $author_name; ?></p>
-      <p class="creator__special"><?= medvoice_get_specialization_label( $author_specialization ); ?></p>
+      <p class="creator__special"><?= $author_specialization; ?></p>
     </div>
   </div>
 
   <p class="creator__description">
-    <?= $author_description; ?>
+    <?= $author_short_description; ?>
   </p>
 
   <a class="creator__link" href="<?= $author_url; ?>">

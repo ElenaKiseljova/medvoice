@@ -3,23 +3,35 @@
 ?>
 
 <?php 
-  global $video_arr;
+  global $video_arr, $author;
 
   $author = get_queried_object();
-
-  if ( $author instanceof WP_User ) {
-    $author_id = $author->ID;
-
-    $args = [
-      'author' => $author_id,
-      'post_type' => 'videos',
-      'numberposts' => -1,
-    ];
   
-    $video_arr = get_posts( $args );
+  if ( $author instanceof WP_Term ) {
+    # code...
   } else {
     return;
-  } 
+  }
+
+  $author_id = $author->term_id ?? null;
+
+  if ( !isset($author_id) ) {
+    return;
+  }
+
+  $args = [
+    'post_type' => 'videos',
+    'numberposts' => -1,
+    'tax_query' => [
+      [
+        'taxonomy' => $author->taxonomy,
+        'field'    => 'id',
+        'terms'    => $author_id
+    ]
+    ]
+  ];
+
+  $video_arr = get_posts( $args );
 ?>
 
 <main class="main">
