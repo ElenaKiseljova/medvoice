@@ -47,7 +47,7 @@
       }
 
       $response = [
-        'post' => $_POST,
+        // 'post' => $_POST,
       ];
 
       ob_start();
@@ -75,6 +75,7 @@
         $term_children_ids = get_term_children( $term_id, $taxonomy );
 
         if ( !is_wp_error( $term_children_ids ) && !empty($term_children_ids) ) {
+          $i = 1;
           foreach ($term_children_ids as $key => $term_child_id) {
             $term_child = get_term_by( 'id', $term_child_id, $taxonomy );
 
@@ -82,18 +83,20 @@
               ?>
                 <li class="dropdown__item">
                   <input class="dropdown__check" type="checkbox" 
-                    id="<?= $taxonomy . '-sub-' . $key; ?>" 
-                    name="<?= $taxonomy; ?>"
+                    id="<?= $taxonomy . '-sub-' . $term_child_id; ?>" 
+                    name="<?= $taxonomy; ?>-sub"
                     value="<?= $term_child_id; ?>">
-                  <label class="dropdown__label" for="<?= $taxonomy . '-sub-' . $key; ?>"><?= $term_child->name; ?></label>
+                  <label class="dropdown__label" for="<?= $taxonomy . '-sub-' . $term_child_id; ?>"><?= $term_child->name; ?></label>
                 </li>
               <?php
             }
+
+            $i++;
           }
         }
       }
     } else {
-      return '';
+      return;
     }    
   }
 
@@ -181,21 +184,23 @@
       // Первым делом проверяем параметр безопасности
       check_ajax_referer('additional-script.js_nonce', 'security');
 
-      $taxonomies = $_POST['taxonomies'] ? htmlspecialchars($_POST['taxonomies']) : '';
+      $taxonomies = $_POST['taxonomies'] ?? '';
+      $sub_tax = $_POST['sub_tax'] ?? '';
+
       $s = $_POST['s'] ? htmlspecialchars($_POST['s']) : '';
 
-      $posts_per_page = (int) $_POST['posts_per_page'];
-      $paged = (int) $_POST['paged'];
+      $posts_per_page = $_POST['posts_per_page'] ? (int) $_POST['posts_per_page'] : 8;
+      $paged = $_POST['paged'] ? (int) $_POST['paged'] : 1;
 
-      $bookmarks = (int) $_POST['bookmarks'];
+      $bookmarks = $_POST['bookmarks'] ? (int) $_POST['bookmarks'] : 0;
 
       $response = [
-        // 'post' => $_POST,
+        'post' => $_POST,
       ];
 
       ob_start();
 
-      medvoice_videos_cards_html( $taxonomies, $posts_per_page, $paged, $s, $bookmarks );
+      medvoice_videos_cards_html( $taxonomies, $posts_per_page, $paged, $s, $bookmarks, $sub_tax );
   
       $response['content'] = ob_get_contents();
   
@@ -210,9 +215,9 @@
   }
 
   /**
-   * $taxonomies = '[['slug' => 'slug1', 'terms' => '1,2,3'], ...]';
+   * $taxonomies = '[['slug1' => '1,2,3'], ...]';
    */
-  function medvoice_videos_cards_html( $taxonomies = '', $posts_per_page = 8, $paged = 1, $s = '', $bookmarks = 0 ) 
+  function medvoice_videos_cards_html( $taxonomies = '', $posts_per_page = 8, $paged = 1, $s = '', $bookmarks = 0, $sub_tax = '' ) 
   {
     // Каталог
     $args = [
@@ -232,25 +237,35 @@
     }
 
     // Категории
-    if ( !empty($taxonomies) ) {
-      $taxonomies = json_decode( $taxonomies, true );
+    if ( $taxonomies !== '' ) {
+      $taxonomies = json_decode( stripcslashes($taxonomies), true );
+      
+      if ( is_array($taxonomies) && !empty($taxonomies) ) {
+        if ( $sub_tax !== '' ) {
+          $sub_tax = json_decode( stripcslashes($sub_tax), true );
+        }
 
-      $args['tax_query'] = [];
+        $args['tax_query'] = [];
 
-      foreach ($taxonomies as $key => $taxonomy) {
-        if ( !empty($taxonomy['terms']) ) {
-          $args['tax_query'][] = [
-            'taxonomy' => $taxonomy['slug'],
-            'field' => 'term_id',
-            'terms' => $taxonomy['terms'],
-          ];
-        } else {
-          $args['tax_query'][] = [
-            'taxonomy' => $taxonomy['slug'],
-            'operator' => 'EXISTS',
-          ];
-        }        
-      }
+        foreach ($taxonomies as $taxonomy => $terms) {
+          if ( !empty($sub_tax) && isset($sub_tax[$taxonomy]) ) {
+            $terms = $sub_tax[$taxonomy];
+          } 
+
+          if ( !empty($terms) ) {
+            $args['tax_query'][] = [
+              'taxonomy' => $taxonomy,
+              'field' => 'term_id',
+              'terms' => $terms,
+            ];
+          } else {
+            $args['tax_query'][] = [
+              'taxonomy' => $taxonomy,
+              'operator' => 'EXISTS',
+            ];
+          }        
+        }
+      }      
     }
 
     // Поиск

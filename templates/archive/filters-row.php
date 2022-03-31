@@ -53,10 +53,10 @@
           ?>
           <li class="dropdown__item">
             <input class="dropdown__check <?= $parent ? 'dropdown__check--parent' : '';?>" <?= $checked ? 'checked' : ''; ?> type="checkbox" 
-              id="<?= $taxonomy_slug . '-' . $key; ?>" 
+              id="<?= $taxonomy_slug . '-' . $term_id; ?>" 
               name="<?= $taxonomy_slug; ?>" 
               value="<?= $term_id; ?>">
-            <label class="dropdown__label" for="<?= $taxonomy_slug . '-' . $key; ?>"><?= $term_name; ?></label>
+            <label class="dropdown__label" for="<?= $taxonomy_slug . '-' . $term_id; ?>"><?= $term_name; ?></label>
           </li>
         <?php endforeach; ?>
       <?php endif; ?>

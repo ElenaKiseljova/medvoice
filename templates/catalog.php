@@ -23,10 +23,7 @@
   $taxonomies = '';
   if ( $is_taxonomy_format_archive ) {
     $taxonomies = [
-      [
-        'slug' => $term->taxonomy, 
-        'terms' => $term->term_id
-      ]
+      $term->taxonomy => $term->term_id,
     ];
 
     $taxonomies = json_encode( $taxonomies );

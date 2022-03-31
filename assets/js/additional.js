@@ -520,9 +520,14 @@
 
     // Фильтры
     filters() {
+      let lastTimeout;
+
       const filterForm = document.querySelector('#filters');
 
       if (filterForm) {
+        // Все чекбоксы
+        const filterFormCheckboxes = filterForm.querySelectorAll('input[type="checkbox"]');
+
         // Получение выбранных категорий
         const getParentTermIds = (parentInputs) => {
           const parentCheckedInputs = [].filter.call(parentInputs, item => item.checked);
@@ -564,23 +569,35 @@
         if (parentInputs.length > 0) {
           parentInputs.forEach(parentInput => {
             parentInput.addEventListener('change', () => {
-              const parentTax = parentInput.name;
+              if (lastTimeout) {
+                clearTimeout(lastTimeout);
+              }
 
-              const parentTermIds = getParentTermIds(parentInputs);
+              lastTimeout = setTimeout(() => {
+                const parentTax = parentInput.name;
 
-              getChildren(parentTermIds, parentTax);
+                const parentTermIds = getParentTermIds(parentInputs);
+
+                getChildren(parentTermIds, parentTax);
+              }, 500);
             });
           });
         }
 
+        filterForm.addEventListener('reset', (evt) => {
+          evt.preventDefault();
+
+          filterFormCheckboxes.forEach(filterFormCheckbox => {
+            if (filterFormCheckbox.checked) {
+              filterFormCheckbox.click();
+            }
+          });
+        });
+
         filterForm.addEventListener('submit', (evt) => {
           evt.preventDefault();
 
-          let dataForm = new FormData(filterForm);
-
-          for (var pair of dataForm.entries()) {
-            console.log(pair[0] + ', ' + pair[1]);
-          }
+          additional.getAjaxFilters(filterForm);
         });
       }
     },
@@ -740,6 +757,71 @@
         additional.onAjax(dataForm, dataAjaxContainer);
       }
     },
+    getAjaxFilters(filterForm) {
+      const dataAjaxContainer = document.querySelector('#catalog-ajax');
+
+      if (dataAjaxContainer) {
+        // Создаем упорядоченный массив Таксономий
+        let taxonomies = {};
+
+        let subTax = {};
+
+        let s = '';
+
+        // Перебираем все, что отправляется в форме
+        let formData = new FormData(filterForm);
+
+        for (var [slug, term] of formData.entries()) {
+          if (slug === 's') {
+            s = term;
+
+            continue;
+          } else if (slug.includes('-sub')) {
+            let trueSlug = slug.split('-')[0];
+
+            if (!subTax[trueSlug]) {
+              subTax[trueSlug] = [];
+            }
+
+            subTax[trueSlug].push(term);
+
+            continue;
+          }
+
+          if (!taxonomies[slug]) {
+            taxonomies[slug] = [];
+          }
+
+          taxonomies[slug].push(term);
+        }
+
+        taxonomies = JSON.stringify(taxonomies);
+
+        // Собираем то, что надо отправить на сервер
+        const dataForm = new FormData();
+
+        dataForm.append('s', s);
+        dataForm.append('taxonomies', taxonomies);
+
+        if (Object.keys(subTax).length > 0) {
+          subTax = JSON.stringify(subTax);
+
+          dataForm.append('sub_tax', subTax);
+        }
+
+        dataForm.append('action', 'medvoice_ajax_videos_cards_html');
+        dataForm.append('security', medvoice_ajax.nonce);
+
+        dataForm.append('posts_per_page', window.postPerpage);
+        dataForm.append('paged', 1);
+        // dataForm.append('taxonomies', window.taxonomies);
+        // dataForm.append('s', window.s);
+        dataForm.append('bookmarks', window.bookmarks);
+
+        additional.onAjax(dataForm, dataAjaxContainer);
+      }
+    },
+    // Получение подкатегорий
     getAjaxSubCategory(parentTax, parentTermIds, dataAjaxContainer, callback) {
       let dataForm = new FormData();
 
