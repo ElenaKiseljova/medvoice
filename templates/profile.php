@@ -1,6 +1,8 @@
 <?php if ( is_user_logged_in(  ) ) : ?>
   <?php 
     $medvoice_user = wp_get_current_user(  );
+
+    $name = !empty($medvoice_user->first_name) ? $medvoice_user->first_name : $medvoice_user->nickname;
   ?>
   <div class="header__user">
     <?php if (medvoice_user_have_subscribe_trial()) : ?>
@@ -21,13 +23,13 @@
       ?>
       <div class="profile__avatar <?= medvoice_have_user_avatar(  ) ? '' : 'profile__avatar--empty'; ?>">
         <?php if( medvoice_have_user_avatar(  ) ) : ?>
-          <img class="profile__avatar-img" src="<?= medvoice_get_user_avatar(  ); ?>" alt="<?= $medvoice_user->nickname; ?>">
+          <img class="profile__avatar-img" src="<?= medvoice_get_user_avatar(  ); ?>" alt="<?= $name; ?>">
         <?php else : ?>
-          <img class="profile__avatar-img" src="<?= get_template_directory_uri(  ); ?>/assets/img/avatar-default.svg" alt="<?= $medvoice_user->nickname; ?>">
+          <img class="profile__avatar-img" src="<?= get_template_directory_uri(  ); ?>/assets/img/avatar-default.svg" alt="<?= $name; ?>">
         <?php endif; ?>                 
       </div>
       <p class="profile__username">
-        <?= $medvoice_user->nickname; ?>
+        <?= $name; ?>
       </p>
 
       <div class="profile__menu hidden">

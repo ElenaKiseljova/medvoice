@@ -71,15 +71,15 @@
                    * hooked login_button (Google Log In plugin)
                    */
 
-                  do_action( 'login_form' ); 
+                  do_action( 'login_form' );  
                 ?>
               </div>
             <?php endif; ?>          
             
             <?php if ( $action === 'register' || $action === 'trial' ) : ?>
               <p class="form__row">
-                <label class="form__label" for="nickname"><?= __( 'Имя', 'medvoice' ); ?></label>
-                <input class="form__field" type="text" name="nickname" id="nickname" placeholder="<?= __( 'Введите ваше имя', 'medvoice' ); ?>">
+                <label class="form__label" for="first_name"><?= __( 'Имя', 'medvoice' ); ?></label>
+                <input class="form__field" type="text" name="first_name" id="first_name" placeholder="<?= __( 'Введите ваше имя', 'medvoice' ); ?>">
               </p>
             <?php endif; ?>            
             

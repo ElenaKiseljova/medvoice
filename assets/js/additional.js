@@ -50,7 +50,7 @@
       let valid = true;
 
       const checkValid = (field) => {
-        if (field.name === 'name' || field.name === 'nickname') {
+        if (field.name === 'name' || field.name === 'first_name') {
           valid = validation.name(field.value);
 
           validation.drawError(field, valid);
@@ -516,7 +516,74 @@
       }
     },
 
-    /* Фильтры Видео */
+    /* Фильтрация списка Видео */
+
+    // Фильтры
+    filters() {
+      const filterForm = document.querySelector('#filters');
+
+      if (filterForm) {
+        // Получение выбранных категорий
+        const getParentTermIds = (parentInputs) => {
+          const parentCheckedInputs = [].filter.call(parentInputs, item => item.checked);
+
+          const parentCheckedIds = [];
+
+          parentCheckedInputs.forEach(parentCheckedInput => {
+            parentCheckedIds.push(parentCheckedInput.value);
+          });
+
+          return parentCheckedIds.join(',');
+        };
+
+        const getChildren = (parentTermIds = '', parentTax = 'sections') => {
+          const childrenDropdown = filterForm.querySelector(`.dropdown--sub-${parentTax}`);
+
+          if (childrenDropdown) {
+            const сallback = () => {
+              const childrenDropdownItems = childrenDropdown.querySelectorAll('.dropdown__item');
+
+              if (childrenDropdownItems.length > 0) {
+                childrenDropdown.classList.remove('disabled');
+              } else {
+                childrenDropdown.classList.add('disabled');
+                childrenDropdown.classList.remove('dropdown--active');
+              }
+            };
+
+            const childrenDropdownList = childrenDropdown.querySelector('.dropdown__body');
+
+            if (childrenDropdownList) {
+              additional.getAjaxSubCategory(parentTax, parentTermIds, childrenDropdownList, сallback);
+            }
+          }
+        };
+
+        const parentInputs = filterForm.querySelectorAll('.dropdown__check--parent');
+
+        if (parentInputs.length > 0) {
+          parentInputs.forEach(parentInput => {
+            parentInput.addEventListener('change', () => {
+              const parentTax = parentInput.name;
+
+              const parentTermIds = getParentTermIds(parentInputs);
+
+              getChildren(parentTermIds, parentTax);
+            });
+          });
+        }
+
+        filterForm.addEventListener('submit', (evt) => {
+          evt.preventDefault();
+
+          let dataForm = new FormData(filterForm);
+
+          for (var pair of dataForm.entries()) {
+            console.log(pair[0] + ', ' + pair[1]);
+          }
+        });
+      }
+    },
     //Поиск
     search() {
       let lastTimeout;
@@ -629,7 +696,7 @@
         console.log(e);
       }
     },
-    // Получение Видео с определенной страницы
+    // Получение номера страницы
     getPage(button) {
       let paged = button.dataset.paged;
 
@@ -673,8 +740,19 @@
         additional.onAjax(dataForm, dataAjaxContainer);
       }
     },
+    getAjaxSubCategory(parentTax, parentTermIds, dataAjaxContainer, callback) {
+      let dataForm = new FormData();
+
+      dataForm.append('action', 'medvoice_ajax_sub_category_list');
+      dataForm.append('security', medvoice_ajax.nonce);
+
+      dataForm.append('taxonomy', parentTax);
+      dataForm.append('terms', parentTermIds);
+
+      additional.onAjax(dataForm, dataAjaxContainer, callback);
+    },
     // Отправка на сервер данных для получения списка Видео
-    onAjax(dataForm, dataAjaxContainer) {
+    onAjax(dataForm, dataAjaxContainer, сallback) {
       try {
         const url = medvoice_ajax.url;
 
@@ -690,11 +768,16 @@
             if (response.success === true) {
               dataAjaxContainer.innerHTML = response.data.content;
 
-              additional.paginationActivate();
+              // Переинициализация ф-й для ноыого контента
+              if (!сallback) {
+                additional.paginationActivate();
 
-              additional.bookmarks();
+                additional.bookmarks();
 
-              // window.scrollSmooth(dataAjaxContainer);
+                // window.scrollSmooth(dataAjaxContainer);
+              } else if (typeof сallback === 'function') {
+                сallback();
+              }
 
               console.log('Успех:', response);
             } else {
@@ -755,6 +838,12 @@
 
     try {
       additional.search();
+    } catch (error) {
+      console.log(error);
+    }
+
+    try {
+      additional.filters();
     } catch (error) {
       console.log(error);
     }

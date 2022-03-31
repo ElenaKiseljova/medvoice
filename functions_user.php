@@ -115,51 +115,31 @@ function medvoice_ajax_register_mail()
 
     if($_POST['antibot'] == 1) {
       // Получаем данные из полей формы и проверяем их
-      $info = array();
+      $user_login = isset($_POST['email']) ? filter_var($_POST['email'], FILTER_SANITIZE_EMAIL) : '';
+      $user_password = isset($_POST['password']) ? htmlspecialchars($_POST['password']) : '';
+      $first_name = isset($_POST['first_name']) ? htmlspecialchars($_POST['first_name']) : '';
+      
+      $subscribe = isset($_POST['subscribe']) ? (int) $_POST['subscribe'] : 0;
 
-      $info['user_login'] = isset($_POST['email']) ? filter_var($_POST['email'], FILTER_SANITIZE_EMAIL) : '';
-      $info['user_password'] = isset($_POST['password']) ? $_POST['password'] : '';
-      $info['nickname'] = isset($_POST['nickname']) ? $_POST['nickname'] : '';
-
-      $info['subscribe'] = isset($_POST['subscribe']) ? (int) $_POST['subscribe'] : 0;
-
-      if ( empty($info['user_login']) || !filter_var($info['user_login'], FILTER_VALIDATE_EMAIL) || !is_email($info['user_login']) ) {
+      if ( empty($user_login) || !filter_var($user_login, FILTER_VALIDATE_EMAIL) || !is_email($user_login) ) {
         wp_send_json_error(['type' => 'email', 'message' => __('Введите правильный адрес электронной почты', 'medvoice')]);
 
         die(  );  
       } 
       
-      if( username_exists($info['user_login']) || email_exists( $info['user_login'] ) ) {
+      if( username_exists($user_login) || email_exists( $user_login ) ) {
         wp_send_json_error(['type' => 'email', 'message' => __('Такой e-mail уже зарегистрирован ранее', 'medvoice')]);
 
         die(  );  
       }
-
-      if ( 4 > mb_strlen( $nickname ) ) {
-        wp_send_json_error(['type' => 'nickname', 'message' => __('Никнейм должен быть не менее 5 символов', 'medvoice')]);
-
-        die(  ); 
-      }
-
-      if ( 25 < mb_strlen( $nickname ) ) {
-        wp_send_json_error(['type' => 'nickname', 'message' => __('Никнейм должен быть не более 25 символов', 'medvoice')]);
-
-        die(  ); 
-      }
-
-      if ( !validate_username( $nickname ) ) {
-        wp_send_json_error(['type' => 'nickname', 'message' => __('Некорректный никнейм', 'medvoice', 'medvoice')]);
-
-        die(  ); 
-      }
       
-      if ( empty($info['user_password']) ) {
+      if ( empty($user_password) ) {
         wp_send_json_error(['type' => 'password', 'message' => __('Введите пароль', 'medvoice')]);
 
         die(  );  
       } 
       
-      if( 7 >= mb_strlen($info['user_password']) ) {
+      if( 7 >= mb_strlen($user_password) ) {
         wp_send_json_error(['type' => 'password', 'message' => __('Пароль должен быть не менее 8 символов.', 'medvoice')]);
 
         die(  );  
@@ -167,7 +147,7 @@ function medvoice_ajax_register_mail()
 
       $confirm_subject = get_bloginfo( 'name' ) . ' - ' . __('Подтверждение e-mail', 'medvoice');
 
-      $key = wp_hash_password( $info['user_password'] . ';' . $info['nickname'] . ';' . $info['user_login'] );
+      $key = wp_hash_password( $user_password . ';' . $first_name . ';' . $user_login );
 
       // Запись в БД пользователя с неподтвержденным мейлом
       if ( class_exists( 'Medvoice' ) ) {
@@ -182,7 +162,7 @@ function medvoice_ajax_register_mail()
           die(  );          
         } else {
           // Запись пароля
-          $saved_pass = $medvoice->set_unconfirmed_mail_user_pass( $key, $info['user_password'] );
+          $saved_pass = $medvoice->set_unconfirmed_mail_user_pass( $key, $user_password );
 
           if ( $saved_pass === false || $saved_pass === 0 ) {
             wp_send_json_error(['message' => __('Не удалось сохранить Ваши данные (строка). Пожалуйста, повторите позже: ', 'medvoice') . $table_unconfirmed_mail_users['error'] ]);
@@ -194,17 +174,17 @@ function medvoice_ajax_register_mail()
       
       $confirm_link = get_forms_page_url(  ) . '?action=confirm' .
                                          '&key=' . $key . 
-                                         '&email=' . rawurlencode($info['user_login']) . 
-                                         '&name=' . $info['nickname'] .
-                                         '&subscribe=' . $info['subscribe'];
+                                         '&email=' . rawurlencode($user_login) . 
+                                         '&name=' . $first_name .
+                                         '&subscribe=' . $subscribe;
 
       $confirm_text = get_custom_logo() . '<br><br>';
-      $confirm_text .= '<p>' . __( 'Приветствуем Вас, ', 'medvoice' ) . '<b>' . $info['nickname'] . '</b></p>';
+      $confirm_text .= '<p>' . __( 'Приветствуем Вас, ', 'medvoice' ) . '<b>' . $first_name . '</b></p>';
       $confirm_text .= '<p>' . __('Для завершения регистрации, пожалуйста, подтвердите Ваш e-mail.', 'medvoice') . '</p>';
       $confirm_text .= '<p>' . __('Для подтверждения e-mail - перейдите по ссылке ниже: ', 'medvoice') . '</p>';
       $confirm_text .= '<p><a href="' . $confirm_link . '">' . __('Подтвердить e-mail и завершить регистрацию', 'medvoice') . '</a></p>';
       
-      $to = $info['user_login'];   
+      $to = $user_login;   
 
       $site_name = 'From: ' . get_bloginfo( 'name' ) . ' <' . get_option('admin_email') . '>';
 
@@ -242,7 +222,13 @@ function medvoice_register()
   if ( !is_user_logged_in(  ) && isset($_GET['action']) && $_GET['action'] === 'confirm' ) {
     $password = null;
 
-    $key = $_GET['key'];    
+    $key = isset($_GET['key']) ? htmlspecialchars($_GET['key']) : null; 
+    
+    if ( !isset($key) ) {
+      echo __('Нет ключа проверки. Проверьте правильность ссылки, которую Вы получили по e-mail.', 'medvoice');
+
+      return false;
+    }
 
     if ( class_exists( 'Medvoice' ) ) {
       $medvoice = new Medvoice;
@@ -265,25 +251,32 @@ function medvoice_register()
 
           return false; 
         } else {
-          $email = rawurldecode($_GET['email']);
-          $nickname = $_GET['name'];
+          $email = isset($_GET['email']) ? rawurldecode($_GET['email']) : '';
+          $name = isset($_GET['name']) ? htmlspecialchars($_GET['name']) : '';
+
+          if ( empty($email) ) {
+            echo __('E-mail не может быть пустым. Проверьте правильность ссылки, которую Вы получили по e-mail.', 'medvoice');
+
+            return false; 
+          }
 
           $userdata = array(
             'user_login'   =>   sanitize_user( $email ),
-            'nickname'     =>   $nickname,
-            'display_name' =>   $nickname,
-            'user_email'   =>   $email,
+            'nickname'     =>   sanitize_email( $email ),
+            'display_name' =>   sanitize_email( $email ),
+            'user_email'   =>   sanitize_email( $email ),
             'user_pass'	   =>   $password,
+            'first_name'   =>   $name, 
           );
 
           $user_id = wp_insert_user( $userdata );
 
-          if( !is_wp_error( $user_id ) ) {
+          if( !is_wp_error( $user_id ) ) {            
 
             wp_new_user_notification( $user_id, null, 'user' );
 
             $info = array();
-            $info['user_login'] = $email;
+            $info['user_login'] = sanitize_email( $email );
             $info['user_password'] = $password;
             $info['remember'] = true;
 
@@ -304,7 +297,9 @@ function medvoice_register()
 
             exit();
           } else {
-            return $user_id;
+            print_r($user_id);
+
+            return false; 
           }
         }
       }

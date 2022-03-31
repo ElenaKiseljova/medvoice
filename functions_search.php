@@ -21,11 +21,80 @@
   }
 
   if( wp_doing_ajax() ) {
-    add_action('wp_ajax_medvoice_ajax_videos_cards_html', 'medvoice_ajax_videos_cards_html');
-    add_action('wp_ajax_nopriv_medvoice_ajax_videos_cards_html', 'medvoice_ajax_videos_cards_html'); 
+    add_action('wp_ajax_medvoice_ajax_sub_category_list', 'medvoice_ajax_sub_category_list');
+    add_action('wp_ajax_nopriv_medvoice_ajax_sub_category_list', 'medvoice_ajax_sub_category_list'); 
 
     add_action('wp_ajax_medvoice_ajax_search_list', 'medvoice_ajax_search_list');
     add_action('wp_ajax_nopriv_medvoice_ajax_search_list', 'medvoice_ajax_search_list'); 
+
+    add_action('wp_ajax_medvoice_ajax_videos_cards_html', 'medvoice_ajax_videos_cards_html');
+    add_action('wp_ajax_nopriv_medvoice_ajax_videos_cards_html', 'medvoice_ajax_videos_cards_html'); 
+  }
+
+  function medvoice_ajax_sub_category_list()
+  {
+    try {
+      // Первым делом проверяем параметр безопасности
+      check_ajax_referer('additional-script.js_nonce', 'security');
+
+      $taxonomy = $_POST['taxonomy'] ? htmlspecialchars($_POST['taxonomy']) : '';
+      $terms = $_POST['terms'] ? htmlspecialchars($_POST['terms']) : '';
+
+      if ( empty($taxonomy) ) {
+        wp_send_json_error( [
+          'message' => 'Нет таксономии',
+        ] );
+      }
+
+      $response = [
+        'post' => $_POST,
+      ];
+
+      ob_start();
+
+      medvoice_sub_category_list( $taxonomy, $terms );
+  
+      $response['content'] = ob_get_contents();
+  
+      ob_clean();
+  
+      wp_send_json_success( $response );
+    } catch (Throwable $th) {
+      wp_send_json_error( $th );
+    } 
+
+    die();
+  }
+
+  function medvoice_sub_category_list( $taxonomy = 'sections', $terms = '' )
+  {
+    $terms = explode(',', $terms);
+
+    if ( !empty($terms) && is_array($terms) && !is_wp_error( $terms ) ) {
+      foreach ($terms as $key => $term_id) {
+        $term_children_ids = get_term_children( $term_id, $taxonomy );
+
+        if ( !is_wp_error( $term_children_ids ) && !empty($term_children_ids) ) {
+          foreach ($term_children_ids as $key => $term_child_id) {
+            $term_child = get_term_by( 'id', $term_child_id, $taxonomy );
+
+            if ( is_a($term_child, 'WP_Term') ) {
+              ?>
+                <li class="dropdown__item">
+                  <input class="dropdown__check" type="checkbox" 
+                    id="<?= $taxonomy . '-sub-' . $key; ?>" 
+                    name="<?= $taxonomy; ?>"
+                    value="<?= $term_child_id; ?>">
+                  <label class="dropdown__label" for="<?= $taxonomy . '-sub-' . $key; ?>"><?= $term_child->name; ?></label>
+                </li>
+              <?php
+            }
+          }
+        }
+      }
+    } else {
+      return '';
+    }    
   }
 
   function medvoice_ajax_search_list()
@@ -55,6 +124,8 @@
     } catch (Throwable $th) {
       wp_send_json_error( $th );
     } 
+
+    die();
   }
 
   function medvoice_search_list_html( $posts_per_page = 3, $paged = 1, $s = '' )
@@ -134,6 +205,8 @@
     } catch (Throwable $th) {
       wp_send_json_error( $th );
     }  
+
+    die();
   }
 
   /**

@@ -1,5 +1,5 @@
 <div class="catalog__filter">
-  <form class="form form--filter" action="">
+  <form class="form form--filter" action="" id="filters">
     <div class="form__row">
       <input type="search" class="dropdown__field" name="s" placeholder="<?= __( 'Поиск...', 'medvoice' ); ?>">
     </div>
@@ -43,10 +43,10 @@
     ?> 
 
     <div class="form__button-box form__button-box--filter">
-      <button class="button button--reset">
+      <button class="button button--reset" type="reset">
         <?= __( 'Сбросить', 'medvoice' ); ?>
       </button>
-      <button class="button button--apply">
+      <button class="button button--apply" type="submit">
         <?= __( 'Применить', 'medvoice' ); ?>
       </button>
     </div>

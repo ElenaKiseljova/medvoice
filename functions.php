@@ -234,7 +234,7 @@ if (!function_exists('medvoice_init_function')) :
         ],
         'description'           => 'Категории видео', // описание таксономии
         'public'                => false,
-        'publicly_queryable'    => true, // равен аргументу public
+        'publicly_queryable'    => false, // равен аргументу public
         'show_ui'               => true, // равен аргументу public
         'show_in_menu'          => true, // равен аргументу show_ui
         'show_in_rest'          => true,
@@ -430,8 +430,6 @@ function medvoice_disabled_some_links ( $query ) {
 /* ==============================================
   ********  //Фильтры ссылок
   =============================================== */
-
-
 add_filter( 'register_url', 'medvoice_register_urf_filter' );
 function medvoice_register_urf_filter( $register ){
 	return  medvoice_get_special_page( 'forms', 'url'  ) . '?action=register';
