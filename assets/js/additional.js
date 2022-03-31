@@ -3,6 +3,7 @@
 
   const { __, _x, _n, _nx } = wp.i18n;
 
+  // Ф-я валидации полей форм
   const validation = {
     email(value) {
       const regex = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
@@ -96,6 +97,15 @@
 
       return valid;
     },
+  };
+
+  // Ф-я удаления активного класса у массива элементов
+  const removeActiveClass = (elements, className = 'active') => {
+    elements.forEach((element, i) => {
+      if (element.classList.contains(className)) {
+        element.classList.remove(className);
+      }
+    });
   };
 
   const additional = {
@@ -263,7 +273,7 @@
             tariffButton.addEventListener('click', (evt) => {
               evt.preventDefault();
 
-              tariffs.forEach(item => item.classList.remove('active'));
+              removeActiveClass(tariffs, 'active');
 
               tariff.classList.add('active');
 
@@ -317,7 +327,7 @@
         // WayForPay (end)
       }
     },
-    // Логирование, регистрация, заказ триала
+    // Логирование, регистрация, заказ триала, восстановление/смена пароля, редактирование информации
     user: {
       init(ids = []) {
         const actions = {
@@ -377,6 +387,7 @@
         });
       },
     },
+    // Установка куки с временем пользователя с привазкой к часовому поясу
     setUserTime() {
       const dataForm = new FormData();
 
@@ -407,6 +418,7 @@
         console.error('Ошибка:', error);
       }
     },
+    // Добавление в закладки
     bookmarks() {
       const changeUserBookmarks = (bookmark, type = 'add') => {
         const videoId = bookmark.dataset.videoId ?? false;
@@ -477,6 +489,7 @@
         });
       }
     },
+    // Попап с инф. об окончании Триала/Подписки
     popups() {
       const popups = document.querySelectorAll('.popup');
 
@@ -501,18 +514,249 @@
           });
         });
       }
+    },
+
+    /* Фильтры Видео */
+    //Поиск
+    search() {
+      let lastTimeout;
+
+      const searchForm = document.querySelector('.header__form');
+
+      if (searchForm) {
+        let value = '';
+
+        const results = document.querySelector('.results');
+
+        const inputSearch = searchForm.querySelector('#s');
+
+        if (inputSearch && results) {
+          const changeSearchResults = (value = '') => {
+            // Искать только по фразе, состоящей из более 2 символов
+            if (value.length > 2 || value.length === 0) {
+              if (lastTimeout) {
+                clearTimeout(lastTimeout);
+              }
+
+              lastTimeout = setTimeout(() => {
+                additional.getAjaxSearch(value);
+
+                results.classList.remove('hidden');
+              }, 500);
+            }
+          };
+
+          const onSearchKeyUp = (evt) => {
+            if (evt.target.value.trim() !== value) {
+              value = evt.target.value.trim();
+
+              changeSearchResults(value);
+            }
+
+            return false;
+          };
+
+          const onSearchKeyDown = (evt) => {
+            value = inputSearch.value.trim();
+          };
+
+          const onSearchBlur = (evt) => {
+            if (!results.classList.contains('hidden') && evt.target !== inputSearch) {
+              results.classList.add('hidden');
+            }
+          };
+
+          inputSearch.addEventListener('keydown', onSearchKeyDown);
+
+          inputSearch.addEventListener('keyup', onSearchKeyUp);
+
+          inputSearch.addEventListener('input', onSearchKeyUp);
+
+          document.addEventListener('click', onSearchBlur);
+        }
+      }
+    },
+    // Пагинация
+    paginationActivate() {
+      try {
+        const paginationButtons = document.querySelectorAll('.pagination__button');
+
+        let paginationPrev, paginationNext;
+
+        paginationButtons.forEach((paginationButton) => {
+          if (paginationButton.classList.contains('pagination__button--prev')) {
+            paginationPrev = paginationButton;
+          }
+
+          if (paginationButton.classList.contains('pagination__button--next')) {
+            paginationNext = paginationButton;
+          }
+
+          paginationButton.addEventListener('click', (e) => {
+            if (paginationButton.classList.contains('pagination__button--page') && !paginationButton.classList.contains('current')) {
+              removeActiveClass(paginationButtons, 'current');
+
+              if (paginationButton.classList.contains('first')) {
+                paginationPrev.classList.add('disabled');
+              } else {
+                paginationPrev.classList.remove('disabled');
+              }
+
+              if (paginationButton.classList.contains('last')) {
+                paginationNext.classList.add('disabled');
+              } else {
+                paginationNext.classList.remove('disabled');
+              }
+
+              paginationButton.classList.add('current');
+
+
+            } else if (paginationButton.classList.contains('pagination__button--prev') || paginationButton.classList.contains('pagination__button--next')) {
+              const toPaged = paginationButton.dataset.paged;
+              const toPagedButton = [].find.call(paginationButtons, (button) => button.classList.contains('pagination__button--page') && button.dataset.paged === toPaged);
+
+              if (toPagedButton) {
+                removeActiveClass(paginationButtons, 'current');
+
+                toPagedButton.classList.add('current');
+              }
+            }
+
+            additional.getPage(paginationButton);
+          });
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    // Получение Видео с определенной страницы
+    getPage(button) {
+      let paged = button.dataset.paged;
+
+      paged = paged ? paged : 1;
+
+      additional.getAjaxPage(paged);
+    },
+    // Запрос на получение Видео с определенной страницы
+    getAjaxPage(paged) {
+      const dataAjaxContainer = document.querySelector('#catalog-ajax');
+
+      if (dataAjaxContainer) {
+        let dataForm = new FormData();
+
+        dataForm.append('action', 'medvoice_ajax_videos_cards_html');
+        dataForm.append('security', medvoice_ajax.nonce);
+
+        dataForm.append('posts_per_page', window.postPerpage);
+        dataForm.append('paged', paged);
+        dataForm.append('taxonomies', window.taxonomies);
+        dataForm.append('s', window.s);
+        dataForm.append('bookmarks', window.bookmarks);
+
+        additional.onAjax(dataForm, dataAjaxContainer);
+      }
+    },
+    // Запрос на получение Видео по поисковой фразе
+    getAjaxSearch(value) {
+      const dataAjaxContainer = document.querySelector('#search-ajax');
+
+      if (dataAjaxContainer) {
+        let dataForm = new FormData();
+
+        dataForm.append('action', 'medvoice_ajax_search_list');
+        dataForm.append('security', medvoice_ajax.nonce);
+
+        dataForm.append('posts_per_page', 3);
+        dataForm.append('paged', 1);
+        dataForm.append('s', value);
+
+        additional.onAjax(dataForm, dataAjaxContainer);
+      }
+    },
+    // Отправка на сервер данных для получения списка Видео
+    onAjax(dataForm, dataAjaxContainer) {
+      try {
+        const url = medvoice_ajax.url;
+
+        dataAjaxContainer.classList.add('sending');
+
+        fetch(url, {
+          method: 'POST',
+          credentials: 'same-origin',
+          body: dataForm
+        })
+          .then((response) => response.json())
+          .then((response) => {
+            if (response.success === true) {
+              dataAjaxContainer.innerHTML = response.data.content;
+
+              additional.paginationActivate();
+
+              additional.bookmarks();
+
+              // window.scrollSmooth(dataAjaxContainer);
+
+              console.log('Успех:', response);
+            } else {
+              console.error('Ошибка:', response);
+            }
+
+            dataAjaxContainer.classList.remove('sending');
+          })
+          .catch((error) => {
+            console.error('Ошибка:', error);
+
+            dataAjaxContainer.classList.remove('sending');
+          });
+      } catch (error) {
+        console.error('Ошибка:', error);
+
+        dataAjaxContainer.classList.remove('sending');
+      }
     }
   };
 
   document.addEventListener('DOMContentLoaded', () => {
-    additional.subscription.init();
+    try {
+      additional.subscription.init();
+    } catch (error) {
+      console.log(error);
+    }
 
-    additional.user.init(['login', 'register', 'trial', 'forgot', 'reset', 'editinfo', 'editpassword']);
+    try {
+      additional.user.init(['login', 'register', 'trial', 'forgot', 'reset', 'editinfo', 'editpassword']);
+    } catch (error) {
+      console.log(error);
+    }
 
-    additional.setUserTime();
+    try {
+      additional.setUserTime();
+    } catch (error) {
+      console.log(error);
+    }
 
-    additional.popups();
+    try {
+      additional.popups();
+    } catch (error) {
+      console.log(error);
+    }
 
-    additional.bookmarks();
+    try {
+      additional.bookmarks();
+    } catch (error) {
+      console.log(error);
+    }
+
+    try {
+      additional.paginationActivate();
+    } catch (error) {
+      console.log(error);
+    }
+
+    try {
+      additional.search();
+    } catch (error) {
+      console.log(error);
+    }
   });
 })();
