@@ -34,16 +34,18 @@
       return pattern.test(value);
     },
     drawError(field, valid) {
-      if (valid) {
-        field.closest('.form__row').classList.remove('error');
+      if (field.closest('.form__row')) {
+        if (valid) {
+          field.closest('.form__row').classList.remove('error');
 
-        let nextElement = field.closest('.form__row').nextElementSibling;
+          let nextElement = field.closest('.form__row').nextElementSibling;
 
-        if (nextElement && nextElement.classList.contains('error-span')) {
-          nextElement.remove();
+          if (nextElement && nextElement.classList.contains('error-span')) {
+            nextElement.remove();
+          }
+        } else {
+          field.closest('.form__row').classList.add('error');
         }
-      } else {
-        field.closest('.form__row').classList.add('error');
       }
     },
     start(form) {
@@ -452,6 +454,11 @@
                     bookmark.classList.add('saved');
                   } else {
                     bookmark.classList.remove('saved');
+
+                    if (window.bookmarks === 1) {
+                      // Обновление списка Видео в закладках при удалении на стр Закладок
+                      additional.getAjaxPage(1);
+                    }
                   }
 
                   console.log('Успех:', response);
@@ -734,6 +741,7 @@
         dataForm.append('posts_per_page', window.postPerpage);
         dataForm.append('paged', paged);
         dataForm.append('taxonomies', window.taxonomies);
+        dataForm.append('sub_tax', window.subTax);
         dataForm.append('s', window.s);
         dataForm.append('bookmarks', window.bookmarks);
 
@@ -802,11 +810,15 @@
 
         dataForm.append('s', s);
         dataForm.append('taxonomies', taxonomies);
+        window.taxonomies = taxonomies;
+
 
         if (Object.keys(subTax).length > 0) {
           subTax = JSON.stringify(subTax);
 
           dataForm.append('sub_tax', subTax);
+
+          window.subTax = subTax;
         }
 
         dataForm.append('action', 'medvoice_ajax_videos_cards_html');

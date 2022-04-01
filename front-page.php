@@ -12,6 +12,8 @@
 <main class="main">  
   <?php 
   $medvoice_user = wp_get_current_user(  );
+
+  // update_metadata( 'user', $medvoice_user->ID, 'bookmarks', '[]' );
   // update_user_meta($medvoice_user->ID, '_new_user', '1');
   // update_user_meta($medvoice_user->ID, 'st', time());
   // delete_metadata( 'user', $medvoice_user->ID, 'subscribed_days' );

@@ -234,7 +234,16 @@
       $ids = medvoice_get_user_bookmarks();
 
       $args['post__in'] = $ids;
+
+      if ( empty($ids) ) {
+        echo __( 'Вы пока ничего не добавили в закладки', 'medvoice' );
+
+        return;
+      }
     }
+
+    // print_r( ['bookmarks' => $bookmarks, 'ids' => $ids] );
+    // return;
 
     // Категории
     if ( $taxonomies !== '' ) {

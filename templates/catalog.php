@@ -45,6 +45,7 @@
       // Глобальные переменные для фильтров и пагинации
       window.postPerpage = <?= $posts_per_page; ?>;
       window.taxonomies = '<?= $taxonomies; ?>';
+      window.subTax = '';
       window.s = '<?= $search_query; ?>';
       window.bookmarks = <?= $is_bookmarks_page ? 1 : 0; ?>;
     </script>

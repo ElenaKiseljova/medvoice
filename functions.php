@@ -292,7 +292,7 @@ if (!function_exists('medvoice_init_function')) :
         'show_ui'               => true, // равен аргументу public
         'show_in_menu'          => true, // равен аргументу show_ui
         'show_in_rest'          => true, 
-        'hierarchical'          => true,
+        'hierarchical'          => false,
         'rewrite'               => true,
       ] );
 
@@ -319,7 +319,7 @@ if (!function_exists('medvoice_init_function')) :
         'show_ui'               => true, // равен аргументу public
         'show_in_menu'          => true, // равен аргументу show_ui
         'show_in_rest'          => true, 
-        'hierarchical'          => true,
+        'hierarchical'          => false,
         'rewrite'               => true,
       ] );
 
@@ -346,7 +346,7 @@ if (!function_exists('medvoice_init_function')) :
         'show_ui'               => true, // равен аргументу public
         'show_in_menu'          => true, // равен аргументу show_ui
         'show_in_rest'          => true, 
-        'hierarchical'          => true,
+        'hierarchical'          => false,
         'rewrite'               => true,
       ] );
 

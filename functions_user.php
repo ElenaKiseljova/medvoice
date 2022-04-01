@@ -132,6 +132,15 @@ function medvoice_ajax_register_mail()
 
         die(  );  
       }
+
+      if ( 25 < mb_strlen( $first_name ) ) {
+        wp_send_json_error([
+          'type' => 'first_name', 
+          'message' => __('Имя должно быть не более 25 символов', 'medvoice')
+        ]);
+
+        die(  );  
+      } 
       
       if ( empty($user_password) ) {
         wp_send_json_error(['type' => 'password', 'message' => __('Введите пароль', 'medvoice')]);
@@ -148,7 +157,7 @@ function medvoice_ajax_register_mail()
       $confirm_subject = get_bloginfo( 'name' ) . ' - ' . __('Подтверждение e-mail', 'medvoice');
 
       $key = wp_hash_password( $user_password . ';' . $first_name . ';' . $user_login );
-
+      
       // Запись в БД пользователя с неподтвержденным мейлом
       if ( class_exists( 'Medvoice' ) ) {
         $medvoice = new Medvoice;
@@ -171,8 +180,8 @@ function medvoice_ajax_register_mail()
           }
         }        
       }
-      
-      $confirm_link = get_forms_page_url(  ) . '?action=confirm' .
+  
+      $confirm_link = medvoice_get_special_page( 'forms', 'url'  ) . '?action=confirm' .
                                          '&key=' . $key . 
                                          '&email=' . rawurlencode($user_login) . 
                                          '&name=' . $first_name .
@@ -443,7 +452,7 @@ function medvoice_retrieve_password()
     $message .= '<p>' . sprintf(__('Username: %s'), $user_login) . '</p>';
     $message .= '<p>' . __('If this was a mistake, ignore this email and nothing will happen.') . '</p>';
     $message .= '<p>' . __('To reset your password, visit the following address:') . '</p>';
-    $message .= '<p><a href="' . get_forms_page_url(  ) . '?action=reset&key=$key&login=' . rawurlencode($user_login) . '">' . __('Ссылка для установки нового пароля', 'medvoice') . '</a></p>';
+    $message .= '<p><a href="' . medvoice_get_special_page( 'forms', 'url'  ) . '?action=reset&key=$key&login=' . rawurlencode($user_login) . '">' . __('Ссылка для установки нового пароля', 'medvoice') . '</a></p>';
 
     $requester_ip = $_SERVER['REMOTE_ADDR'];
     if ($requester_ip) {
@@ -1033,6 +1042,7 @@ function medvoice_ajax_add_to_bookmarks()
         if ( $bookmarks_updated === false ) {
           wp_send_json_error([
             'message' => __('Не удалось обновить закладки!', 'medvoice'),
+            'bookmarks' => $bookmarks,
           ]);
 
           die();
@@ -1082,8 +1092,8 @@ function medvoice_ajax_remove_from_bookmarks()
           foreach ($video_ids as $key => $video_id) {
             $bookmarks_key = array_search($video_id, $bookmarks);
 
-            if ( $bookmarks_key ) {
-              unset( $bookmarks[$bookmarks_key] );
+            if ( isset($bookmarks_key) ) {
+              array_splice( $bookmarks, $bookmarks_key, 1 );
             }
           }
 
@@ -1094,6 +1104,7 @@ function medvoice_ajax_remove_from_bookmarks()
           if ( $bookmarks_updated === false ) {
             wp_send_json_error([
               'message' => __('Не удалось обновить закладки!', 'medvoice'),
+              'bookmarks' => $bookmarks,
             ]);
 
             die();
