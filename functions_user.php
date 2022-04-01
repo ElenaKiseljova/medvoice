@@ -344,6 +344,7 @@ function medvoice_ajax_forgot_password()
         wp_send_json_success([
           'message' => __('Форма отправлена!', 'medvoice' ),
           'email' => $email,
+          'lost' => $lostpassword
         ]);
       }
     } else {
@@ -452,7 +453,7 @@ function medvoice_retrieve_password()
     $message .= '<p>' . sprintf(__('Username: %s'), $user_login) . '</p>';
     $message .= '<p>' . __('If this was a mistake, ignore this email and nothing will happen.') . '</p>';
     $message .= '<p>' . __('To reset your password, visit the following address:') . '</p>';
-    $message .= '<p><a href="' . medvoice_get_special_page( 'forms', 'url'  ) . '?action=reset&key=$key&login=' . rawurlencode($user_login) . '">' . __('Ссылка для установки нового пароля', 'medvoice') . '</a></p>';
+    $message .= '<p><a href="' . medvoice_get_special_page( 'forms', 'url'  ) . '?action=reset&key=' . $key . '&login=' . rawurlencode($user_login) . '">' . __('Ссылка для установки нового пароля', 'medvoice') . '</a></p>';
 
     $requester_ip = $_SERVER['REMOTE_ADDR'];
     if ($requester_ip) {
@@ -499,7 +500,7 @@ function medvoice_retrieve_password()
         return $errors;
     }
 
-    return true;
+    return $user_email;
 }
 
 /* ==============================================
@@ -1164,8 +1165,8 @@ class Medvoice
     // Check that the table does not already exist before continuing
     $sql = "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}unconfirmed_mail_users` (
       id bigint(50) NOT NULL AUTO_INCREMENT,
-      user_key varchar(100),
-      user_pass varchar(100),
+      user_key varchar(255),
+      user_pass varchar(255),
       PRIMARY KEY (id)
       ) $charset_collate;";
 

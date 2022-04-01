@@ -56,7 +56,7 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
 
       if ( $medvoice_user instanceof WP_User) {
         $medvoice_user_id = isset($medvoice_user_id) ? $medvoice_user_id : $medvoice_user->ID;    
-        
+
         // Данные для WooCommerce
         $address = [];
           
@@ -131,6 +131,11 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
           
           wp_send_json_success( $response );
         }
+
+        $new_user = get_user_meta($medvoice_user->ID, '_new_user', true);
+        if ($new_user === '1') {   
+          update_metadata( 'user', $medvoice_user->ID, '_new_user', '0');
+        }        
       } else {
         $response = [
           'message' => __('Пользователь не существует', 'medvoice'),
@@ -216,9 +221,7 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
   function medvoice_create_order_login( $medvoice_user_login, $medvoice_user )
   {
     $new_user = get_user_meta($medvoice_user->ID, '_new_user', true);
-    if ($new_user === '1') {    
-      update_metadata( 'user', $medvoice_user->ID, '_new_user', '0');
-
+    if ($new_user === '1') {   
       $product_id = get_field( 'trial', 'options' ) ?? null;
 
       if ( isset($product_id) ) {
@@ -491,9 +494,7 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
       if ( $st <= time() ) {
         $new_user = get_user_meta($medvoice_user->ID, '_new_user', true);
 
-        if ($new_user === '1') {    
-          update_metadata( 'user', $medvoice_user->ID, '_new_user', '0');
-
+        if ($new_user === '1') {   
           $product_id = get_field( 'trial', 'options' ) ?? null;
 
           if ( isset($product_id) ) {

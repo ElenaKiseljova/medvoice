@@ -356,9 +356,9 @@
               window.location.href = medvoice_ajax.forms + '?action=success&type=register';
             }
           },
-          forgot(form = null, response = null) {
+          forgot(form, response) {
             if (medvoice_ajax.forms) {
-              const email = (response !== null) ? (response.email ?? '') : '';
+              const email = response.data.email ? response.data.email : '';
 
               window.location.href = medvoice_ajax.forms + '?action=success&type=forgot&email=' + email;
             }

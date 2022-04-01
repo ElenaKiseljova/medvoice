@@ -176,7 +176,9 @@
 
           $title = __( 'Проверьте свою почту', 'medvoice' );
 
-          $description = sprintif( __( 'Мы отправили ссылку для восстановления пароля на почту %s', 'medvoice' ), $email );
+          $description = sprintf( 
+            __( 'Мы отправили ссылку для восстановления пароля на почту %s', 'medvoice' ), 
+            $email );
 
           $button_text = __( 'Открыть почту', 'medvoice' );
           $button_link = 'mailto:' . $email;
