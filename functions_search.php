@@ -184,6 +184,8 @@
       // Первым делом проверяем параметр безопасности
       check_ajax_referer('additional-script.js_nonce', 'security');
 
+      $count = 0;
+
       $taxonomies = $_POST['taxonomies'] ?? '';
       $sub_tax = $_POST['sub_tax'] ?? '';
 
@@ -194,17 +196,23 @@
 
       $bookmarks = $_POST['bookmarks'] ? (int) $_POST['bookmarks'] : 0;
 
+      $reset = $_POST['reset'] ? (int) $_POST['reset'] : 0;
+
       $response = [
         'post' => $_POST,
       ];
 
       ob_start();
 
-      medvoice_videos_cards_html( $taxonomies, $posts_per_page, $paged, $s, $bookmarks, $sub_tax );
+      $count = medvoice_videos_cards_html( $taxonomies, $posts_per_page, $paged, $s, $bookmarks, $sub_tax );
   
       $response['content'] = ob_get_contents();
   
       ob_clean();
+
+      if ( $reset === 0 ) {
+        $response['results'] = medvoice_filter_results_text( $count );
+      }      
   
       wp_send_json_success( $response );
     } catch (Throwable $th) {
@@ -214,11 +222,21 @@
     die();
   }
 
+  function medvoice_filter_results_text( $count = 0 )
+  {
+    $results = medvoice_pluralize($count, __('результат', 'medvoice'), __('результата', 'medvoice'),
+      __('результатов', 'medvoice'));
+
+    return $results;
+  }
+
   /**
    * $taxonomies = '[['slug1' => '1,2,3'], ...]';
    */
   function medvoice_videos_cards_html( $taxonomies = '', $posts_per_page = 8, $paged = 1, $s = '', $bookmarks = 0, $sub_tax = '' ) 
   {
+    $count = 0;
+
     // Каталог
     $args = [
       'post_type' => 'videos',
@@ -285,6 +303,8 @@
     $query = new WP_Query( $args ); 
 
     if ( $query->have_posts() ) {
+      $count = $query->found_posts;
+
       $max_num_pages = (int) $query->max_num_pages;
 
       global $video, $place;
@@ -423,5 +443,7 @@
     } else {
       echo __( 'По вашему запросу результатов не найдено', 'medvoice' );
     } 
+
+    return $count;
   }  
 ?>

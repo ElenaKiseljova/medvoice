@@ -535,6 +535,17 @@
         // Все чекбоксы
         const filterFormCheckboxes = filterForm.querySelectorAll('input[type="checkbox"]');
 
+        // Сброс Формы
+        const resetFilterForm = () => {
+          filterFormCheckboxes.forEach(filterFormCheckbox => {
+            if (filterFormCheckbox.checked) {
+              filterFormCheckbox.click();
+            }
+          });
+
+          additional.getAjaxFilters(filterForm, true);
+        };
+
         // Получение выбранных категорий
         const getParentTermIds = (parentInputs) => {
           const parentCheckedInputs = [].filter.call(parentInputs, item => item.checked);
@@ -591,21 +602,32 @@
           });
         }
 
-        filterForm.addEventListener('reset', (evt) => {
-          evt.preventDefault();
-
-          filterFormCheckboxes.forEach(filterFormCheckbox => {
-            if (filterFormCheckbox.checked) {
-              filterFormCheckbox.click();
-            }
-          });
-        });
-
         filterForm.addEventListener('submit', (evt) => {
           evt.preventDefault();
 
           additional.getAjaxFilters(filterForm);
         });
+
+        filterForm.addEventListener('reset', (evt) => {
+          evt.preventDefault();
+
+          resetFilterForm();
+        });
+
+        // Поле результатов и кнопка Сброса
+        const resultsArea = document.querySelector('.catalog__amount');
+
+        if (resultsArea) {
+          const resultsResetButton = resultsArea.querySelector('.catalog__x');
+
+          if (resultsResetButton) {
+            resultsResetButton.addEventListener('click', () => {
+              resetFilterForm();
+
+              resultsArea.classList.add('hidden');
+            });
+          }
+        }
       }
     },
     //Поиск
@@ -765,7 +787,7 @@
         additional.onAjax(dataForm, dataAjaxContainer);
       }
     },
-    getAjaxFilters(filterForm) {
+    getAjaxFilters(filterForm, reset = false) {
       const dataAjaxContainer = document.querySelector('#catalog-ajax');
 
       if (dataAjaxContainer) {
@@ -826,9 +848,11 @@
 
         dataForm.append('posts_per_page', window.postPerpage);
         dataForm.append('paged', 1);
-        // dataForm.append('taxonomies', window.taxonomies);
-        // dataForm.append('s', window.s);
         dataForm.append('bookmarks', window.bookmarks);
+
+        if (reset) {
+          dataForm.append('reset', 1);
+        }
 
         additional.onAjax(dataForm, dataAjaxContainer);
       }
@@ -869,6 +893,17 @@
                 additional.bookmarks();
 
                 // window.scrollSmooth(dataAjaxContainer);
+
+                // Поле результатов и кнопка Сброса
+                const resultsArea = document.querySelector('.catalog__amount');
+                if (resultsArea && response.data.results) {
+                  resultsArea.classList.remove('hidden');
+
+                  const resultsText = resultsArea.querySelector('.catalog__results');
+                  if (resultsText) {
+                    resultsText.textContent = response.data.results;
+                  }
+                }
               } else if (typeof сallback === 'function') {
                 сallback();
               }

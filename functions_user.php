@@ -1042,14 +1042,14 @@ function medvoice_ajax_add_to_bookmarks()
         if ( $bookmarks_updated === false ) {
           wp_send_json_error([
             'message' => __('Не удалось обновить закладки!', 'medvoice'),
-            'bookmarks' => $bookmarks,
+            //'bookmarks' => $bookmarks,
           ]);
 
           die();
         } else {
           wp_send_json_success([
             'message' => __('Видео успешно добавлено в закладки!', 'medvoice'),
-            'bookmarks' => $bookmarks,
+            //'bookmarks' => $bookmarks,
           ]);
         }
       } else {
@@ -1104,14 +1104,14 @@ function medvoice_ajax_remove_from_bookmarks()
           if ( $bookmarks_updated === false ) {
             wp_send_json_error([
               'message' => __('Не удалось обновить закладки!', 'medvoice'),
-              'bookmarks' => $bookmarks,
+              //'bookmarks' => $bookmarks,
             ]);
 
             die();
           } else {
             wp_send_json_success([
               'message' => __('Видео успешно удалено из закладок!', 'medvoice'),
-              'bookmarks' => $bookmarks,
+              //'bookmarks' => $bookmarks,
             ]);
           }
         }
