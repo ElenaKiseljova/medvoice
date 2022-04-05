@@ -4,37 +4,35 @@ document.addEventListener("DOMContentLoaded", function (event) {
   let buttonMinimize = document.querySelector('.nav__btn');
   let navigationMenu = document.querySelector('.nav');
   let mainContainer = document.querySelector('.content');
-  let logo = document.querySelector('.logo__img')
-  let logoShort = document.querySelector('.logo__img--short')
+  let logo = document.querySelector('.logo')
 
   if (buttonMinimize) {
     buttonMinimize.addEventListener('click', function () {
       navigationMenu.classList.toggle('nav--minimize');
       mainContainer.classList.toggle('content--minimize');
-      logo.classList.toggle('hidden');
-      logoShort.classList.toggle('hidden');
+      logo.classList.toggle('logo--min');
     })
   }
 
 
   // Выпадающее меню в шапке при клике на пользователя
-  let headerProfile = document.querySelector('.profile'); // находим кнопку для открытия/закрытия окна навигации
-  let headerProfileMenu = document.querySelector('.profile__menu'); // находим окно навигации
+  // let headerProfile = document.querySelector('.profile');
+  // let headerProfileMenu = document.querySelector('.profile__menu');
 
-  if (headerProfile) {
-    headerProfile.addEventListener('click', () => {
-      headerProfileMenu.classList.toggle('hidden');
-    })
-  }
+  // if (headerProfile) {
+  //   headerProfile.addEventListener('click', () => {
+  //     headerProfileMenu.classList.toggle('hidden');
+  //   })
+  // }
 
-  window.addEventListener('click', e => {
-    if (headerProfileMenu) {
-      const target = e.target;
-      if (!target.closest('.profile__menu') && !target.closest('.profile')) {
-        headerProfileMenu.classList.add('hidden');
-      }
-    }
-  })
+  // window.addEventListener('click', e => {
+  //   if (headerProfileMenu) {
+  //     const target = e.target;
+  //     if (!target.closest('.profile__menu') && !target.closest('.profile')) {
+  //       headerProfileMenu.classList.add('hidden');
+  //     }
+  //   }
+  // })
 
 
   // Свайпер

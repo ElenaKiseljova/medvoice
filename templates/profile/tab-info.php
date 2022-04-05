@@ -29,7 +29,7 @@
   }  
 ?>
 <div class="tab tab--active">
-  <form class="tab__form tab__form--locked form" id="editinfo">
+  <form class="tab__form form" id="editinfo">
     <div class="form__wrapper">
       <div class="form__avatar">
         <div class="form__avatar-box">

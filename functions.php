@@ -66,68 +66,14 @@ function medvoice_scripts ()
   wp_localize_script( 'additional-script', 'medvoice_ajax', $args);  
 }
 
-// Customizer
-add_action( 'customize_register', 'medvoice_customizer' ); 
-function medvoice_customizer ( $wp_customize ) 
-{
-  /* Create Panel Logo */  
-  $wp_customize->add_panel('logo', array(
-    'priority' => 50,
-    'theme_supports' => '',
-    'title' => __('Логотип', 'medvoice'),
-    'description' => __('Изображения для Логотипа и его узкой версии', 'medvoice'),
-  ));
-  
-  /* Create Sections for Panel Logo */  
-  $wp_customize->add_section('logo_large', array(
-    'panel' => 'logo',
-    'type' => 'theme_mod', 
-    'priority' => 5,
-    'theme_supports' => '',
-    'title' => __('Логотип (широкий)', 'medvoice'),
-    'description' => '',
-  ));
-  
-  $wp_customize->add_section('logo_narrow', array(
-    'panel' => 'logo',
-    'type' => 'theme_mod', 
-    'priority' => 10,
-    'theme_supports' => '',
-    'title' => __('Логотип (узкий)', 'medvoice'),
-    'description' => '',
-  ));
-  
-  /* Create Settings for Panel Logo */  
-  $wp_customize->add_setting('logo_large', array(
-    'default'    =>  '',
-    'transport'  =>  'refresh',
-  ));
-  
-  $wp_customize->add_setting('logo_narrow', array(
-    'default'    =>  '',
-    'transport'  =>  'refresh',
-  ));
-  
-  /* Create Controls for Panel Logo */  
-  $wp_customize->add_control( new WP_Customize_Image_Control($wp_customize, 'logo_image_large', array(
-      'label'    => __('Изображение логотипа', 'medvoice'),
-      'section'  => 'logo_large',
-      'settings' => 'logo_large',
-  )));
-  
-  $wp_customize->add_control( new WP_Customize_Image_Control($wp_customize, 'logo_image_narrow', array(
-      'label'    => __('Изображение логотипа', 'medvoice'),
-      'section'  => 'logo_narrow',
-      'settings' => 'logo_narrow',
-  )));  
-}
-
 // After_setup_theme
 add_action( 'after_setup_theme', 'medvoice_after_setup_theme_function' );
 
 if (!function_exists('medvoice_after_setup_theme_function')) :
   function medvoice_after_setup_theme_function () {
     load_theme_textdomain('medvoice', get_template_directory() . '/languages');
+
+    add_theme_support( 'custom-logo' );
 
     /* ==============================================
     ********  //Миниатюрки
@@ -496,18 +442,23 @@ function wp_new_user_notification_email_filter( $wp_new_user_notification_email,
    */
   function medvoice_get_logo_html( $place = 'nav' )
   {
-    $logo_large = get_theme_mod( 'logo_large' ) ?? '';
-    $logo_narrow = get_theme_mod( 'logo_narrow' ) ?? '';
+    $logo = medvoice_get_custom_logo_url(  ) ?? '';
 
     ?>
       <a href="<?= get_bloginfo( 'url' ); ?>" class="logo logo--<?= $place; ?>">
-        <img class="logo__img" src="<?= $logo_large; ?>" alt="<?= get_bloginfo( 'name' ); ?>">
-
-        <?php if ( $place === 'nav' ) : ?>
-          <img class="logo__img--short hidden" src="<?= $logo_narrow; ?>" alt="<?= get_bloginfo( 'name' ); ?>">
-        <?php endif; ?>        
+        <img class="logo__img" src="<?= $logo; ?>" alt="<?= get_bloginfo( 'name' ); ?>">     
       </a>
     <?php
+  }
+
+  /* ==============================================
+  ********  //Ссылка на лого
+  =============================================== */
+  function medvoice_get_custom_logo_url()
+  {
+      $custom_logo_id = get_theme_mod( 'custom_logo' );
+      $image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
+      return $image[0];
   }
 
   /* ==============================================

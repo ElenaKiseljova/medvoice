@@ -1,11 +1,4 @@
 <?php 
-  // $user = wp_get_current_user(  );
-
-  // update_metadata( 'user', $user->ID, 'subscribed', '0' );
-  // update_metadata( 'user', $user->ID, 'trial', '0' );
-  // update_metadata( 'user', $user->ID, '_new_user', '1' );
-  // update_metadata( 'user', $user->ID, 'st', time() );
-
   $subscriptions = medvoice_get_user_subscribe_array() ?? [];
 
   $subscription_current = medvoice_get_user_subscribe_array( 1 ) ?? [];

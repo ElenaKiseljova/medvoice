@@ -8,7 +8,7 @@
   get_header(  );
 ?>
 
-<main class="main">
+<main class="main main--search">
   <?php 
     get_template_part( 'templates/catalog' );
   ?>
