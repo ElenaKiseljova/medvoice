@@ -146,7 +146,7 @@ if (!function_exists('medvoice_init_function')) :
         'menu_position'       => 20,
         'menu_icon'           => 'dashicons-playlist-video',
         'hierarchical'        => true,
-        'supports'            => [ 'title', 'editor', 'thumbnail', 'page-attributes', 'custom-fields', 'author' ], // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
+        'supports'            => [ 'title', 'editor', 'thumbnail', 'page-attributes', 'custom-fields' ], // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
         'taxonomies'          => [ 'sections', 'labels', 'format', 'authors', 'langs' ],
         'has_archive'         => true,
         'rewrite'             => [ 'slug' => 'katalog','with_front' => false ],

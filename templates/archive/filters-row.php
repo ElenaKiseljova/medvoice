@@ -17,7 +17,8 @@
   // Получаем данные о таксономии
   $taxonomy_name = $taxonomy->label;
 
-  $terms = get_terms( $taxonomy_slug, [
+  $terms = get_terms( [
+    'taxonomy' => $taxonomy_slug,
     'hide_empty' => false,
     'parent' => false,
   ]);

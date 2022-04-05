@@ -147,9 +147,7 @@
     $query = new WP_Query( $args ); 
 
     if ( !$query->have_posts() ) {
-      $args['s'] = medvoice_search_replace( $s );
-      
-      $query = new WP_Query( $args ); 
+      $query = medvoice_smart_search( $args, $s );
     }
 
     if ( $query->have_posts() ) {
@@ -306,9 +304,7 @@
     $query = new WP_Query( $args ); 
 
     if ( !$query->have_posts() ) {
-      $args['s'] = medvoice_search_replace( $s );
-
-      $query = new WP_Query( $args ); 
+      $query = medvoice_smart_search( $args, $s );
     }    
 
     if ( $query->have_posts() ) {      
@@ -488,9 +484,6 @@
 
   function medvoice_search_replace( $s ) 
   {
-    $s = (string) $s; // преобразуем в строковое значение
-    $s = trim($s); // убираем пробелы в начале и конце строки
-    $s = function_exists('mb_strtolower') ? mb_strtolower($s) : strtolower($s); // переводим строку в нижний регистр (иногда надо задать локаль)
     $s = strtr($s, [
       'q' => 'й',
       'w' => 'ц',
@@ -562,5 +555,59 @@
     ]);
 
     return $s; // возвращаем результат
+  }
+
+  function medvoice_smart_search( $args, $s, $post_type = 'videos' )
+  {
+    $s = (string) $s; // преобразуем в строковое значение
+    $s = trim($s); // убираем пробелы в начале и конце строки
+    
+    $s = function_exists('mb_strtolower') ? mb_strtolower($s) : strtolower($s); // переводим строку в нижний регистр (иногда надо задать локаль)
+    
+    $args['s'] = medvoice_search_replace( $s );
+
+    $query = new WP_Query( $args ); 
+
+    // Если всё ещё пусто - ищем в названиях терминов таксономий
+    if ( !$query->have_posts()  ) {
+      $videos_taxs = get_taxonomies( ['object_type' => [$post_type]] ) ?? [];
+
+      if ( $videos_taxs && !empty($videos_taxs) && !is_wp_error( $videos_taxs ) ) {
+        $videos_terms = get_terms([ 'taxonomy' => $videos_taxs ]) ?? [];
+
+        if ( $videos_terms && !empty($videos_terms) && !is_wp_error( $videos_terms ) ) {
+          $taxonomies = [];
+
+          foreach ($videos_terms as $key => $videos_term) {
+            $term_taxonomy = $videos_term->taxonomy;
+
+            $term_id = $videos_term->term_id;
+
+            $term_name = $videos_term->name;
+            $term_name = $term_name ? (function_exists('mb_strtolower') ? mb_strtolower($term_name) : strtolower($term_name)) : '';
+
+            if ( str_contains( $term_name, $args['s'] ) || str_contains( $term_name, $s ) ) {
+              $taxonomies[$term_taxonomy][] = $term_id;
+            }
+          }
+
+          if ( !empty($taxonomies) ) {
+            $args['s'] = '';
+
+            foreach ($taxonomies as $tax => $terms) {
+              $args['tax_query'][] = [
+                'taxonomy' => $tax,
+                'field' => 'term_id',
+                'terms' => $terms,
+              ];
+            }
+          }
+          
+          $query = new WP_Query( $args );           
+        }
+      }
+    }
+
+    return $query;
   }
 ?>

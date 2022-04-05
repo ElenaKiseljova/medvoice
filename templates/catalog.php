@@ -18,16 +18,13 @@
       $args = [
         'post_type' => 'videos',
         'post_status' => 'publish',
-        's' => medvoice_search_replace( $search_query ),
       ];
 
-      $query = new WP_Query( $args ); 
+      $query = medvoice_smart_search( $args, $search_query ); 
 
       $count = $query->found_posts;
 
       if ( $count > 0 ) {
-        $search_query = $args['s'];
-
         $posts_found = $count;
       }      
     }
