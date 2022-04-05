@@ -327,116 +327,14 @@
       <?php      
       
       if ( $max_num_pages > 1 ) {
-        ?>
-          <div class="pagination">
-            <ul class="pagination__list">
-              <li class="pagination__item pagination__item--prev">
-                <a href="#catalog-ajax" class="pagination__button pagination__button--prev <?= ($paged === 1) ? 'disabled' : ''; ?>"  data-paged="<?= $paged - 1; ?>">
-                  <svg width="9" height="14">
-                    <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#pagination-prev"></use>
-                  </svg>
+        $attr = [
+          'show' => 10,
+          'left' => 7,
+          'center' => 5,
+          'right' => 7,
+        ];
 
-                  <?= __( 'Назад', 'medvoice' ); ?>
-                </a>
-              </li>
-
-              <?php 
-                if ($max_num_pages <= 5) {
-                  for ($i=1; $i <= $max_num_pages; $i++) { 
-                    ?>
-                      <li class="pagination__item">
-                        <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ($i === 1) ? 'first' : ($i === $max_num_pages ? 'last' : ''); ?> <?= ($i === $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
-                          <?= $i; ?>
-                        </a>
-                      </li>
-                    <?php
-                  }
-                } else if ($max_num_pages > 5) {
-                  if ($paged <= 4) {
-                    for ($i=1; $i <= 4; $i++) {                  
-                      ?>
-                        <li class="pagination__item">
-                          <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ($i === 1) ? 'first' : ''; ?> <?= ($i === $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
-                            <?= $i; ?>
-                          </a>
-                        </li>
-                      <?php
-                    }
-                    ?>
-                      <li class="pagination__item pagination__item--separate">
-                        ...
-                      </li>
-                      <li class="pagination__item">
-                        <a href="#catalog-ajax" class="pagination__button pagination__button--page last" data-paged="<?= $max_num_pages; ?>">
-                          <?= $max_num_pages; ?>
-                        </a>
-                      </li>
-                    <?php
-                  } else if ($paged > 4 && $paged < ($max_num_pages - 3)) {
-                    ?>
-                      <li class="pagination__item">
-                        <a href="#catalog-ajax" class="pagination__button pagination__button--page" data-paged="1">
-                          1
-                        </a>
-                      </li>
-                      <li class="pagination__item pagination__item--separate">
-                        ...
-                      </li>
-                    <?php
-                    for ($i= ($paged - 1); $i <= ($paged + 1); $i++) {                  
-                      ?>
-                        <li class="pagination__item">
-                          <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ($i === $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
-                            <?= $i; ?>
-                          </a>
-                        </li>
-                      <?php
-                    }
-                    ?>
-                      <li class="pagination__item pagination__item--separate">
-                        ...
-                      </li>
-                      <li class="pagination__item">
-                        <a href="#catalog-ajax" class="pagination__button pagination__button--page" data-paged="<?= $max_num_pages; ?>1">
-                          <?= $max_num_pages; ?>
-                        </a>
-                      </li>                    
-                    <?php
-                  } else if ($paged > 4 && $paged >= ($max_num_pages - 3)) {
-                    ?>
-                    <li class="pagination__item">
-                      <a href="#catalog-ajax" class="pagination__button pagination__button--page" data-paged="1">
-                        1
-                      </a>
-                    </li>
-                    <li class="pagination__item pagination__item--separate">
-                      ...
-                    </li>
-                    <?php
-                    for ($i= ($max_num_pages - 3); $i <= $max_num_pages; $i++) {                  
-                      ?>
-                        <li class="pagination__item">
-                          <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ($i === $max_num_pages) ? 'last' : ''; ?> <?= ($i === $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
-                            <?= $i; ?>
-                          </a>
-                        </li>
-                      <?php
-                    }
-                  }                
-                }              
-              ?>
-              
-              <li class="pagination__item pagination__item--next">
-                <a href="#catalog-ajax" class="pagination__button pagination__button--next <?= ($paged === $max_num_pages) ? 'disabled' : ''; ?>" data-paged="<?= $paged + 1; ?>">
-                  <?= __( 'Вперёд', 'medvoice' ); ?>  
-                  <svg width="9" height="14">
-                    <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#pagination-next"></use>
-                  </svg>
-                </a>
-              </li>
-            </ul>
-          </div>          
-        <?php
+        medvoice_get_pagination_html( $max_num_pages, $paged, $attr );
       }   
 
       wp_reset_postdata();
@@ -445,5 +343,137 @@
     } 
 
     return $count;
-  }  
+  } 
+  
+  function medvoice_get_pagination_html( $max_num_pages, $paged, $attr ) 
+  {
+    $show = isset($attr['show']) ? (int) $attr['show'] : 5;
+    $left = isset($attr['left']) ? (int) $attr['left'] : 3;
+    $center = isset($attr['center']) ? (int) $attr['center'] : 3;
+    $right = isset($attr['right']) ? (int) $attr['right'] : 4;
+    ?>          
+      <div class="pagination">
+        <ul class="pagination__list">
+          <li class="pagination__item pagination__item--prev">
+            <a href="#catalog-ajax" class="pagination__button pagination__button--prev <?= ($paged === 1) ? 'disabled' : ''; ?>"  data-paged="<?= $paged - 1; ?>">
+              <svg width="9" height="14">
+                <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#pagination-prev"></use>
+              </svg>
+
+              <?= __( 'Назад', 'medvoice' ); ?>
+            </a>
+          </li>
+
+          <!-- Мобильная пагинация - Старт -->
+          <li class="pagination__item pagination__item--mobile pagination__item--slash">
+            <a href="#catalog-ajax" class="pagination__button">
+              <?= $paged; ?>
+            </a>
+          </li>
+          <li class="pagination__item pagination__item--mobile">
+            <a href="#catalog-ajax" class="pagination__button">
+              <?= $max_num_pages; ?>
+            </a>
+          </li>
+          <!-- Мобильная пагинация - Конец -->
+
+          <?php 
+            if ($max_num_pages <= $show) {
+              for ($i=1; $i <= $max_num_pages; $i++) { 
+                ?>
+                  <li class="pagination__item">
+                    <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ($i === 1) ? 'first' : ($i === $max_num_pages ? 'last' : ''); ?> <?= ($i === $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
+                      <?= $i; ?>
+                    </a>
+                  </li>
+                <?php
+              }
+            } else if ($max_num_pages > $show) {
+              if ($paged <= $left) {
+                for ($i=1; $i <= $left; $i++) {                  
+                  ?>
+                    <li class="pagination__item">
+                      <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ($i === 1) ? 'first' : ''; ?> <?= ($i === $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
+                        <?= $i; ?>
+                      </a>
+                    </li>
+                  <?php
+                }
+                ?>
+                  <li class="pagination__item pagination__item--separate">
+                    ...
+                  </li>
+                  <li class="pagination__item">
+                    <a href="#catalog-ajax" class="pagination__button pagination__button--page last" data-paged="<?= $max_num_pages; ?>">
+                      <?= $max_num_pages; ?>
+                    </a>
+                  </li>
+                <?php
+              } else if ($paged > $left && $paged <= ($max_num_pages - $right)) {
+                ?>
+                  <li class="pagination__item">
+                    <a href="#catalog-ajax" class="pagination__button pagination__button--page" data-paged="1">
+                      1
+                    </a>
+                  </li>
+                  <li class="pagination__item pagination__item--separate">
+                    ...
+                  </li>
+                <?php
+                $center_half = floor($center/2);
+                for ($i= ($paged - $center_half); $i <= ($paged + $center_half); $i++) {                  
+                  ?>
+                    <li class="pagination__item">
+                      <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ((int)$i === $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
+                        <?= $i; ?>
+                      </a>
+                    </li>
+                  <?php
+                }
+                ?>
+                  <li class="pagination__item pagination__item--separate">
+                    ...
+                  </li>
+                  <li class="pagination__item">
+                    <a href="#catalog-ajax" class="pagination__button pagination__button--page" data-paged="<?= $max_num_pages; ?>1">
+                      <?= $max_num_pages; ?>
+                    </a>
+                  </li>                    
+                <?php
+              } else if ($paged > $left && $paged > ($max_num_pages - $right)) {
+                ?>
+                <li class="pagination__item">
+                  <a href="#catalog-ajax" class="pagination__button pagination__button--page" data-paged="1">
+                    1
+                  </a>
+                </li>
+                <li class="pagination__item pagination__item--separate">
+                  ...
+                </li>
+                <?php
+                for ($i= ($max_num_pages - $right + 1); $i <= $max_num_pages; $i++) {                  
+                  ?>
+                    <li class="pagination__item">
+                      <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ($i === $max_num_pages) ? 'last' : ''; ?> <?= ($i === $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
+                        <?= $i; ?>
+                      </a>
+                    </li>
+                  <?php
+                }
+              }                
+            }              
+          ?>
+          
+          <li class="pagination__item pagination__item--next">
+            <a href="#catalog-ajax" class="pagination__button pagination__button--next <?= ($paged === $max_num_pages) ? 'disabled' : ''; ?>" data-paged="<?= $paged + 1; ?>">
+              <?= __( 'Вперёд', 'medvoice' ); ?>  
+              <svg width="9" height="14">
+                <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#pagination-next"></use>
+              </svg>
+            </a>
+          </li>
+        </ul>
+      </div>          
+    <?php
+  }
 ?>
