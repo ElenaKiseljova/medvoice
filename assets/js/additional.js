@@ -147,7 +147,7 @@
                   // Уникальные действия при успехе отправки формы
                   data.callback(form, response);
 
-                  console.log('Успех:', response);
+                  // console.log('Успех:', response);
                 } else {
                   if (response.data && response.data.type && response.data.message) {
                     const field = form.querySelector(`input[name="${response.data.type}"]`);
@@ -408,7 +408,7 @@
           .then((response) => response.json())
           .then((response) => {
             if (response.success === true) {
-              console.log('Успех:', response);
+              // console.log('Успех:', response);
             } else {
               console.error('Ошибка:', response);
             }
@@ -461,7 +461,7 @@
                     }
                   }
 
-                  console.log('Успех:', response);
+                  // console.log('Успех:', response);
                 } else {
                   console.error('Ошибка:', response);
                 }
@@ -532,18 +532,44 @@
       const filterForm = document.querySelector('#filters');
 
       if (filterForm) {
+        // Поле результатов и кнопка Сброса
+        const resultsArea = document.querySelector('.catalog__amount');
+
+        if (resultsArea) {
+          const resultsResetButton = resultsArea.querySelector('.catalog__x');
+
+          if (resultsResetButton) {
+            resultsResetButton.addEventListener('click', () => {
+              resetFilterForm();
+            });
+          }
+        }
+
         // Все чекбоксы
         const filterFormCheckboxes = filterForm.querySelectorAll('input[type="checkbox"]');
 
+        // Поле поиска
+        const filterFormSearch = filterForm.querySelector('input[type="search"]');
+
         // Сброс Формы
         const resetFilterForm = () => {
-          filterFormCheckboxes.forEach(filterFormCheckbox => {
-            if (filterFormCheckbox.checked) {
-              filterFormCheckbox.click();
-            }
-          });
+          if (filterFormCheckboxes && filterFormCheckboxes.length > 0) {
+            filterFormCheckboxes.forEach(filterFormCheckbox => {
+              if (filterFormCheckbox.checked) {
+                filterFormCheckbox.click();
+              }
+            });
+          }
 
-          additional.getAjaxFilters(filterForm, true);
+          if (filterFormSearch) {
+            filterFormSearch.value = '';
+          }
+
+          if (resultsArea) {
+            resultsArea.classList.add('hidden');
+          }
+
+          additional.getAjaxFilters(filterForm);
         };
 
         // Получение выбранных категорий
@@ -605,7 +631,7 @@
         filterForm.addEventListener('submit', (evt) => {
           evt.preventDefault();
 
-          additional.getAjaxFilters(filterForm);
+          additional.getAjaxFilters(filterForm, true);
         });
 
         filterForm.addEventListener('reset', (evt) => {
@@ -613,21 +639,6 @@
 
           resetFilterForm();
         });
-
-        // Поле результатов и кнопка Сброса
-        const resultsArea = document.querySelector('.catalog__amount');
-
-        if (resultsArea) {
-          const resultsResetButton = resultsArea.querySelector('.catalog__x');
-
-          if (resultsResetButton) {
-            resultsResetButton.addEventListener('click', () => {
-              resetFilterForm();
-
-              resultsArea.classList.add('hidden');
-            });
-          }
-        }
       }
     },
     //Поиск
@@ -787,7 +798,7 @@
         additional.onAjax(dataForm, dataAjaxContainer);
       }
     },
-    getAjaxFilters(filterForm, reset = false) {
+    getAjaxFilters(filterForm, results = false) {
       const dataAjaxContainer = document.querySelector('#catalog-ajax');
 
       if (dataAjaxContainer) {
@@ -850,8 +861,8 @@
         dataForm.append('paged', 1);
         dataForm.append('bookmarks', window.bookmarks);
 
-        if (reset) {
-          dataForm.append('reset', 1);
+        if (results) {
+          dataForm.append('results', 1);
         }
 
         additional.onAjax(dataForm, dataAjaxContainer);
@@ -908,7 +919,7 @@
                 сallback();
               }
 
-              console.log('Успех:', response);
+              // console.log('Успех:', response);
             } else {
               console.error('Ошибка:', response);
             }

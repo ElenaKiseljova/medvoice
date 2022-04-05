@@ -10,7 +10,27 @@
     global $wp_query;
  
     $posts_found = $wp_query->found_posts ?? 0;
+
     $search_query = get_search_query(  );
+
+    // Подмена символов, если не было результатов по запросу
+    if ( $posts_found === 0 ) {
+      $args = [
+        'post_type' => 'videos',
+        'post_status' => 'publish',
+        's' => medvoice_search_replace( $search_query ),
+      ];
+
+      $query = new WP_Query( $args ); 
+
+      $count = $query->found_posts;
+
+      if ( $count > 0 ) {
+        $search_query = $args['s'];
+
+        $posts_found = $count;
+      }      
+    }
   }  
 
   // Каталог
