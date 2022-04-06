@@ -38,6 +38,12 @@ function medvoice_scripts ()
     wp_enqueue_script('main-script', get_template_directory_uri() . '/assets/js/script.js', $deps = array(), $ver = null, $in_footer = true );
   }
 
+  if ( is_singular( 'videos' ) ) {
+    wp_enqueue_script('vimeo-script', get_template_directory_uri() . '/assets/js/vimeo.player_v2.16.4.js', $deps = array(), $ver = null, $in_footer = true );
+
+    
+  }
+
   wp_enqueue_script('cookie-edit-script', get_template_directory_uri() . '/assets/js/cookie-edit.js', $deps = array(), $ver = null, $in_footer = true );
   wp_enqueue_script('files-script', get_template_directory_uri() . '/assets/js/files.js', $deps = array(), $ver = null, $in_footer = true );
   wp_enqueue_script('additional-script', get_template_directory_uri() . '/assets/js/additional.js', $deps = array(), $ver = null, $in_footer = true );
@@ -99,9 +105,6 @@ if (!function_exists('medvoice_after_setup_theme_function')) :
     add_image_size( 'video_card', 245, 160, false);
 
     add_image_size( 'video_side', 140, 80, false);
-
-    /* Видео (постер) */
-    add_image_size( 'video_poster', 655, 380, false);
   }
 endif;
 
@@ -550,5 +553,44 @@ function wp_new_user_notification_email_filter( $wp_new_user_notification_email,
     }
 
     return $post_ids; 
+  }
+
+  /* ==============================================
+  ********  //Получение длительности видео Вимео
+  =============================================== */
+  function medvoice_vimeo_duration( $id ) {
+    $url = 'https://vimeo.com/' . $id;
+
+    $json_url = 'https://vimeo.com/api/oembed.json?url=' . $url;
+  
+    $ch = curl_init($json_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HEADER, 0);
+    $data = curl_exec($ch);
+    curl_close($ch);
+    try{
+      $data = json_decode($data, true);
+    }catch (\Exception $e){ $data = null; }
+  
+    if (!isset($data['duration'])) {
+      return false;
+    }
+  
+    // in seconds
+    return $data['duration'];
+  }
+
+   /* ==============================================
+  ********  //Перевод секунк в часы : минуты : секунды
+  =============================================== */
+  function medvoice_seconds_to_hour( $seconds )
+  {    
+    $hours = floor($seconds / (60 * 60));
+
+    $minutes = floor($seconds / 60) - $hours * 60;
+
+    $seconds = $seconds - ($minutes * 60) - ($hours * 60 * 60);
+
+    return ($hours < 10 ? ('0' . $hours) : $hours) . ' : ' . ($minutes < 10 ? ('0' . $minutes) : $minutes) . ' : ' . ($seconds < 10 ? ('0' . $seconds) : $seconds);
   }
 ?>

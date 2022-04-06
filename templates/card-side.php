@@ -17,7 +17,14 @@
               ($author_firstname . ' ' . $author_lastname) :
               get_the_author_meta( 'nickname', $author_id );
 
-  $video_duration = get_field( 'duration', $video_id ) ?? '';
+  $video_duration = '';
+
+  $vimeo_id = get_field( 'vimeo_id', $video_id ) ?? '';  
+  if ( !empty($vimeo_id) ) {
+    $video_duration = medvoice_vimeo_duration( $vimeo_id );
+
+    $video_duration = $video_duration ? medvoice_seconds_to_hour( $video_duration ) : '';
+  }
 ?>
 <li class="side__item">
   <a href="<?= get_permalink( $video_id ); ?>" class="side__link">
