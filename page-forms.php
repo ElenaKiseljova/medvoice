@@ -6,6 +6,14 @@
 ?>
 
 <?php 
+  if ( !isset($_GET['action']) ) {
+    wp_redirect( get_home_url(  ) );
+
+    exit();
+  }
+?>
+
+<?php 
   get_header( 'empty' );
 ?>
 
