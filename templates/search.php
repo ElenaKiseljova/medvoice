@@ -6,7 +6,7 @@
       <?= __( 'Результаты', 'medvoice' ); ?>
     </h3>
 
-    <div id="search-ajax">      
+    <div class="search-ajax">      
     </div>    
   </div>
 </div>

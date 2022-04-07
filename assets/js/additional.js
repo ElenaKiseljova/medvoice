@@ -645,59 +645,64 @@
     search() {
       let lastTimeout;
 
-      const searchForm = document.querySelector('.header__form');
+      const searchContainers = document.querySelectorAll('.header__search');
 
-      if (searchForm) {
-        let value = '';
+      if (searchContainers.length > 0) {
+        searchContainers.forEach(searchContainer => {
+          let value = '';
 
-        const results = document.querySelector('.results');
+          const searchForm = searchContainer.querySelector('.header__form');
+          const results = searchContainer.querySelector('.results');
 
-        const inputSearch = searchForm.querySelector('#s');
+          if (searchForm && results) {
+            const inputSearch = searchForm.querySelector('input[name="s"]');
 
-        if (inputSearch && results) {
-          const changeSearchResults = (value = '') => {
-            // Искать только по фразе, состоящей из более 2 символов
-            if (value.length > 2 || value.length === 0) {
-              if (lastTimeout) {
-                clearTimeout(lastTimeout);
-              }
+            if (inputSearch) {
+              const changeSearchResults = (value = '') => {
+                // Искать только по фразе, состоящей из более 2 символов
+                if (value.length > 2 || value.length === 0) {
+                  if (lastTimeout) {
+                    clearTimeout(lastTimeout);
+                  }
 
-              lastTimeout = setTimeout(() => {
-                additional.getAjaxSearch(value);
+                  lastTimeout = setTimeout(() => {
+                    additional.getAjaxSearch(value, searchContainer);
 
-                results.classList.remove('hidden');
-              }, 500);
+                    results.classList.remove('hidden');
+                  }, 500);
+                }
+              };
+
+              const onSearchKeyUp = (evt) => {
+                if (evt.target.value.trim() !== value) {
+                  value = evt.target.value.trim();
+
+                  changeSearchResults(value);
+                }
+
+                return false;
+              };
+
+              const onSearchKeyDown = (evt) => {
+                value = inputSearch.value.trim();
+              };
+
+              const onSearchBlur = (evt) => {
+                if (!results.classList.contains('hidden') && evt.target !== inputSearch) {
+                  results.classList.add('hidden');
+                }
+              };
+
+              inputSearch.addEventListener('keydown', onSearchKeyDown);
+
+              inputSearch.addEventListener('keyup', onSearchKeyUp);
+
+              inputSearch.addEventListener('input', onSearchKeyUp);
+
+              document.addEventListener('click', onSearchBlur);
             }
-          };
-
-          const onSearchKeyUp = (evt) => {
-            if (evt.target.value.trim() !== value) {
-              value = evt.target.value.trim();
-
-              changeSearchResults(value);
-            }
-
-            return false;
-          };
-
-          const onSearchKeyDown = (evt) => {
-            value = inputSearch.value.trim();
-          };
-
-          const onSearchBlur = (evt) => {
-            if (!results.classList.contains('hidden') && evt.target !== inputSearch) {
-              results.classList.add('hidden');
-            }
-          };
-
-          inputSearch.addEventListener('keydown', onSearchKeyDown);
-
-          inputSearch.addEventListener('keyup', onSearchKeyUp);
-
-          inputSearch.addEventListener('input', onSearchKeyUp);
-
-          document.addEventListener('click', onSearchBlur);
-        }
+          }
+        });
       }
     },
     // Пагинация
@@ -782,8 +787,10 @@
       }
     },
     // Запрос на получение Видео по поисковой фразе
-    getAjaxSearch(value) {
-      const dataAjaxContainer = document.querySelector('#search-ajax');
+    getAjaxSearch(value, searchContainer) {
+      searchContainer = searchContainer ? searchContainer : document;
+
+      const dataAjaxContainer = searchContainer.querySelector('.search-ajax');
 
       if (dataAjaxContainer) {
         let dataForm = new FormData();

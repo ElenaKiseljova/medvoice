@@ -10,7 +10,6 @@
         <form class="header__form" action="' . home_url( '/' ) . '" method="get" role="search">
           <input class="header__field" autocomplete="off" type="text" 
             name="s" 
-            id="s" 
             placeholder="' . __( 'Поиск...', 'medvoice' ) . '"            
           /> 
           
