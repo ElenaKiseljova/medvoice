@@ -398,12 +398,14 @@ add_filter( 'wp_new_user_notification_email', 'wp_new_user_notification_email_fi
 function wp_new_user_notification_email_filter( $wp_new_user_notification_email, $medvoice_user, $blogname ){
 	$wp_new_user_notification_email['subject'] = __( 'Регистрация на сайте', 'medvoice' ) .' ' . wp_specialchars_decode( $blogname );
 	
-  $logo_large = get_theme_mod( 'logo_large' ) ?? '';
-
   $wp_new_user_notification_email['message'] = 
-		__( 'Добро пожаловать на сайт', 'medvoice' ) .' '. get_bloginfo('name') . '<br>
-		'. __( 'Ваш логин для входа:', 'medvoice' ) .' '.$medvoice_user->user_email.'<br>
-		'. __( 'Вход:', 'medvoice' ) .' <a href="' . medvoice_get_special_page( 'forms', 'url'  ) . '?action=login">' . __( 'перейти на страницу логирования', "medvoice" ) . '</a>';
+    get_custom_logo().
+		'<br><br>' .
+		__( 'Добро пожаловать на сайт', 'medvoice' ) .' '. get_bloginfo('name') . '<br>' . 
+		__( 'Ваш логин для входа:', 'medvoice' ) .' '.$medvoice_user->user_email.'<br>' .
+		 __( 'Вход:', 'medvoice' ) .
+     ' <a href="' . medvoice_get_special_page( 'forms', 'url'  ) .'?action=login">' . 
+     __( 'перейти на страницу логирования', "medvoice" ) . '</a>';
 	
 	return $wp_new_user_notification_email;
 }

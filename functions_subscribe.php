@@ -520,6 +520,7 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
   =============================================== */
   function medvoice_is_free_video( $video_id = null ) {
     if ( isset($video_id) ) {
+      // Получение ИД бесплатной категории и ее языковых версий
       $video_sections_free_id = get_field( 'sections_free_id', 'options' );
       if ( $video_sections_free_id ) {
         if ( function_exists( 'pll_get_term' ) ) {

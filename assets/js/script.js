@@ -20,8 +20,18 @@ document.addEventListener("DOMContentLoaded", function (event) {
   }
 
 
-  // 
+  //Бургер
+  let nav = document.querySelector('.nav');
+  let burger = nav.querySelector('.nav__burger');
 
+  if (burger) {
+    burger.addEventListener('click', function() {
+      nav.classList.toggle('open');
+      burger.classList.toggle('open')
+    });
+  }
+
+  
   // Навигация
   let buttonMinimize = document.querySelector('.nav__btn');
   let navigationMenu = document.querySelector('.nav');

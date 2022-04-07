@@ -5,19 +5,19 @@
     $name = !empty($medvoice_user->first_name) ? $medvoice_user->first_name : $medvoice_user->nickname;
   ?>
   <div class="header__user">
-    <?php if (medvoice_user_have_subscribe_trial()) : ?>
-      <p class="header__trial-text">
-        <?=
-          sprintf( __( 'Осталось %s%s дней%s триала', 'medvoice' ), 
-            '<span class="header__trial-count">',
-            medvoice_get_user_subscribe_or_trial_days_left(),
-            '</span>'
-          );
-        ?>        
-      </p>
-    <?php endif; ?>
-    
     <div class="profile">
+      <?php if (medvoice_user_have_subscribe_trial()) : ?>
+        <p class="profile__trial">
+          <?=
+            sprintf( __( 'Осталось %s%s дней%s триала', 'medvoice' ), 
+              '<span class="header__trial-count">',
+              medvoice_get_user_subscribe_or_trial_days_left(),
+              '</span>'
+            );
+          ?>        
+        </p>
+      <?php endif; ?>
+      
       <?php 
         $medvoice_avatar = $medvoice_user->get( 'avatar' );
       ?>
