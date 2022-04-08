@@ -558,9 +558,39 @@ function wp_new_user_notification_email_filter( $wp_new_user_notification_email,
   }
 
   /* ==============================================
-  ********  //Получение длительности видео Вимео
+  ********  //Запись длительности видео Vimeo при сохранении Видео
   =============================================== */
-  function medvoice_vimeo_duration( $id ) {
+  add_action( 'save_post', 'medvoice_set_vimeo_duration' );
+  function medvoice_set_vimeo_duration( $video_id ) 
+  {
+    $vimeo_id = get_field( 'vimeo_id', $video_id ) ?? '';  
+
+    if ( !empty($vimeo_id) ) {
+      $video_duration = medvoice_vimeo_duration( $vimeo_id );
+
+      $video_duration = $video_duration ? medvoice_seconds_to_hour( $video_duration ) : '';
+
+      $video_duration_updated = update_metadata( 'post', $video_id, 'vimeo_duration', $video_duration );
+
+      return $video_duration_updated;
+    }
+
+    return false;
+  }
+
+  /* ==============================================
+  ********  //Получение длительности видео
+  =============================================== */
+  function medvoice_get_vimeo_duration( $video_id )
+  {
+    return get_metadata( 'post', $video_id, 'vimeo_duration', true ) ?? '';
+  }
+
+  /* ==============================================
+  ********  //Получение длительности видео Вимео по АПИ
+  =============================================== */
+  function medvoice_vimeo_duration( $id ) 
+  {
     $url = 'https://vimeo.com/' . $id;
 
     $json_url = 'https://vimeo.com/api/oembed.json?url=' . $url;

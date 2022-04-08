@@ -60,13 +60,7 @@
       $video_format_name = __( 'Лекция', 'medvoice' );
     } 
 
-    $vimeo_id = get_field( 'vimeo_id', $video_id ) ?? '';  
-
-    if ( !empty($vimeo_id) ) {
-      $video_duration = medvoice_vimeo_duration( $vimeo_id );
-
-      $video_duration = $video_duration ? medvoice_seconds_to_hour( $video_duration ) : '';
-    }
+    $video_duration = medvoice_get_vimeo_duration( $video_id ) ?? '';
   }
 
   // Класс для карточки

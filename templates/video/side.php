@@ -1,5 +1,5 @@
 <?php 
-  global $video_id;
+  global $video;
 
   $video_id = get_the_ID(  );
 
@@ -54,7 +54,7 @@
       <ul class="side__list swiper-slide">
         <?php foreach ($video_side as $key => $video_side_item) : ?>
           <?php 
-            $video_id =  $video_side_item->ID;  
+            $video = $video_side_item;  
 
             get_template_part( 'templates/card', 'side' );
           ?>    
