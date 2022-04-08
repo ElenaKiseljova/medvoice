@@ -50,7 +50,7 @@
         <img class="side__img" src="<?= get_the_post_thumbnail_url( $video_id, 'video_side' ); ?>" alt="<?= strip_tags( $title ); ?>">
       <?php endif; ?>
 
-      <div class="side__btn <?= $video_block ? 'side__btn--lock' : ''; ?>">
+      <div class="side__btn <?= $video_block ? 'side__btn--block' : ''; ?>">
         <?php if ( $video_block ) : ?>
           <svg aria-labelledby="<?= __( 'Заблокировано', 'medvoice' ); ?>" width="20" height="25">
             <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#block"></use>            

@@ -10,21 +10,21 @@
 ?>
 
 <section class="slider" id="<?= $format->slug; ?>">
-  <div class="swiper swiper-courses">
+  <div class="slider__body swiper swiper-courses">
     <div class="slider__head">
       <h2 class="slider__title">
          <?= $title; ?>
       </h2>
 
       <?php if (isset($archive['title']) && !empty($archive['title'])) : ?>
-        <a href="<?= get_term_link( $format ); ?>" class="slider__link">
+        <a href="<?= get_term_link( $format ); ?>" class="slider__link slider__link--top">
           <?= $archive['title']; ?>
         </a>
       <?php endif; ?>      
     </div>
 
     <?php if ($videos && !empty($videos) && !is_wp_error( $videos )) : ?>
-      <div class="swiper-wrapper">
+      <div class="slider__wrapper swiper-wrapper">
         <?php foreach ($videos as $key => $video_item) : ?>
           <?php 
             $video = $video_item;
@@ -46,6 +46,12 @@
           </svg>
         </button>   
       </div>
+
+      <?php if (isset($archive['title']) && !empty($archive['title'])) : ?>
+        <a href="<?= get_term_link( $format ); ?>" class="slider__link slider__link--bottom">
+          <?= $archive['title']; ?>
+        </a>
+      <?php endif; ?> 
     <?php endif; ?>  
   </div>
 </section>

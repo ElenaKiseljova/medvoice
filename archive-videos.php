@@ -1,22 +1,5 @@
-
 <?php 
-  /**
-   * Template Name: Каталог
-   */
-?>
+  wp_redirect( medvoice_get_special_page( 'catalog', 'url'  ) );
 
-<?php 
-  get_header(  );
-?>
-
-<main class="main">
-  <?php 
-    get_template_part( 'templates/archive/banner' );
-
-    get_template_part( 'templates/catalog' );
-  ?>
-</main>
-
-<?php 
-  get_footer(  );
+  exit;
 ?>

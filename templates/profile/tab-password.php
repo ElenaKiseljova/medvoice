@@ -3,7 +3,7 @@
     <div class="form__wrapper">
       <div class="form__content form__content--account">
         <p class="form__row">
-          <label class="form__label" for="password-old"><?= __( 'Старый пароль пароль', 'medvoice' ); ?></label>
+          <label class="form__label" for="password-old"><?= __( 'Старый пароль', 'medvoice' ); ?></label>
           <input class="form__field" type="password" name="password-old" id="password-old" >
         </p>
 

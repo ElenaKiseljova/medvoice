@@ -31,7 +31,7 @@
   }  
 
   // Каталог
-  $is_archive_videos = is_post_type_archive( 'videos' );
+  $is_archive_videos = is_page( medvoice_get_special_page( 'catalog', 'id'  ) );
 
   // Вебинары/Курсы/Лекции и т.д.
   $term = get_queried_object();

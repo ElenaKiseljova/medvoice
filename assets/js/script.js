@@ -1,36 +1,4 @@
 document.addEventListener("DOMContentLoaded", function (event) {
-  // Видео
-  const video = document.querySelector('.lection__video');
-
-  if (video) {
-    const videoPlayButton = video.querySelector('.lection__img');
-    const videoIframe = video.querySelector('iframe');
-
-    if (videoPlayButton && videoIframe) {
-      videoPlayButton.addEventListener('click', () => {
-        const videoId = videoPlayButton.dataset.videoId;
-
-        if (videoId) {
-          videoIframe.src = `https://player.vimeo.com/video/${videoId}?h=e4d417a182&autoplay=1&color=7b42e9&title=0&byline=0&portrait=0`;
-
-          videoPlayButton.classList.add('hide');
-        }
-      });
-    }
-  }
-
-
-  //Бургер
-  let nav = document.querySelector('.nav');
-  let burger = nav.querySelector('.nav__burger');
-
-  if (burger) {
-    burger.addEventListener('click', function() {
-      nav.classList.toggle('open');
-      burger.classList.toggle('open')
-    });
-  }
-
   
   // Навигация
   let buttonMinimize = document.querySelector('.nav__btn');
@@ -44,27 +12,21 @@ document.addEventListener("DOMContentLoaded", function (event) {
       mainContainer.classList.toggle('content--minimize');
       logo.classList.toggle('logo--min');
     })
+  };
+
+  //Бургер
+  let nav = document.querySelector('.nav');
+  let burger = nav.querySelector('.nav__burger');
+
+  if (burger) {
+    const rootElement = document.documentElement; 
+
+    burger.addEventListener('click', function() {
+      nav.classList.toggle('open');
+      burger.classList.toggle('open');
+      rootElement.classList.toggle('block');
+    });
   }
-
-
-  // Выпадающее меню в шапке при клике на пользователя
-  // let headerProfile = document.querySelector('.profile');
-  // let headerProfileMenu = document.querySelector('.profile__menu');
-
-  // if (headerProfile) {
-  //   headerProfile.addEventListener('click', () => {
-  //     headerProfileMenu.classList.toggle('hidden');
-  //   })
-  // }
-
-  // window.addEventListener('click', e => {
-  //   if (headerProfileMenu) {
-  //     const target = e.target;
-  //     if (!target.closest('.profile__menu') && !target.closest('.profile')) {
-  //       headerProfileMenu.classList.add('hidden');
-  //     }
-  //   }
-  // })
 
 
   // Свайпер
@@ -82,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
       on: {
         init(e) {
-          if (window.screen.width >= 576) {
+          if (window.screen.width >= 768) {
             e.enable()
           } else {
             e.slideTo(0, 0)
@@ -90,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
           }
         },
         resize(e) {
-          if (window.screen.width >= 576) {
+          if (window.screen.width >= 768) {
             e.enable()
           } else {
             e.slideTo(0, 0)
@@ -111,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
       on: {
         init(e) {
-          if (window.screen.width >= 576) {
+          if (window.screen.width >= 768) {
             e.enable()
           } else {
             e.slideTo(0, 0)
@@ -119,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
           }
         },
         resize(e) {
-          if (window.screen.width >= 576) {
+          if (window.screen.width >= 768) {
             e.enable()
           } else {
             e.slideTo(0, 0)
@@ -140,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
       on: {
         init(e) {
-          if (window.screen.width >= 576) {
+          if (window.screen.width >= 768) {
             e.enable()
           } else {
             e.slideTo(0, 0)
@@ -148,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
           }
         },
         resize(e) {
-          if (window.screen.width >= 576) {
+          if (window.screen.width >= 768) {
             e.enable()
           } else {
             e.slideTo(0, 0)
@@ -164,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         direction: "vertical",
         slidesPerView: "auto",
         freemode: true,
-        allowTouchMove: false,
+        allowTouchMove: true,
 
         scrollbar: {
           el: ".scrollbar",
@@ -182,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         direction: "vertical",
         slidesPerView: "auto",
         freemode: true,
-        allowTouchMove: false,
+        allowTouchMove: true,
 
         scrollbar: {
           el: ".scrollbar",
@@ -438,6 +400,26 @@ document.addEventListener("DOMContentLoaded", function (event) {
         };
       });
     });
+  }
+
+  // Видео
+  const video = document.querySelector('.lection__video');
+
+  if (video) {
+    const videoPlayButton = video.querySelector('.lection__img');
+    const videoIframe = video.querySelector('iframe');
+
+    if (videoPlayButton && videoIframe) {
+      videoPlayButton.addEventListener('click', () => {
+        const videoId = videoPlayButton.dataset.videoId;
+
+        if (videoId) {
+          videoIframe.src = `https://player.vimeo.com/video/${videoId}?h=e4d417a182&autoplay=1&color=7b42e9&title=0&byline=0&portrait=0`;
+
+          videoPlayButton.classList.add('hide');
+        }
+      });
+    }
   }
 
 

@@ -35,6 +35,8 @@
           </svg>  
           <p class="nav__text"><?= $menu_item->title; ?></p>      
         </a>
+
+        <span class="nav__flag"><?= $menu_item->title; ?></span>
       </li>
     <?php endforeach; ?>
   </ul>

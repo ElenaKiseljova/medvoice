@@ -106,12 +106,9 @@
             
             <?php if ( $action === 'login' ) : ?>
               <p class="form__text text">
-                <?= 
-                  sprintf(
-                    __( '<a href="%s">Забыли пароль</a>', 'medvoice' ),
-                    medvoice_get_special_page( 'forms', 'url'  ) . '?action=forgot'
-                  ); 
-                ?>  
+                <a href="<?= medvoice_get_special_page( 'forms', 'url'  ) . '?action=forgot'; ?>">
+                  <?= __( 'Забыли пароль?', 'medvoice' ); ?>
+                </a>
               </p>
             <?php endif; ?>
 

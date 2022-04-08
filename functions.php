@@ -152,7 +152,7 @@ if (!function_exists('medvoice_init_function')) :
         'supports'            => [ 'title', 'editor', 'thumbnail', 'page-attributes', 'custom-fields' ], // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
         'taxonomies'          => [ 'sections', 'labels', 'format', 'authors', 'langs' ],
         'has_archive'         => true,
-        'rewrite'             => [ 'slug' => 'katalog','with_front' => false ],
+        'rewrite'             => true,
         'query_var'           => true,
       ] );
     }       
