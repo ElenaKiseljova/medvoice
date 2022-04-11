@@ -1,5 +1,5 @@
 <div class="tab">
-  <form class="tab__form form" id="editpassword">
+  <form class="tab__form tab__form--password form" id="editpassword">
     <div class="form__wrapper">
       <div class="form__content form__content--account">
         <p class="form__row">

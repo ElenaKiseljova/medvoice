@@ -1,3 +1,8 @@
+<?php 
+  global $is_nav;
+
+  $is_nav = isset($is_nav) ? $is_nav : false;
+?>
 <?php if ( is_user_logged_in(  ) ) : ?>
   <?php 
     $medvoice_user = wp_get_current_user(  );
@@ -34,7 +39,7 @@
 
       <div class="profile__menu">
         <ul class="profile__list">
-          <li class="profile__item">
+          <li class="profile__item <?= $is_nav ? 'hidden' : ''; ?>">
             <a class="profile__item-link" href="<?= medvoice_get_special_page( 'profile', 'url' ); ?>">
               <svg class="profile__icon" width="20" height="20">
                 <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#profile"></use>
@@ -42,7 +47,7 @@
               <p class="profile__text"><?= __( 'Профиль', 'medvoice' ); ?></p>
             </a>
           </li>
-          <li class="profile__item">
+          <li class="profile__item <?= $is_nav ? 'hidden' : ''; ?>">
             <a class="profile__item-link" href="<?= medvoice_get_special_page( 'bookmarks', 'url' ); ?>">
               <svg class="profile__icon" width="20" height="20">
                 <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#bookmarks"></use>

@@ -52,7 +52,7 @@
 
       <div class="side__btn <?= $video_block ? 'side__btn--block' : ''; ?>">
         <?php if ( $video_block ) : ?>
-          <svg aria-labelledby="<?= __( 'Заблокировано', 'medvoice' ); ?>" width="20" height="25">
+          <svg aria-labelledby="<?= __( 'Заблокировано', 'medvoice' ); ?>" width="22" height="27">
             <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#block"></use>            
           </svg>
         <?php else : ?>

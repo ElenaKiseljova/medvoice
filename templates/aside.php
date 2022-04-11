@@ -7,6 +7,10 @@
   
   <div class="header header--nav">
     <?php 
+      global $is_nav;
+
+      $is_nav = true;
+    
       get_template_part( 'templates/search' );
 
       get_template_part( 'templates/profile' );
