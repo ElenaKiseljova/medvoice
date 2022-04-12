@@ -23,47 +23,11 @@
 
   $wp_session_tokens = WP_Session_Tokens::get_instance($medvoice_user->ID);
 
-  $wp_session_tokens->destroy_others( $token_to_keep );
-
-  // update_metadata( 'user', $medvoice_user->ID, 'bookmarks', '[]' );
-  // update_user_meta($medvoice_user->ID, '_new_user', '1');
-  // update_user_meta($medvoice_user->ID, 'st', time());
-  // delete_metadata( 'user', $medvoice_user->ID, 'subscribed_days' );
-  // var_dump( get_user_meta( $medvoice_user->ID ) );
-  // global $wpdb;
-  // $themes_table               =   $wpdb->prefix . 'unconfirmed_mail_users';
-  //   $wpdb->query("DROP TABLE IF EXISTS `".$themes_table."`");
-  
-  //echo wp_get_session_token();
-
-  // if ( class_exists('WP_Session_Tokens') ) {
-  //   $manager = WP_Session_Tokens::get_instance( get_current_user_id() );
-
-  //   var_dump($manager);
-  // }
-
-
-  // echo '<br><br><br><br>';
-
-
-  // $wp_sessions = wp_get_all_sessions() ?? [];
-
-  //   foreach ($wp_sessions as $key => $wp_session) {
-  //     var_dump($wp_session);
-  //     echo '<br><br>';
-      
-  //     // echo date('Y-m-d H:i:s', utc_to_usertime($wp_session['expiration'])) . '<br>';
-  //   }
-
-    // echo medvoice_get_user_subscribe_end_date();
-
-
-
-    
+  $wp_session_tokens->destroy_others( $token_to_keep );    
 ?>
 
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="<?= function_exists( 'pll_current_language' ) ? (pll_current_language() === 'uk' ? 'ua' : pll_current_language()) : 'ru' ; ?>">
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
