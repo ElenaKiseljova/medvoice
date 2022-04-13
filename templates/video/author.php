@@ -1,5 +1,7 @@
 <?php 
   global $video_id;
+  
+  $video_id = get_the_ID(  );
 
   if ( !isset($video_id) ) {
     return;

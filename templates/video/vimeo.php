@@ -1,11 +1,5 @@
 <?php 
   $vimeo_id = get_field( 'vimeo_id', $video_id ) ?? '';  
-
-  // $videos = get_posts( ['post_type' => 'videos', 'numberposts' => -1] );
-
-  // foreach ($videos as $key => $video) {
-  //   update_field( 'vimeo_id', '679049228', $video->ID );
-  // }
 ?>
 <div class="lection__video">
   <div class="lection__vimeo">
