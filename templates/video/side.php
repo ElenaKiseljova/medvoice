@@ -49,20 +49,22 @@
     <?= $video_title; ?>
   </h2>
 
-  <div class="side__body swiper swiper-side">
-    <div class="side__block swiper-wrapper">
-      <ul class="side__list swiper-slide">
-        <?php foreach ($video_side as $key => $video_side_item) : ?>
-          <?php 
-            $video = $video_side_item;  
+  <?php if ( $video_side && !empty($video_side) && !is_wp_error( $video_side )) : ?>
+    <div class="side__body swiper swiper-side">
+      <div class="side__block swiper-wrapper">
+        <ul class="side__list swiper-slide">
+          <?php foreach ($video_side as $key => $video_side_item) : ?>
+            <?php 
+              $video = $video_side_item;  
 
-            get_template_part( 'templates/card', 'side' );
-          ?>    
-        <?php endforeach; ?>  
-      </ul>
+              get_template_part( 'templates/card', 'side' );
+            ?>    
+          <?php endforeach; ?>  
+        </ul>
+      </div>
+      <div class="scrollbar">
+        <div class="scrollbar__drag"></div>
+      </div>
     </div>
-    <div class="scrollbar">
-      <div class="scrollbar__drag"></div>
-    </div>
-  </div>
+  <?php endif; ?>  
 </section>

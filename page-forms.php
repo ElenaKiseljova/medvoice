@@ -6,7 +6,7 @@
 ?>
 
 <?php 
-  if ( !isset($_GET['action']) ) {
+  if ( !isset($_GET['action']) || is_user_logged_in(  ) ) {
     wp_redirect( get_home_url(  ) );
 
     exit();
