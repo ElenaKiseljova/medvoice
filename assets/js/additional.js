@@ -943,6 +943,14 @@
 
         dataAjaxContainer.classList.remove('sending');
       }
+    },
+    // Выбор аккаунта гугла каждый раз
+    selectGoogleAccount() {
+      const googleAuthorizationLink = document.querySelector('.wp_google_login__button');
+
+      if (googleAuthorizationLink) {
+        googleAuthorizationLink.href = googleAuthorizationLink.href + '&prompt=select_account';
+      }
     }
   };
 
@@ -991,6 +999,12 @@
 
     try {
       additional.filters();
+    } catch (error) {
+      console.log(error);
+    }
+
+    try {
+      additional.selectGoogleAccount();
     } catch (error) {
       console.log(error);
     }
