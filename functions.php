@@ -40,8 +40,6 @@ function medvoice_scripts ()
 
   if ( is_singular( 'videos' ) ) {
     wp_enqueue_script('vimeo-script', get_template_directory_uri() . '/assets/js/vimeo.player_v2.16.4.js', $deps = array(), $ver = null, $in_footer = true );
-
-    
   }
 
   wp_enqueue_script('cookie-edit-script', get_template_directory_uri() . '/assets/js/cookie-edit.js', $deps = array(), $ver = null, $in_footer = true );
@@ -79,6 +77,9 @@ if (!function_exists('medvoice_after_setup_theme_function')) :
   function medvoice_after_setup_theme_function () {
     load_theme_textdomain('medvoice', get_template_directory() . '/languages');
 
+    /* ==============================================
+    ********  //Лого
+    =============================================== */
     add_theme_support( 'custom-logo' );
 
     /* ==============================================
