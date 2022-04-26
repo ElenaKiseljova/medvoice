@@ -174,34 +174,42 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
       // Проверка nonce
       check_ajax_referer('additional-script.js_nonce', 'security');
 
-      // Получение срока подписки
-      $months = isset($_REQUEST['months']) ? (int) trim( $_REQUEST['months'] ) : null;
+      if($_POST['antibot'] == 1) {
+        // Получение срока подписки
+        $months = isset($_REQUEST['months']) ? (int) trim( $_REQUEST['months'] ) : null;
 
-      if ( isset($months) ) {
-        // Получить ID Товара из $_REQUEST
-        $product_id = isset($_REQUEST['product_id']) ? (int) trim( $_REQUEST['product_id'] ) : null;
+        if ( isset($months) ) {
+          // Получить ID Товара из $_REQUEST
+          $product_id = isset($_REQUEST['product_id']) ? (int) trim( $_REQUEST['product_id'] ) : null;
 
-        if ( isset($product_id) ) {
+          if ( isset($product_id) ) {
 
-          // Создание заказа
-          medvoice_create_order($product_id, $months);
-               
+            // Создание заказа
+            medvoice_create_order($product_id, $months);
+                
+          } else {
+            $response = [
+              'message' => __('Товар не существует', 'medvoice'),
+            ];
+
+            wp_send_json_error( $response );
+
+            die(  );
+          } 
         } else {
           $response = [
-            'message' => __('Товар не существует', 'medvoice'),
+            'message' => __('Не указан период', 'medvoice'),
           ];
 
-          wp_send_json_error( $response );
-
-          die(  );
+          wp_send_json_error( $response );        
         } 
       } else {
         $response = [
-          'message' => __('Не указан период', 'medvoice'),
+          'message' => __('Подтвердите, что Вы не робот', 'medvoice' ),
         ];
 
-        wp_send_json_error( $response );        
-      } 
+        wp_send_json_error( $response );
+      }
       
       die(  );
     } catch (\Throwable $th) {
