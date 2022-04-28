@@ -155,3 +155,7 @@
   
   pointer-events: none;
 }
+
+.lection__vimeo {
+  background-color: #000000;
+}
