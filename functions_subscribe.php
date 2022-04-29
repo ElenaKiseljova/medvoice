@@ -64,12 +64,8 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
         $attr = [
           'customer_id'   => $medvoice_user_id,
           'created_via'   => 'medvoice_ajax',
+          'status' => 'processing',
         ];
-
-        // Если оформляется триал - переводим заказ в выполненный сразу
-        if ( !isset($months) ) {
-          $attr['status'] = 'completed';
-        }  
 
         $order = wc_create_order( $attr );
     
@@ -103,9 +99,14 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
         $order->calculate_totals();
 
         // Записываю кол-во месяцев в заказ
+        // Если оформляется триал - переводим заказ в выполненный сразу
         if ( isset($months) ) {
+          $order->update_status( 'pending' );  
+
           $order->update_meta_data( 'months', $months );
-        } else {             
+        } else {         
+          $order->update_status( 'completed' );  
+
           $order->update_meta_data( 'trial', '1' );
         }
         
@@ -135,7 +136,7 @@ if ( class_exists( 'WC_wayforpay' ) && class_exists( 'woocommerce' )) {
         $new_user = get_user_meta($medvoice_user->ID, '_new_user', true);
         if ($new_user === '1') {   
           update_metadata( 'user', $medvoice_user->ID, '_new_user', '0');
-        }        
+        }    
       } else {
         $response = [
           'message' => __('Пользователь не существует', 'medvoice'),

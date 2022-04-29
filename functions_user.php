@@ -293,6 +293,12 @@ function medvoice_register()
 
             wp_set_current_user( $user_signon->ID, $user_signon->user_login );   
 
+            $meta_updated_first_name = update_metadata( 'user', $user_signon->ID, 'billing_first_name', $$name );
+
+            if ($meta_updated_first_name === false) {
+              echo __('Не удалось обновить ', 'medvoice') . 'billing_first_name';
+            }
+
             // Проверка желаемого типа подписки
             $subscribe = $_GET['subscribe'] ? (int) $_GET['subscribe'] : 0;
 
@@ -652,6 +658,9 @@ function medvoice_ajax_edit_user_info()
   
         $info_meta['billing_country'] = isset($_POST['billing_country']) ? htmlspecialchars($_POST['billing_country']) : '';
         $info_meta['billing_city'] = isset($_POST['billing_city']) ? htmlspecialchars($_POST['billing_city']) : '';
+
+        $info_meta['billing_first_name'] = $info['first_name'];
+        $info_meta['billing_last_name'] = $info['last_name'];
 
         foreach ($info_meta as $key => $value) {
           $meta_value = get_metadata( 'user', $medvoice_user->ID, $key, true );
