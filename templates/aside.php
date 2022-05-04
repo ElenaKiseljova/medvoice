@@ -2,7 +2,11 @@
   <div class="nav__head">
     <?php medvoice_get_logo_html( 'nav' ); ?>
 
-    <button class="nav__burger"></button>
+    <button class="nav__burger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
   
   <div class="header header--nav">

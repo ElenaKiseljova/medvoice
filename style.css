@@ -159,3 +159,7 @@
 .lection__vimeo {
   background-color: #000000;
 }
+
+.grecaptcha-badge {
+  display: none;
+}
