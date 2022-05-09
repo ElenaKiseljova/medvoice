@@ -19,7 +19,7 @@
 
   $terms = get_terms( [
     'taxonomy' => $taxonomy_slug,
-    'hide_empty' => false,
+    // 'hide_empty' => false,
     'parent' => false,
   ]);
 ?>
@@ -35,36 +35,38 @@
         </svg>
       </div>
       
-      <ul class="dropdown__body">
-        <?php if ( $terms && !empty($terms) && !is_wp_error( $terms ) ) : ?>
-          <?php foreach ($terms as $key => $term) : ?>
-            <?php 
-              $checked = false;
+      <div class="dropdown__body">
+        <ul class="dropdown__list">
+          <?php if ( $terms && !empty($terms) && !is_wp_error( $terms ) ) : ?>
+            <?php foreach ($terms as $key => $term) : ?>
+              <?php 
+                $checked = false;
 
-              $term_id = $term->term_id;
+                $term_id = $term->term_id;
 
-              $term_name = $term->name;
+                $term_name = $term->name;
 
-              if ( $cur_term->term_id === $term->term_id ) {
-                $checked = true;
-              }
-              
-              $parent = false;
-              $term_children = get_term_children( $term_id, $taxonomy_slug );
-              if ( !empty($term_children) && !is_wp_error( $term_children ) ) {
-                $parent = true;
-              }
-            ?>          
-            <li class="dropdown__item">
-              <input class="dropdown__check <?= $parent ? 'dropdown__check--parent' : '';?>" type="checkbox" 
-                id="<?= $taxonomy_slug . '-' . $term_id; ?>" 
-                name="<?= $taxonomy_slug; ?>" 
-                value="<?= $term_id; ?>">
-              <label class="dropdown__label" for="<?= $taxonomy_slug . '-' . $term_id; ?>"><?= $term_name; ?></label>
-            </li>
-          <?php endforeach; ?>
-        <?php endif; ?>
-      </ul>
+                if ( $cur_term->term_id === $term->term_id ) {
+                  $checked = true;
+                }
+                
+                $parent = false;
+                $term_children = get_term_children( $term_id, $taxonomy_slug );
+                if ( !empty($term_children) && !is_wp_error( $term_children ) ) {
+                  $parent = true;
+                }
+              ?>          
+              <li class="dropdown__item">
+                <input class="dropdown__check <?= $parent ? 'dropdown__check--parent' : '';?>" type="checkbox" 
+                  id="<?= $taxonomy_slug . '-' . $term_id; ?>" 
+                  name="<?= $taxonomy_slug; ?>" 
+                  value="<?= $term_id; ?>">
+                <label class="dropdown__label" for="<?= $taxonomy_slug . '-' . $term_id; ?>"><?= $term_name; ?></label>
+              </li>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </ul>
+      </div>      
     </div>
   <?php endif; ?>  
 </div>
@@ -79,8 +81,10 @@
         </svg>
       </div>
 
-      <ul class="dropdown__body">            
-      </ul>
+      <div class="dropdown__body">
+        <ul class="dropdown__list">            
+        </ul>
+      </div>      
     </div>
   </div>
 <?php endif; ?>
