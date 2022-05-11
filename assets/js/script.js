@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function (event) {
-
+  
   // Навигация
   let buttonMinimize = document.querySelector('.nav__btn');
   let navigationMenu = document.querySelector('.nav');
@@ -19,16 +19,14 @@ document.addEventListener("DOMContentLoaded", function (event) {
   let burger = nav.querySelector('.nav__burger');
 
   if (burger) {
-    const rootElement = document.documentElement;
+    const rootElement = document.documentElement; 
 
-    burger.addEventListener('click', function () {
-      // alert(navigator.userAgent);
+    burger.addEventListener('click', function() {
       nav.classList.toggle('open');
       burger.classList.toggle('open');
       rootElement.classList.toggle('block');
 
       if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
-        // alert('Safari');
         nav.classList.toggle('padding');
       };
     });

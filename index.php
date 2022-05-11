@@ -9,11 +9,15 @@
   }
 ?>
 
-<main>
-  <h1 class="title"><?php the_title(  ); ?></h1>
+<main class="main main--policy">
+  <section class="policy">
+    <h1 class="policy__title"><?php the_title(  ); ?></h1>
+    <p class="policy__update"><?= __( 'Дата останнього оновлення:', 'medvoice' ) . ' ' . get_the_modified_time('d.m.Y'); ?></p>
 
-  <?php the_content(  ); ?>  
-  
+    <div class="policy__content">
+      <?php the_content(  ); ?> 
+    </div>
+  </section>
 </main>
 
 <?php 
