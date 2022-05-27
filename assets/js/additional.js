@@ -600,7 +600,7 @@
               }
             };
 
-            const childrenDropdownList = childrenDropdown.querySelector('.dropdown__body');
+            const childrenDropdownList = childrenDropdown.querySelector('.dropdown__list');
 
             if (childrenDropdownList) {
               additional.getAjaxSubCategory(parentTax, parentTermIds, childrenDropdownList, сallback);
