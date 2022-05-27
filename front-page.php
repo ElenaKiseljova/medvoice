@@ -9,6 +9,7 @@
 ?>
 
 <main class="main"> 
+
   <?php 
     // Check value exists.
     if( have_rows('content') ):
