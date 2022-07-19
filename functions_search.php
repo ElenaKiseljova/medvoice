@@ -458,7 +458,7 @@
                 for ($i= ($max_num_pages - $right + 1); $i <= $max_num_pages; $i++) {                  
                   ?>
                     <li class="pagination__item">
-                      <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ($i === $max_num_pages) ? 'last' : ''; ?> <?= ($i === $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
+                      <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ($i === $max_num_pages) ? 'last' : ''; ?> <?= ((int) $i === (int) $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
                         <?= $i; ?>
                       </a>
                     </li>
