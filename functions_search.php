@@ -359,7 +359,7 @@
       <div class="pagination">
         <ul class="pagination__list">
           <li class="pagination__item pagination__item--prev">
-            <a href="#catalog-ajax" class="pagination__button pagination__button--prev <?= ($paged === 1) ? 'disabled' : ''; ?>"  data-paged="<?= $paged - 1; ?>">
+            <a href="#catalog-ajax" class="pagination__button pagination__button--prev <?= ((int) $paged === 1) ? 'disabled' : ''; ?>"  data-paged="<?= $paged - 1; ?>">
               <svg width="9" height="14">
                 <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#pagination-prev"></use>
               </svg>
@@ -386,7 +386,7 @@
               for ($i=1; $i <= $max_num_pages; $i++) { 
                 ?>
                   <li class="pagination__item">
-                    <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ($i === 1) ? 'first' : ($i === $max_num_pages ? 'last' : ''); ?> <?= ($i === $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
+                    <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ((int) $i === 1) ? 'first' : ((int) $i === (int) $max_num_pages ? 'last' : ''); ?> <?= ((int) $i === (int) $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
                       <?= $i; ?>
                     </a>
                   </li>
@@ -397,7 +397,7 @@
                 for ($i=1; $i <= $left; $i++) {                  
                   ?>
                     <li class="pagination__item">
-                      <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ($i === 1) ? 'first' : ''; ?> <?= ($i === $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
+                      <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ((int) $i === 1) ? 'first' : ''; ?> <?= ((int) $i === (int) $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
                         <?= $i; ?>
                       </a>
                     </li>
@@ -428,7 +428,7 @@
                 for ($i= ($paged - $center_half); $i <= ($paged + $center_half); $i++) {                  
                   ?>
                     <li class="pagination__item">
-                      <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ((int)$i === $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
+                      <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ((int)$i === (int) $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
                         <?= $i; ?>
                       </a>
                     </li>
@@ -458,7 +458,7 @@
                 for ($i= ($max_num_pages - $right + 1); $i <= $max_num_pages; $i++) {                  
                   ?>
                     <li class="pagination__item">
-                      <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ($i === $max_num_pages) ? 'last' : ''; ?> <?= ((int) $i === (int) $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
+                      <a href="#catalog-ajax" class="pagination__button pagination__button--page <?= ((int) $i === (int) $max_num_pages) ? 'last' : ''; ?> <?= ((int) $i === (int) $paged) ? 'current' : ''; ?>" data-paged="<?= $i; ?>">
                         <?= $i; ?>
                       </a>
                     </li>
@@ -469,7 +469,7 @@
           ?>
           
           <li class="pagination__item pagination__item--next">
-            <a href="#catalog-ajax" class="pagination__button pagination__button--next <?= ($paged === $max_num_pages) ? 'disabled' : ''; ?>" data-paged="<?= $paged + 1; ?>">
+            <a href="#catalog-ajax" class="pagination__button pagination__button--next <?= ((int) $paged === (int) $max_num_pages) ? 'disabled' : ''; ?>" data-paged="<?= $paged + 1; ?>">
               <?= __( 'Вперёд', 'medvoice' ); ?>  
               <svg width="9" height="14">
                 <use xlink:href="<?= get_template_directory_uri(  ); ?>/assets/img/sprite.svg#pagination-next"></use>
